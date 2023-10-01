@@ -268,7 +268,7 @@
                                 }
                                 Swal.fire('Thêm thành công !', '', 'success')
                                 setTimeout(() => {
-                                    location.href = "/admin/products/view";
+                                    location.href = "#/products/view";
                                 }, 2000);
                             }
 
@@ -310,9 +310,7 @@
                     $http.put("http://localhost:8080/api/product/"+idProductDetail).then(function (response){
                         if (response.status === 200){
                             Swal.fire('Xóa thành công !', '', 'success')
-                            setTimeout(() => {
-                            location.href = "/admin/products/view";
-                            }, 1500);
+                            $location.path("/view")
                         }
                         else{
                             Swal.fire('Xóa thất bại !', '', 'error')
@@ -326,7 +324,7 @@
 
         //detail product
         $scope.detail = function (){
-            let id = document.getElementById("idProductDetail").value;
+            let id = $routeParams.id;
             $http.get("http://localhost:8080/api/product/"+id).then(function (detail){
                 $scope.form = detail.data;
                     for (let i = 0; i < detail.data.productDetail_materials.length; i++) {
@@ -354,7 +352,7 @@
 
         //update product
         $scope.update = function() {
-            let id = document.getElementById("idProductDetail").value;
+            let id = $routeParams.id;
             $scope.get = function (name){
                 return document.getElementById(name).value;
             }
@@ -528,7 +526,7 @@
 
                                 Swal.fire('Sửa thành công !', '', 'success')
                                 setTimeout(() => {
-                                    location.href = "/admin/products/view";
+                                    location.href = "#/products/view";
                                 }, 2000);
 
 
@@ -740,6 +738,67 @@
 
 
         }
+
+// filter by price and weight
+let min = 0;
+let max = 9999999;
+
+const calcLeftPosition = value => 100 / (9999999 - 0) *  (value - 0);
+
+$('#rangeMin').on('input', function(e) {
+    const newValue = parseInt(e.target.value);
+    if (newValue > max) return;
+    min = newValue;
+    $('#thumbMin').css('left', calcLeftPosition(newValue) + '%');
+    $('#min').html(newValue);
+    $('#line').css({
+        'left': calcLeftPosition(newValue) + '%',
+        'right': (100 - calcLeftPosition(max)) + '%'
+    });
+});
+
+$('#rangeMax').on('input', function(e) {
+    const newValue = parseInt(e.target.value);
+    if (newValue < min) return;
+    max = newValue;
+    $('#thumbMax').css('left', calcLeftPosition(newValue) + '%');
+    $('#max').html(newValue);
+    $('#line').css({
+        'left': calcLeftPosition(min) + '%',
+        'right': (100 - calcLeftPosition(newValue)) + '%'
+    });
+});
+
+//trong luong
+let minTL = 0;
+let maxTL = 3000;
+
+const calcLeftPosition1 = value => 100 / (3000 - 0) *  (value - 0);
+
+$('#rangeMinTL').on('input', function(e) {
+    const newValue = parseInt(e.target.value);
+    if (newValue > maxTL) return;
+    minTL = newValue;
+    $('#thumbMinTL').css('left', calcLeftPosition1(newValue) + '%');
+    $('#minTL').html(newValue);
+    $('#lineTL').css({
+        'left': calcLeftPosition1(newValue) + '%',
+        'right': (100 - calcLeftPosition1(maxTL)) + '%'
+    });
+});
+
+$('#rangeMaxTL').on('input', function(e) {
+    const newValue = parseInt(e.target.value);
+    if (newValue < minTL) return;
+    maxTL = newValue;
+    $('#thumbMaxTL').css('left', calcLeftPosition1(newValue) + '%');
+    $('#maxTL').html(newValue);
+    $('#lineTL').css({
+        'left': calcLeftPosition1(minTL) + '%',
+        'right': (100 - calcLeftPosition1(newValue)) + '%'
+    });
+});
+
 
 
     }

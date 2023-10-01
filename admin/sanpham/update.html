@@ -1,36 +1,6 @@
-<!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:thnum="http://www.thymeleaf.org/extras/numbers">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BeeBetaShoes</title>
-  <link rel="shortcut icon" type="image/png" href="../../../static/assets/images/logos/favicon.png" />
-  <link rel="stylesheet" href="../../../static/assets/css/styles.min.css" />
-  <link rel="stylesheet" href="../../../static/assets/css/sanpham.css" />
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-
-<body ng-app="myApp" ng-controller="ctrl" data-ng-init="detail()">
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
-    data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <div th:insert="admin/layout/_sidebar.html"> :: sidebar"></div>
-    <!--  Sidebar End -->
-    <!--  Main wrapper -->
-    <div class="body-wrapper">
-      <!--  Header Start -->
-      <div th:insert="admin/layout/_header.html"> :: header"></div>
-      <!--  Header End -->
-      <!--noidung-->
-      <div class="container-fluid">
         <div> <h3>Sửa Sản Phẩm</h3></div>
-        <form class="form-control">
-          <input type="hidden" id="idProductDetail" th:value="${id}" >
+        <form class="form-control" data-ng-init="detail()">
           <div class="row">
 
             <div class="col-md-3 add">
@@ -148,20 +118,3 @@
           </div>
         </form>
       </div>
-      <script src="../../../static/assets/angularjs/sanpham.js"></script>
-      <script src="../../../static/assets/angularjs/sp.js"></script>
-<!--        footer-->
-      <div th:insert="admin/layout/_footer.html"> :: footer"></div>
-      </div>
-    </div>
-  </div>
-  <script src="../../../static/assets/libs/jquery/dist/jquery.min.js"></script>
-  <script src="../../../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../../../static/assets/js/sidebarmenu.js"></script>
-  <script src="../../../static/assets/js/app.min.js"></script>
-  <script src="../../../static/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <script src="../../../static/assets/libs/simplebar/dist/simplebar.js"></script>
-  <script src="../../../static/assets/js/dashboard.js"></script>
-</body>
-
-</html>
