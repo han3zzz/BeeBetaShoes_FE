@@ -1,0 +1,121 @@
+label{
+    width: 30%;
+    display: inline-block;
+}
+.add img{
+    height: 200px;
+    width: 200px;
+}
+input[type="file"]{
+    padding-top: 10px;
+    font-size: 10px;
+}
+select{
+    width: 167px;
+    height: 28px;
+}
+.anh{
+    height: 300px;
+    border: solid 2px; text-align: center; background-color: white;
+}
+
+.add{
+    padding-top: 10px;
+}
+
+.timkiem{
+    display: flex;
+    padding: 5px;
+}
+.timkiem input{
+    width: 300px;
+    margin-right: 5px;
+}
+.loc{
+    font-size: 12px;
+    padding-top: 10px;
+}
+.loc label{
+    padding-right: 10px;
+}
+.range-slide {
+    position: relative;
+    margin: 10px;
+    height: 4px;
+    width: 240px;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    height: 4px;
+    background: #ccc;
+    left: 9px;
+    right: 9px;
+}
+
+.line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 4px;
+    background-color: #c7c7c7;
+}
+
+.thumb {
+    position: absolute;
+    z-index: 2;
+    text-align: left;
+    border: 1px solid #2A3547;
+    background-color: #2A3547;
+    border-radius: 50%;
+    outline: none;
+    top: -7px;
+    height: 18px;
+    width: 18px;
+    margin-left: -9px;
+}
+
+.gia input {
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    height: 3px;
+    top: 0;
+    width: 100%;
+    opacity: 0;
+    margin: 0;
+}
+
+.gia input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    pointer-events: all;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.display {
+    width: 240px;
+    display: flex;
+
+}
+.display span{
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+}
+.validate{
+    color: red;
+    font-size: 12px;
+    text-align: center;
+}
+.vaid{
+    color: red;
+    font-size: 20px;
+}

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:thnum="http://www.thymeleaf.org/extras/numbers">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BeeBetaShoes</title>
+  <link rel="shortcut icon" type="image/png" href="../../../static/assets/images/logos/favicon.png" />
+  <link rel="stylesheet" href="../../../static/assets/css/styles.min.css" />
+  <link rel="stylesheet" href="../../../static/assets/css/sanpham.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body ng-app="myApp" ng-controller="ctrl" data-ng-init="detail()">
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <div th:insert="admin/layout/_sidebar.html"> :: sidebar"></div>
+    <!--  Sidebar End -->
+    <!--  Main wrapper -->
+    <div class="body-wrapper">
+      <!--  Header Start -->
+      <div th:insert="admin/layout/_header.html"> :: header"></div>
+      <!--  Header End -->
+      <!--noidung-->
+      <div class="container-fluid">
+        <div> <h3>Sửa Sản Phẩm</h3></div>
+        <form class="form-control">
+          <input type="hidden" id="idProductDetail" th:value="${id}" >
+          <div class="row">
+
+            <div class="col-md-3 add">
+              <div>Ảnh đại diện sản phẩm</div>
+              <img id="output"/>
+              <input file-model="image" id="fileUpload" type="file" accept="image/*" onchange="loadFile(event)" >
+              <div style="margin-top: 10px">Danh sách ảnh sản phẩm</div>
+              <input  id="fileList" type="file" accept="image/*" multiple>
+            </div>
+            <div class="col-md-9">
+
+              <div class="row">
+                <div class="col-md-6 add">
+                  <label>Mã Sản Phẩm <span class="vaid">*</span></label> <input ng-model="form.product.code" readonly disabled>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Tên Sản Phẩm <span class="vaid">*</span></label> <input ng-model="form.product.name">
+                  <div ng-repeat="err in validationErrors">
+                  <span class="validate" ng-if="err.objectName == 'validateForm' && err.field == 'Name'">
+                     {{err.defaultMessage}}
+                  </span>
+                  </div>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Giá Bán <span class="vaid">*</span></label> <input ng-model="form.price">
+                  <div ng-repeat="err in validationErrors">
+                  <span class="validate" ng-if="err.objectName == 'validateForm' && err.field == 'Price'">
+                     {{err.defaultMessage}}
+                  </span>
+                  </div>
+                </div>
+                <div class="col-md-6 add">
+                  <label> Trọng lượng (g) <span class="vaid">*</span></label> <input ng-model="form.weight">
+                  <div ng-repeat="err in validationErrors">
+                  <span class="validate" ng-if="err.objectName == 'validateForm' && err.field == 'Weight'">
+                     {{err.defaultMessage}}
+                  </span>
+                  </div>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Giảm Giá <span class="vaid">*</span></label> <input ng-model="form.discount">
+                  <div ng-repeat="err in validationErrors">
+                  <span class="validate" ng-if="err.objectName == 'validateForm' && err.field == 'Discount'">
+                     {{err.defaultMessage}}
+                  </span>
+                  </div>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Mô Tả</label> <input ng-model="form.description">
+                </div>
+                <div class="col-md-6 add">
+                  <label>Danh Mục <span class="vaid">*</span></label> <select id="category" >
+                  <option ng-repeat="dm in listCategory" value="{{dm.id}}" ng-selected="dm.id == form.category.id">
+                    {{dm.name}}</option></select>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Thương Hiệu <span class="vaid">*</span></label> <select id="brand">
+                  <option ng-repeat="th in listBrand" value="{{th.id}}" ng-selected="th.id == form.brand.id">
+                    {{th.name}}</option></select>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Mũi Giày <span class="vaid">*</span></label>
+                  <select id="toe">
+                    <option ng-repeat="mg in listToe" value="{{mg.id}}" ng-selected="mg.id == form.toe.id">
+                      {{mg.name}}</option></select>
+                </div>
+
+                <div class="col-md-6 add">
+                  <label>Đế Giày <span class="vaid">*</span></label>
+                  <select id="sole">
+                    <option ng-repeat="dg in listSole" value="{{dg.id}}" ng-selected="dg.id == form.sole.id">
+                      {{dg.name}}</option></select>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Dây Giày <span class="vaid">*</span></label>
+                  <select id="shoelace">
+                    <option ng-repeat="day in listShoelace" value="{{day.id}}" ng-selected="day.id == form.shoelace.id">
+                      {{day.name}}</option></select>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Lót Giày <span class="vaid">*</span></label>
+                  <select id="heelcushion">
+                    <option ng-repeat="lot in listHeelcushion" value="{{lot.id}}" ng-selected="lot.id == form.heelcushion.id">
+                      {{lot.name}}</option></select>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Thiết Kế <span class="vaid">*</span></label>
+                  <select id="design">
+                    <option ng-repeat="tk in listDesign" value="{{tk.id}}" ng-selected="tk.id == form.design.id">
+                      {{tk.name}}</option></select>
+                </div>
+                <div class="col-md-12 add">
+                  <label>Chất Liệu <span class="vaid">*</span></label>
+                  <div>
+                    <span style="padding-left: 5px" ng-repeat="chatlieu in listMaterial"><input id="Material{{chatlieu.id}}"  type="checkbox" value="{{chatlieu.id}}"> {{chatlieu.name}}</span>
+                  </div>
+                </div>
+                <div class="col-md-6 add">
+                  <label>Màu Sắc <span class="vaid">*</span></label>
+                  <span ng-repeat="mausac in listColor">
+                                    <input type="checkbox" id="Color{{mausac.id}}" ng-click="checkbox(mausac.id)">{{mausac.name}}
+                               </span>
+                <div>
+                                <span ng-repeat="mausac in listColor">
+                                    <div id="text{{mausac.id}}"></div>
+                               </span>
+                  <div style="font-size: 12px;color: red;padding-top: 10px">* Số lượng size không có mặc định là 0</div>
+                </div>
+              </div>
+
+              <div style="padding-top: 30px"><button  class="btn btn-danger" ng-click="update()">Sửa</button></div>
+
+            </div>
+          </div>
+          </div>
+        </form>
+      </div>
+      <script src="../../../static/assets/angularjs/sanpham.js"></script>
+      <script src="../../../static/assets/angularjs/sp.js"></script>
+<!--        footer-->
+      <div th:insert="admin/layout/_footer.html"> :: footer"></div>
+      </div>
+    </div>
+  </div>
+  <script src="../../../static/assets/libs/jquery/dist/jquery.min.js"></script>
+  <script src="../../../static/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../../../static/assets/js/sidebarmenu.js"></script>
+  <script src="../../../static/assets/js/app.min.js"></script>
+  <script src="../../../static/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+  <script src="../../../static/assets/libs/simplebar/dist/simplebar.js"></script>
+  <script src="../../../static/assets/js/dashboard.js"></script>
+</body>
+
+</html>
