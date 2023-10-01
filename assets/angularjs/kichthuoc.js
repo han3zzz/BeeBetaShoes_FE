@@ -1,11 +1,11 @@
 
-window.DanhMucController = function($scope, $http, $location,$routeParams){
-    let urlcategory = "http://localhost:8080/api/category";
+window.KichThuocController = function($scope, $http, $location,$routeParams){
+    let url = "http://localhost:8080/api/size";
     $scope.loadAll = function (){
 
-        // load category
+        // load size
         $scope.list = [];
-        $http.get(urlcategory).then(function (response){
+        $http.get(url).then(function (response){
             $scope.list = response.data;
         })
 
@@ -16,16 +16,16 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
         description : '',
     }
 
-    //add category
+    //add size
     $scope.add = function(){
-        $http.post(urlcategory,{
+        $http.post(url,{
             name : $scope.form.name,
             description : $scope.form.description
         }).then(function(resp){
             if(resp.status === 200){
                 Swal.fire('Thêm thành công !', '', 'success')
                 setTimeout(() => {
-                    location.href = "#/categorys/view";
+                    location.href = "#/sizes/view";
                 }, 2000);
             }
         }).catch(function (err){
@@ -35,17 +35,17 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
 
         })
     }
-      //update category
+      //update size
       $scope.update = function(){
         let id = $routeParams.id ;
-        $http.put("http://localhost:8080/api/category/update/"+id,{
+        $http.put("http://localhost:8080/api/size/update/"+id,{
             name : $scope.form.name,
             description : $scope.form.description
         }).then(function(resp){
             if(resp.status === 200){
                 Swal.fire('Sửa thành công !', '', 'success')
                 setTimeout(() => {
-                    location.href = "#/categorys/view";
+                    location.href = "#/sizes/view";
                 }, 2000);
             }
         }).catch(function (err){
@@ -56,7 +56,7 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
         })
     }
 
-      //delete category
+      //delete size
       $scope.delete = function (id){
         Swal.fire({
             title: 'Bạn có chắc muốn xóa ?',
@@ -65,11 +65,11 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
         }).then((result) => {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
-                $http.put("http://localhost:8080/api/category/delete/"+id).then(function (response){
+                $http.put("http://localhost:8080/api/size/delete/"+id).then(function (response){
                     if (response.status === 200){
                         Swal.fire('Xóa thành công !', '', 'success')
                         setTimeout(() => {
-                            location.href = "#/categorys/view";
+                            location.href = "#/sizes/view";
                         }, 2000);
                     }
                     else{
@@ -87,7 +87,7 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
 
     $scope.detail = function(){
         let id = $routeParams.id ;
-        $http.get("http://localhost:8080/api/category/" + id).then(function(resp){
+        $http.get("http://localhost:8080/api/size/" + id).then(function(resp){
             $scope.form = resp.data;
         })
     }
@@ -167,7 +167,7 @@ window.DanhMucController = function($scope, $http, $location,$routeParams){
             Swal.fire("Nhập tên trước khi tìm kiếm...","","error");
         }
         else{
-            $http.get("http://localhost:8080/api/category/search/"+name).then(function (search){
+            $http.get("http://localhost:8080/api/size/search/"+name).then(function (search){
                 $scope.list = search.data;
                 $scope.pager.first();
             })

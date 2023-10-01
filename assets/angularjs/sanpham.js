@@ -1,15 +1,16 @@
-    let url = "http://localhost:8080/api/product";
-    let urlcategory = "http://localhost:8080/api/category";
-    let urlbrand = "http://localhost:8080/api/brand";
-    let urltoe = "http://localhost:8080/api/toe";
-    let urlsole = "http://localhost:8080/api/sole";
-    let urlshoelace = "http://localhost:8080/api/shoelace";
-    let urlheelcushion = "http://localhost:8080/api/heelcushion";
-    let urlmaterial = "http://localhost:8080/api/material";
-    let urlcolor = "http://localhost:8080/api/color";
-    let urlsize = "http://localhost:8080/api/size";
-    let urldesign = "http://localhost:8080/api/design";
+
     window.SanPhamController = function($scope, $http, $location,$routeParams){
+        let url = "http://localhost:8080/api/product";
+        let urlcategory = "http://localhost:8080/api/category";
+        let urlbrand = "http://localhost:8080/api/brand";
+        let urltoe = "http://localhost:8080/api/toe";
+        let urlsole = "http://localhost:8080/api/sole";
+        let urlshoelace = "http://localhost:8080/api/shoelace";
+        let urlheelcushion = "http://localhost:8080/api/heelcushion";
+        let urlmaterial = "http://localhost:8080/api/material";
+        let urlcolor = "http://localhost:8080/api/color";
+        let urlsize = "http://localhost:8080/api/size";
+        let urldesign = "http://localhost:8080/api/design";
        $scope.loadAll = function (){
            //load product
            $scope.list = [];
