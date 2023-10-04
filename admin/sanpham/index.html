@@ -1,51 +1,55 @@
     <h3> Quản Lý Giày</h3>
         <div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo tên giày.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
         <div>
+         <div style="padding-left: 5px;">
+          <button class="btn btn-dark"><i class="fa-solid fa-filter"></i> Lọc</button>
+         </div>
           <div class="row">
+            
             <div class="col-md-3 loc"> <label>Danh Mục</label>
-            <select id="danhmuc" class="form-select-sm">
+            <select id="danhmuc" class="form-select-sm" ng-click="filter()">
               <option value="">Tất cả danh mục</option>
               <option ng-repeat="danhmuc in listCategory" value="{{danhmuc.id}}">
                 {{danhmuc.name}}</option></select>
           </div>
             <div class="col-md-3 loc"><label>Thương Hiệu</label>
-            <select id="thuonghieu" class="form-select-sm">
+            <select id="thuonghieu" class="form-select-sm" ng-click="filter()">
               <option value="">Tất cả thương hiệu</option>
               <option ng-repeat="thuonghieu in listBrand" value="{{thuonghieu.id}}">
                 {{thuonghieu.name}}</option></select>
           </div>
             <div class="col-md-3 loc"><label>Mũi Giày</label>
-              <select id="muigiay" class="form-select-sm">
+              <select id="muigiay" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả mũi giày</option>
                 <option ng-repeat="muigiay in listToe" value="{{muigiay.id}}">
                   {{muigiay.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Đế Giày</label>
-              <select id="degiay" class="form-select-sm">
+              <select id="degiay" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả đế giày</option>
                 <option ng-repeat="degiay in listSole" value="{{degiay.id}}">
                   {{degiay.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Thiết Kế</label>
-              <select id="thietke" class="form-select-sm">
+              <select id="thietke" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả thiết kế</option>
                 <option ng-repeat="thietke in listDesign" value="{{thietke.id}}">
                   {{thietke.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Dây Giày</label>
-              <select id="daygiay" class="form-select-sm">
+              <select id="daygiay" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả dây giày</option>
                 <option ng-repeat="daygiay in listShoelace" value="{{daygiay.id}}" >
                   {{daygiay.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Lót Giày</label>
-              <select id="lotgiay" class="form-select-sm">
+              <select id="lotgiay" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả lót giày</option>
                 <option ng-repeat="lotgiay in listHeelcushion" value="{{lotgiay.id}}">
                   {{lotgiay.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Màu Sắc</label>
-              <select id="mausac" class="form-select-sm">
+              <select id="mausac" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả màu sắc</option>
                 <option ng-repeat="mausac in listColor" value="{{mausac.id}}">
                   {{mausac.name}}</option></select>
@@ -58,8 +62,8 @@
                   <span class="thumb" id="thumbMin" style="left: 0%;"></span>
                   <span class="thumb" id="thumbMax" style="left: 100%;"></span>
                 </div>
-                <input id="rangeMin" type="range" max="9999999" min="0" step="1" value="0">
-                <input id="rangeMax" type="range" max="9999999" min="0" step="1" value="9999999">
+                <input id="rangeMin" ng-click="filter()" type="range" max="9999999" min="0" step="1" value="0">
+                <input id="rangeMax" ng-click="filter()" type="range" max="9999999" min="0" step="1" value="9999999">
               </div>
               <div class="display">
                 Từ
@@ -76,8 +80,8 @@
                   <span class="thumb" id="thumbMinTL" style="left: 0%;"></span>
                   <span class="thumb" id="thumbMaxTL" style="left: 100%;"></span>
                 </div>
-                <input id="rangeMinTL" type="range" max="3000" min="0" step="1" value="0">
-                <input id="rangeMaxTL" type="range" max="3000" min="0" step="1" value="3000">
+                <input id="rangeMinTL" ng-click="filter()" type="range" max="3000" min="0" step="1" value="0">
+                <input id="rangeMaxTL" ng-click="filter()" type="range" max="3000" min="0" step="1" value="3000">
               </div>
               <div class="display">
                 Từ
@@ -87,13 +91,13 @@
               </div>
             </div>
             <div class="col-md-3 loc"><label>Chất Liệu</label>
-              <select id="chatlieu" class="form-select-sm">
+              <select id="chatlieu" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả chất liệu</option>
                 <option ng-repeat="chatlieu in listMaterial" value="{{chatlieu.id}}">
                   {{chatlieu.name}}</option></select>
             </div>
             <div class="col-md-3 loc"><label>Kích Thước</label>
-              <select id="kichthuoc" class="form-select-sm">
+              <select id="kichthuoc" class="form-select-sm" ng-click="filter()">
                 <option value="">Tất cả kích thước</option>
                 <option ng-repeat="kichthuoc in listSize" value="{{kichthuoc.id}}">
                   Size {{kichthuoc.name}}</option></select>
@@ -103,7 +107,6 @@
 
         </div>
 <!--        <button class="btn btn-outline-dark" ng-click="loadAll()"> <i class="fa-solid fa-rotate-right"></i></button>-->
-         <button class="btn btn-dark" ng-click="filter()"><i class="fa-solid fa-filter"></i> Lọc</button>
         <div style="float: right">
           <a href="#/products/add"><button class="btn btn-success"><i class="fa-solid fa-plus"></i> Thêm</button></a>
           <button class="btn btn-info" ng-click="exportToExcel()"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0,0,256,256">

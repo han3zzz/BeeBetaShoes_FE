@@ -701,7 +701,7 @@
             }).then(function (resp){
                 $scope.list = resp.data;
                 $scope.pager.first();
-                Swal.fire("Lọc thành công !","","success");
+                // Swal.fire("Lọc thành công !","","success");
             });
         }
 

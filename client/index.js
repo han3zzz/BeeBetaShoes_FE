@@ -30,6 +30,12 @@ app.config(function ($routeProvider, $locationProvider) {
             controller : HomeController
            
         })
+        .when("/cart", {
+            templateUrl: "cart.html",
+            controller : HomeController
+          
+           
+        })
       
 
         .otherwise({

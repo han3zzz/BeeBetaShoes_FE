@@ -5,7 +5,7 @@
                 <!--Breadcrumb-->
                 <div class="bredcrumbWrap">
                     <div class="container breadcrumbs">
-                        <a href="index.html" title="Back to the home page">Home</a><span aria-hidden="true">›</span><span>{{sp.product.name}}</span>
+                        <a href="#home" title="Back to the home page">Home</a><span aria-hidden="true">›</span><span>{{sp.product.name}}</span>
                     </div>
                 </div>
                 <!--End Breadcrumb-->
@@ -15,18 +15,11 @@
                     <div class="product-single">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12 col-12">
-                                <div ng-repeat="img in sp.product.productImages" id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
-                                    <div class="carousel-inner">
-                                      <span ng-if="img.mainImage == true">
-                                        <div class="carousel-item active">
-                                            <img style="width: 200px; height: 450px;" class="d-block w-100" src="{{img.url}}" alt="First slide">
-                                          </div>
-                                      </span>
-                                      <span ng-if="img.mainImage == false">
-                                        <div class="carousel-item">
-                                            <img style="width: 200px; height: 450px;" class="d-block w-100" src="{{img.url}}" alt=" slide">
-                                          </div>
-                                        </span>
+                                <div id="slideshow">
+                                    <div class="slide-wrapper">
+                                      <div class="slide" ng-repeat="img in sp.product.productImages">
+                                        <img style="height: 350px;" src="{{img.url}}"></div>
+                        
                                     </div>
                                   </div>
                             </div>

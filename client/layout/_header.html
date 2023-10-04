@@ -1,4 +1,5 @@
-	<!--Search Form Drawer-->
+<div>
+    	<!--Search Form Drawer-->
 	<div class="search">
         <div class="search__form">
             <form class="search-bar__form" action="#">
@@ -50,13 +51,13 @@
     </div>
     <!--End Top Header-->
     <!--Header-->
-    <div class="header-wrap classicHeader animated d-flex">
+    <div class="header-wrap classicHeader animated d-flex" >
     	<div class="container-fluid">        
             <div class="row align-items-center">
             	<!--Desktop Logo-->
                 <div class="logo col-md-2 col-lg-2 d-none d-lg-block">
                     <a href="#home">
-                    	<img src="/client/logo.png" alt="BeeBeta Shop" title="BeeBeta Shop" />
+                    	<img  src="/client/logo.png" alt="BeeBeta Shop" title="BeeBeta Shop" />
                     </a>
                 </div>
                 <!--End Desktop Logo-->
@@ -105,38 +106,18 @@
                         <!--Minicart Popup-->
                         <div id="header-cart" class="block block-cart">
                         	<ul class="mini-products-list">
-                                <li class="item">
+                                <li class="item" ng-repeat="cart in listCart">
                                 	<a class="product-image" href="#">
-                                    	<img src="assets/images/product-images/cape-dress-1.jpg" alt="3/4 Sleeve Kimono Dress" title="" />
+                                        <span ng-repeat="img in cart.productDetail.product.productImages">
+                                            <span ng-if="img.mainImage == true">
+                                                <a href="#"><img class="cart__image" src="{{img.url}}" alt="Elastic Waist Dress - Navy / Small"></a>
+                                            </span>
+                                        </span>
                                     </a>
                                     <div class="product-details">
                                     	<a href="#" class="remove"><i class="anm anm-times-l" aria-hidden="true"></i></a>
                                         <a href="#" class="edit-i remove"><i class="anm anm-edit" aria-hidden="true"></i></a>
-                                        <a class="pName" href="cart.html">Sleeve Kimono Dress</a>
-                                        <div class="variant-cart">Black / XL</div>
-                                        <div class="wrapQtyBtn">
-                                            <div class="qtyField">
-                                            	<span class="label">Qty:</span>
-                                                <a class="qtyBtn minus" href="javascript:void(0);"><i class="fa anm anm-minus-r" aria-hidden="true"></i></a>
-                                                <input type="text" id="Quantity" name="quantity" value="1" class="product-form__input qty">
-                                                <a class="qtyBtn plus" href="javascript:void(0);"><i class="fa anm anm-plus-r" aria-hidden="true"></i></a>
-                                            </div>
-                                        </div>
-                                        <div class="priceRow">
-                                        	<div class="product-price">
-                                            	<span class="money">$59.00</span>
-                                            </div>
-                                         </div>
-									</div>
-                                </li>
-                                <li class="item">
-                                	<a class="product-image" href="#">
-                                    	<img src="assets/images/product-images/cape-dress-2.jpg" alt="Elastic Waist Dress - Black / Small" title="" />
-                                    </a>
-                                    <div class="product-details">
-                                    	<a href="#" class="remove"><i class="anm anm-times-l" aria-hidden="true"></i></a>
-                                        <a href="#" class="edit-i remove"><i class="anm anm-edit" aria-hidden="true"></i></a>
-                                        <a class="pName" href="cart.html">Elastic Waist Dress</a>
+                                        <a class="pName" href="cart.html">{{cart.productDetail.product.name}}</a>
                                         <div class="variant-cart">Gray / XXL</div>
                                         <div class="wrapQtyBtn">
                                             <div class="qtyField">
@@ -153,14 +134,14 @@
                                         </div>
                                     </div>
                                 </li>
-                            </ul>
+                            </ul> 
                             <div class="total">
                             	<div class="total-in">
-                                	<span class="label">Cart Subtotal:</span><span class="product-price"><span class="money">$748.00</span></span>
+                                	<span class="label">Tổng tiền :</span><span class="product-price"><span class="money">$748.00</span></span>
                                 </div>
                                  <div class="buttonSet text-center">
-                                    <a href="cart.html" class="btn btn-secondary btn--small">View Cart</a>
-                                    <a href="checkout.html" class="btn btn-secondary btn--small">Checkout</a>
+                                    <a href="#cart" class="btn btn-secondary btn--small">Xem Giỏ Hàng</a>
+                                    <a href="#checkout" class="btn btn-secondary btn--small">Thanh Toán</a>
                                 </div>
                             </div>
                         </div>
@@ -199,3 +180,4 @@
       </ul>
 	</div>
 	<!--End Mobile Menu-->
+</div>
