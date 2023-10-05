@@ -22,23 +22,23 @@ app.config(function ($routeProvider, $locationProvider) {
         })
         .when("/products", {
             templateUrl: "products.html",
-            controller : HomeController
+            controller : ProductController
            
         })
         .when("/detail/:id", {
             templateUrl: "detail.html",
-            controller : HomeController
+            controller : DetailController
            
         })
         .when("/cart", {
             templateUrl: "cart.html",
-            controller : HomeController
+            controller : CartController
           
            
         })
         .when("/checkout", {
             templateUrl: "checkout.html",
-            controller : HomeController
+            controller : CheckOutController
           
            
         })
