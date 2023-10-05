@@ -259,14 +259,14 @@
                                             <!-- End product name -->
                                             <div class="product-price">
                                                 <span ng-if="sp.discount > 0">
-                                                    <span class="old-price">{{sp.price | currency}}</span>
-                                                    <span class="price">{{sp.price - (sp.price * (sp.discount * 0.01)) | currency}}</span>
+                                                    <span class="old-price">{{sp.price | currency:'':0}} VNĐ</span>
+                                                    <span class="price">{{sp.price - (sp.price * (sp.discount * 0.01)) | currency:'':0}} VNĐ</span>
                                                 </span>
             
                                                 
                                                 <span ng-if="sp.discount == 0">
             
-                                                    <span class="price">{{sp.price | currency}}</span>
+                                                    <span class="price">{{sp.price | currency:'':0}} VNĐ</span>
                                                 </span>
                                                 
                                             </div>

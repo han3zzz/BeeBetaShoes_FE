@@ -36,6 +36,12 @@ app.config(function ($routeProvider, $locationProvider) {
           
            
         })
+        .when("/checkout", {
+            templateUrl: "checkout.html",
+            controller : HomeController
+          
+           
+        })
       
 
         .otherwise({

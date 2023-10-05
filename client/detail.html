@@ -35,9 +35,9 @@
                                     <p class="product-single__price product-single__price-product-template">
                                         <span class="visually-hidden">Regular price</span>
                                         <span ng-if="sp.discount > 0">
-                                            <s id="ComparePrice-product-template"><span class="money">{{sp.price | currency}}</span></s>
+                                            <s id="ComparePrice-product-template"><span class="money">{{sp.price | currency:'':0}} VNĐ</span></s>
                                             <span class="product-price__price product-price__price-product-template product-price__sale product-price__sale--single">
-                                                <span id="ProductPrice-product-template"><span class="money">{{sp.price - (sp.price * (sp.discount * 0.01)) | currency}}</span></span>
+                                                <span id="ProductPrice-product-template"><span class="money">{{sp.price - (sp.price * (sp.discount * 0.01)) | currency:'':0}} VNĐ</span></span>
                                             </span>
                                             <span class="discount-badge"> <span class="devider">|</span>&nbsp;
                                                 <span>Giảm tới</span>
@@ -48,7 +48,7 @@
                                         <span ng-if="sp.discount == 0">
                                             
                                             <span class="product-price__price product-price__price-product-template product-price__sale product-price__sale--single">
-                                                <span id="ProductPrice-product-template"><span class="money">{{sp.price | currency}}</span></span>
+                                                <span id="ProductPrice-product-template"><span class="money">{{sp.price | currency:'':0}} VNĐ</span></span>
                                             </span>
                         
                                         </span>
