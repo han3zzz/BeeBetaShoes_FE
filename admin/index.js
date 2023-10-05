@@ -154,6 +154,18 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "kichthuoc/update.html",
             controller : KichThuocController
         })
+        .when("/customer/view", {
+            templateUrl: "khachhang/index.html",
+            controller : KhachHangController
+        })
+        .when("/customer/add", {
+            templateUrl: "khachhang/add.html",
+            controller : KhachHangController
+        })
+        .when("/customer/update/:id", {
+            templateUrl: "khachhang/update.html",
+            controller : KhachHangController
+        })
         
 
         .otherwise({
