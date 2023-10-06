@@ -1,6 +1,32 @@
 window.CheckOutController = function ($http, $scope, $routeParams, $location) {
  //trang thanh toán
  $scope.checkOut = function () {
+  let urlcolor = "http://localhost:8080/api/color";
+  let urlsize = "http://localhost:8080/api/size";
+   // load color
+$scope.listColor = [];
+$http.get(urlcolor).then(function (response) {
+$scope.listColor = response.data;
+});
+// load size
+$scope.listSize = [];
+$http.get(urlsize).then(function (response) {
+$scope.listSize = response.data;
+});
+          
+          //check trạng thái thanh toán online khi trả về
+          if($location.search().vnp_TransactionStatus === '00'){
+            $http.put("http://localhost:8080/api/bill/"+$location.search().vnp_OrderInfo);
+            let amount  = parseInt($location.search().vnp_Amount) / 100;
+            Swal.fire("Thanh toán thành công !","Bạn đã thanh toán thành công số tiền " +amount + "<br> cho đơn hàng : " + $location.search().vnp_OrderInfo,"success");
+            location.href = "#/myorder";
+          }
+          if($location.search().vnp_TransactionStatus === '02'){
+            Swal.fire("Đơn hàng "+$location.search().vnp_OrderInfo+" chưa được thanh toán","Vui lòng thanh toán trong vòng 24h ","warning");
+            location.href = "#/myorder";
+          }
+        
+
        //load cart by user
        $scope.listCart = [];
        $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
@@ -132,7 +158,7 @@ window.CheckOutController = function ($http, $scope, $routeParams, $location) {
                                   shipPrice: ship.data.data.total,
                                   totalPriceLast: TotalPrice,
                                   note: document.getElementById("note").value,
-                                  payType: 1,
+                                  payType: 0,
                                   payStatus: 0,
                                   idCoupon: 0,
                                   idAddress: idAddress,
@@ -221,6 +247,164 @@ window.CheckOutController = function ($http, $scope, $routeParams, $location) {
                           }
                         });
                     } else if (typePay === "pay2") {
+                      //thanh toán qua vnpay
+                       //check số lượng còn hàng trước khi cho đặt hàng
+                       $http
+                       .get("http://localhost:8080/api/cart/1")
+                       .then(function (CheckCart) {
+                         for (let i = 0; i < CheckCart.data.length; i++) {
+                           //get số lượng sản phẩm đang có
+                           var getPram = {
+                             IdProduct: CheckCart.data[i].productDetail.id,
+                             IdColor: CheckCart.data[i].idColor,
+                             IdSize: CheckCart.data[i].idSize,
+                           };
+
+                           $http({
+                             method: "GET",
+                             url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                             params: getPram,
+                           }).then(function (resp) {
+                             if (CheckCart.data[i].quantity > resp.data) {
+                               Swal.fire(
+                                 "Số lượng sản phẩm " + CheckCart.data[i].productDetail.product.name + " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
+                                 "",
+                                 "error"
+                               );
+                               // cập lại số lượng hiện có vào giỏ hàng
+                               $http
+                                 .put(
+                                   "http://localhost:8080/api/cart/updateCart/" +
+                 CheckCart.data[i].id,
+                                   {
+                                     idCart: 1,
+                                     idProductDetail:  CheckCart.data[i].productDetail.id,
+                                     idColor: CheckCart.data[i].idColor,
+                                     idSize: CheckCart.data[i].idSize,
+                                     quantity: resp.data,
+                                     unitPrice: CheckCart.data[i].unitPrice,
+                                   }
+                                 )
+                                 .then(function (cart) {
+                                   if (cart.status === 200) {
+                                     //load lại sau khi tăng thành công !
+                                     $scope.loadCart();
+                                   }
+                                 });
+                               return;
+                             }
+               // nếu số lượng hết thì xóa khỏi giỏ hàng
+               if(resp.data === 0){
+               Swal.fire("Số lượng sản phẩm " + CheckCart.data[i].productDetail.product.name+" đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng" , "", "success");
+               $http.delete("http://localhost:8080/api/cart/" + CheckCart.data[i].id);
+               $scope.loadCart();
+               return;
+               }
+
+                             // add bill
+                             $http
+                               .post("http://localhost:8080/api/bill", {
+                                 totalPrice: TotalPrice,
+                                 shipPrice: ship.data.data.total,
+                                 totalPriceLast: TotalPrice,
+                                 note: document.getElementById("note").value,
+                                 payType: 1,
+                                 payStatus: 0,
+                                 idCoupon: 0,
+                                 idAddress: idAddress,
+                                 idCustomer: 1,
+                               })
+                               .then(function (bill) {
+                                 $http
+                                   .get("http://localhost:8080/api/cart/1")
+                                   .then(function (CartToBill) {
+                                     for (
+                                       let i = 0;
+                                       i < CartToBill.data.length;
+                                       i++
+                                     ) {
+                                       $http
+                                         .post(
+                                           "http://localhost:8080/api/bill/addBillDetail",
+                                           {
+                                             // add bill detail
+                                             idBill: bill.data.id,
+                                             idProductDetail:
+                                               CartToBill.data[i].productDetail
+                                                 .id,
+                                             idColor:
+                                               CartToBill.data[i].idColor,
+                                             idSize: CartToBill.data[i].idSize,
+                                             quantity:
+                                               CartToBill.data[i].quantity,
+                                             unitPrice:
+                                               CartToBill.data[i].unitPrice,
+                                           }
+                                         )
+                                         .then(function (billdetail) {
+                                           //xóa giỏ hàng by user
+                                           $http.delete(
+                                             "http://localhost:8080/api/cart/deleteAllCart/1"
+                                           );
+
+                                           //get số lượng sản phẩm đang có
+                                           var getPram = {
+                                             IdProduct:
+                                               CartToBill.data[i].productDetail
+                                                 .id,
+                                             IdColor:
+                                               CartToBill.data[i].idColor,
+                                             IdSize: CartToBill.data[i].idSize,
+                                           };
+                                           $http({
+                                             method: "GET",
+                                             url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                                             params: getPram,
+                                           }).then(function (resp) {
+                                             var param2 = {
+                                               IdProduct:
+                                                 CartToBill.data[i]
+                                                   .productDetail.id,
+                                               IdColor:
+                                                 CartToBill.data[i].idColor,
+                                               IdSize:
+                                                 CartToBill.data[i].idSize,
+                                               Quantity:
+                                                 parseInt(resp.data) -
+                                                 parseInt(
+                                                   CartToBill.data[i].quantity
+                                                 ),
+                                             };
+                                             $http({
+                                               method: "PUT",
+                                               url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                                               params: param2,
+                                             }).then(function (resp) {
+                                              let params = {
+                                                totalPrice: $scope.tienThanhToan,
+                                                code : bill.data.code
+                                              }
+                                              $http({
+                                                method: "GET",
+                                                url: "http://localhost:8080/api/vnpay",
+                                                params: params,
+                                                transformResponse : [
+                                                  function(data){
+                                                   location.href = data;
+                                                  }
+                                                ]
+                                              })
+                        
+                                             });
+                                           });
+                                         });
+                                     }
+                                   });
+                               });
+                           });
+                         }
+                       });
+                     
                     } else {
                       Swal.fire("Có lỗi xảy ra !", "", "error");
                     }

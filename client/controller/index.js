@@ -42,6 +42,13 @@ app.config(function ($routeProvider, $locationProvider) {
           
            
         })
+        .when("/myorder", {
+            templateUrl: "myorder.html",
+            controller : MyOrderController
+           
+          
+           
+        })
       
 
         .otherwise({
