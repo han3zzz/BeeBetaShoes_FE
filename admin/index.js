@@ -166,6 +166,35 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "khachhang/update.html",
             controller : KhachHangController
         })
+        .when("/employee/view", {
+            templateUrl: "nhanvien/index.html",
+            controller : NhanVienController
+           
+        })
+        .when("/employee/add", {
+            templateUrl: "nhanvien/add.html",
+            controller : NhanVienController
+            
+        })
+        .when("/employee/update/:id", {
+            templateUrl: "nhanvien/update.html",
+            controller : NhanVienController
+        })
+        .when("/role/view", {
+            templateUrl: "vaitro/index.html",
+            controller : VaiTroController
+           
+        })
+        .when("/role/add", {
+            templateUrl: "vaitro/add.html",
+            controller : VaiTroController
+            
+        })
+        .when("/role/update/:id", {
+            templateUrl: "vaitro/update.html",
+            controller : VaiTroController
+        })
+
         
 
         .otherwise({
