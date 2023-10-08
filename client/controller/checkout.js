@@ -18,7 +18,7 @@ $scope.listSize = response.data;
           if($location.search().vnp_TransactionStatus === '00'){
             $http.put("http://localhost:8080/api/bill/"+$location.search().vnp_OrderInfo);
             let amount  = parseInt($location.search().vnp_Amount) / 100;
-            Swal.fire("Thanh toán thành công !","Bạn đã thanh toán thành công số tiền " +amount + "<br> cho đơn hàng : " + $location.search().vnp_OrderInfo,"success");
+            Swal.fire("Thanh toán thành công !","Bạn đã thanh toán thành công số tiền " +amount.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }) + "<br> cho đơn hàng : " + $location.search().vnp_OrderInfo,"success");
             location.href = "#/myorder";
           }
           if($location.search().vnp_TransactionStatus === '02'){
@@ -31,6 +31,11 @@ $scope.listSize = response.data;
        $scope.listCart = [];
        $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
          $scope.listCart = cart.data;
+        //  if($scope.listCart.length == 0) {
+        //   Swal.fire("Giỏ hàng bạn đã rỗng !","","error");
+        //   location.href = "#/cart";
+        //   return;
+        //  }
          $scope.tongTien = 0;
          for (let i = 0; i < $scope.listCart.length; i++) {
            $scope.tongTien +=
@@ -156,13 +161,14 @@ $scope.listSize = response.data;
                                 .post("http://localhost:8080/api/bill", {
                                   totalPrice: TotalPrice,
                                   shipPrice: ship.data.data.total,
-                                  totalPriceLast: TotalPrice,
+                                  totalPriceLast: TotalPrice + ship.data.data.total,
                                   note: document.getElementById("note").value,
                                   payType: 0,
                                   payStatus: 0,
                                   idCoupon: 0,
                                   idAddress: idAddress,
                                   idCustomer: 1,
+                                  status : 1,
                                 })
                                 .then(function (bill) {
                                   $http
@@ -236,7 +242,7 @@ $scope.listSize = response.data;
                                                   "success"
                                                 );
 
-                                                $location.path("#/checkout");
+                                                location.href = "#/myorder";
                                               });
                                             });
                                           });
@@ -306,13 +312,14 @@ $scope.listSize = response.data;
                                .post("http://localhost:8080/api/bill", {
                                  totalPrice: TotalPrice,
                                  shipPrice: ship.data.data.total,
-                                 totalPriceLast: TotalPrice,
+                                 totalPriceLast: TotalPrice +ship.data.data.total,
                                  note: document.getElementById("note").value,
                                  payType: 1,
                                  payStatus: 0,
                                  idCoupon: 0,
                                  idAddress: idAddress,
                                  idCustomer: 1,
+                                 status : 0,
                                })
                                .then(function (bill) {
                                  $http

@@ -1,6 +1,7 @@
 window.CartController = function ($http, $scope, $routeParams, $location) {
-
+  var token = localStorage.getItem('token');
     $scope.loadCart = function () {
+      console.log(token);
       let urlcolor = "http://localhost:8080/api/color";
       let urlsize = "http://localhost:8080/api/size";
        // load color

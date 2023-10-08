@@ -1,7 +1,217 @@
  window.MyOrderController = function($http, $scope, $routeParams, $location){
-    $("select").each(function (e) {
-        this.chosen();
-    });
+
+  $scope.myorder = function(){
+    let urlcolor = "http://localhost:8080/api/color";
+    let urlsize = "http://localhost:8080/api/size";
+    let url = "http://localhost:8080/api/product";
+     // load color
+$scope.listColor = [];
+$http.get(urlcolor).then(function (response) {
+  $scope.listColor = response.data;
+});
+// load size
+$scope.listSize = [];
+$http.get(urlsize).then(function (response) {
+  $scope.listSize = response.data;
+});
+ //load product
+ $scope.listPro = [];
+ $http.get(url).then(function (response) {
+   $scope.listPro = response.data;
+ });
+   
+    $scope.isPopupVisible = false;
+
+  $scope.togglePopup = function(code) {
+    $scope.listItem = [];
+    $scope.bill = {};
+    $scope.isPopupVisible = !$scope.isPopupVisible;
+    $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(resp){
+      $scope.bill = resp.data;
+    })
+    $scope.address = {};
+    $http.get("http://localhost:8080/api/address/getBill/"+code).then(function(resp){
+      $scope.address = resp.data;
+    })
+    $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+      $scope.listItem = resp.data;
+    })
+   
+
+  };
+    //count cho xac nhan
+   $scope.choxacnhan = [];
+   let paramchoxacnhan = {
+      idCustomer : 1,
+      status : 0
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramchoxacnhan,
+            }).then(function (choxacnhan) {
+              $scope.choxacnhan = choxacnhan.data.length;
+            })
+
+    //count cho giao hang
+   $scope.chogiaohang = [];
+   let paramchogiaohang = {
+      idCustomer : 1,
+      status : 1
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramchogiaohang,
+            }).then(function (chogiaohang) {
+              $scope.chogiaohang = chogiaohang.data.length;
+            })
+
+     //count dang giao hang
+   $scope.danggiaohang = [];
+   let paramdanggiaohang = {
+      idCustomer : 1,
+      status : 2
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramdanggiaohang,
+            }).then(function (danggiaohang) {
+              $scope.danggiaohang = danggiaohang.data.length;
+            })
+
+        //count da giao hang
+   $scope.dagiaohang = [];
+   let paramdagiaohang = {
+      idCustomer : 1,
+      status : 3
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramdagiaohang,
+            }).then(function (dagiaohang) {
+              $scope.dagiaohang = dagiaohang.data.length;
+            })
+             //count da huy
+   $scope.dahuy = [];
+   let paramdahuy = {
+      idCustomer : 1,
+      status : 4
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramdahuy,
+            }).then(function (dahuy) {
+              $scope.dahuy = dahuy.data.length;
+            })
+              //count hoan tra
+   $scope.hoantra = [];
+   let paramhoantra = {
+      idCustomer : 1,
+      status : 5
+   }
+       $http({
+              method: "GET",
+              url: "http://localhost:8080/api/bill/billByCustomer",
+              params: paramhoantra,
+            }).then(function (hoantra) {
+              $scope.hoantra = hoantra.data.length;
+            })
+
+
+
+            $scope.getStatus = function(status){
+              $scope.list = [];
+              let paramlist = {
+                idCustomer : 1,
+                status : status
+             }
+                 $http({
+                        method: "GET",
+                        url: "http://localhost:8080/api/bill/billByCustomer",
+                        params: paramlist,
+                      }).then(function (data) {
+                        $scope.list = data.data;
+                      })
+                          // pagation
+        $scope.pager = {
+          page: 0,
+          size: 10,
+          get items() {
+            var start = this.page * this.size;
+            return $scope.list.slice(start, start + this.size);
+          },
+          get count() {
+            return Math.ceil((1.0 * $scope.list.length) / this.size);
+          },
+    
+          first() {
+            this.page = 0;
+          },
+          prev() {
+            this.page--;
+            if (this.page < 0) {
+              this.last();
+            }
+          },
+          next() {
+            this.page++;
+            if (this.page >= this.count) {
+              this.first();
+            }
+          },
+          last() {
+            this.page = this.count - 1;
+          },
+        };
+            }
+
+        
+
+            $scope.huy = function(code){
+              Swal.fire({
+                title: "Xác nhận hủy ?",
+                showCancelButton: true,
+                confirmButtonText: "Hủy",
+              }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                  $http.get("http://localhost:8080/api/bill/huy/"+code).then(function(response){
+                    Swal.fire("Hủy đơn hàng thành công !","Bạn đã hủy thành công đơn hàng " +code,"success")
+                    $scope.getStatus(0);
+                  })
+                }
+              })
+             
+
+            }
+            $scope.getStatus(0);
+
+            $scope.thanhtoan = function(code,price){
+              let params = {
+                totalPrice: price,
+                code : code
+              }
+              $http({
+                method: "GET",
+                url: "http://localhost:8080/api/vnpay",
+                params: params,
+                transformResponse : [
+                  function(data){
+                   location.href = data;
+                  }
+                ]
+              })
+            }
+      
+            
+
+
+  }
+  $scope.myorder();
 
 
 

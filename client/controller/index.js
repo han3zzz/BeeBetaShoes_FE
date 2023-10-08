@@ -1,5 +1,5 @@
 var app = angular.module("client", ["ngRoute"]);
-app.config(function ($routeProvider, $locationProvider) {
+app.config(function ($routeProvider, $locationProvider,$httpProvider) {
     $locationProvider.hashPrefix("");
     $routeProvider
         .when("/home", {
@@ -9,7 +9,7 @@ app.config(function ($routeProvider, $locationProvider) {
         })
         .when("/login", {
             templateUrl: "login.html",
-            // controller : HomeController
+            controller : LoginController
            
         })
         .when("/register", {
@@ -56,3 +56,31 @@ app.config(function ($routeProvider, $locationProvider) {
         });
 
 });
+
+app.factory('AuthService', ['$http', '$window', function($http, $window) {
+    var authService = {};
+
+    authService.getToken = function() {
+        return $window.localStorage.getItem('token');
+    };
+
+    authService.setToken = function(token) {
+        $window.localStorage.setItem('token', token);
+    };
+
+    authService.clearToken = function() {
+        $window.localStorage.removeItem('token');
+    };
+
+
+    authService.logout = function() {
+        authService.clearToken();
+    };
+
+    authService.isAuthenticated = function() {
+        var token = authService.getToken();
+        return token !== null && token !== undefined;
+    };
+
+    return authService;
+}]);

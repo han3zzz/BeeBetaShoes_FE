@@ -134,7 +134,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
           if (newValue > max) return;
           min = newValue;
           $("#thumbMin").css("left", calcLeftPosition(newValue) + "%");
-          $("#min").html(newValue);
+          $("#min").html(newValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
           $("#line").css({
             left: calcLeftPosition(newValue) + "%",
             right: 100 - calcLeftPosition(max) + "%",
@@ -146,7 +146,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
           if (newValue < min) return;
           max = newValue;
           $("#thumbMax").css("left", calcLeftPosition(newValue) + "%");
-          $("#max").html(newValue);
+          $("#max").html(newValue.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }));
           $("#line").css({
             left: calcLeftPosition(min) + "%",
             right: 100 - calcLeftPosition(newValue) + "%",
