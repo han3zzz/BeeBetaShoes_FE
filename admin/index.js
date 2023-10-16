@@ -195,6 +195,22 @@ app.config(function ($routeProvider, $locationProvider) {
             controller : VaiTroController
         })
 
+        .when("/voucher/view", {
+            templateUrl: "khuyenmai/index.html",
+            controller : KhuyenMaiController
+           
+        })
+        .when("/voucher/add", {
+            templateUrl: "khuyenmai/add.html",
+            controller : KhuyenMaiController
+            
+        })
+        .when("/voucher/update/:id", {
+            templateUrl: "khuyenmai/update.html",
+            controller : KhuyenMaiController
+        })
+
+
         
 
         .otherwise({
