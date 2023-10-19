@@ -1,0 +1,79 @@
+<h3>Hóa Đơn #{{bill.code}}</h3>
+<button style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Chờ Xác Nhận </button>
+<button style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Chờ Giao Hàng</button>
+<button style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đang Giao Hàng</button>
+<button style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Giao Hàng</button>
+<button style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Hủy</button>
+<div style="padding-top: 30px;">
+    <h4>Thông Tin Đơn Hàng</h4>
+    <h6>Ngày mua : {{bill.purchaseDate | date:'dd-MM-yyyy' }}</h6>
+    <h6 ng-if="bill.paymentDate != null">Ngày thanh toán : {{bill.paymentDate | date:'dd-MM-yyyy' }}</h6>
+    <h6>Thông tin giao hàng : {{address.fullname}} - {{address.phone}} 
+        ( {{address.address}}, {{address.wardName}}, {{address.districtName}}, {{address.cityName}} )</h6>
+    <h6>Hình thức thanh toán : {{bill.payType == 0 ? 'Thanh toán khi nhận hàng' : 'Thanh toán online qua VNPAY'}}</h6>
+    <h6>Trạng thái thanh toán : {{bill.payStatus == 0 ? 'Chưa thanh toán' : 'Đã thanh toán'}}</h6>
+    <h6>Phí vận chuyển : {{bill.shipPrice | currency:'':0}} VNĐ</h6>
+    <h6>Giảm giá : 0 VNĐ</h6>
+    <h6>Tổng tiền thanh toán : {{bill.totalPriceLast | currency:'':0}} VNĐ</h6>
+</div>
+
+<table class="table">
+    <thead class="cart__row cart__header">
+        <tr>
+            <td colspan="2" class="text-center">Sản Phẩm</td>
+            <td class="text-center">Đơn Giá</td>
+            <td class="text-center">Số Lượng</td>
+            <td class="text-center">Thành Tiền</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="cart in listItem">
+            
+            <td class="cart__image-wrapper cart-flex-item">
+                <span ng-repeat="img in cart.productDetail.product.productImages">
+                    <span ng-if="img.mainImage == true">
+                        <a href="#"><img style="width: 100px;height: 100px;" class="cart__image" src="{{img.url}}" alt="Elastic Waist Dress - Navy / Small"></a>
+                    </span>
+                </span>
+               
+            </td>
+            <td class="cart__meta small--text-left cart-flex-item">
+                <div class="list-view-item__title">
+                   {{cart.productDetail.product.name}}
+                </div>
+                
+                <div class="cart__meta-text">
+                    Màu : 
+                    <span ng-repeat="color in listColor">
+                        <span ng-if="color.id == cart.idColor">
+                            {{color.name}}
+                        </span>
+                    </span>
+                    <br> Kích Thước : 
+                    <span ng-repeat="size in listSize">
+                        <span ng-if="size.id == cart.idSize">
+                            {{size.name}}
+                        </span>
+                    </span><br>
+                </div>
+            </td>
+            <td class="text-center">{{cart.unitPrice | currency:'':0}} VNĐ
+        </td>
+                <td class="cart__update-wrapper cart-flex-item text-center">
+                    {{cart.quantity}}
+                </td>
+                <td class="text-center">
+                    {{cart.unitPrice * cart.quantity | currency:'':0}} VNĐ
+                </td>
+
+        </tr>
+       
+       
+      
+       
+    </tbody>
+   
+</table>
+
+<!--        <paging-control paging-size="pagingSize" noofitem="dataPerPage" total-items="totalItems" display-items="displayItems"></paging-control>-->
+</div>

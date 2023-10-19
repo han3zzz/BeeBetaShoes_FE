@@ -36,9 +36,54 @@ $http.get(urlsize).then(function (response) {
     $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
       $scope.listItem = resp.data;
     })
+    $scope.pager1 = {
+      page: 0,
+      size: 3,
+      get items() {
+        var start = this.page * this.size;
+        return $scope.listItem.slice(start, start + this.size);
+      },
+      get count() {
+        return Math.ceil((1.0 * $scope.listItem.length) / this.size);
+      },
+
+      first() {
+        this.page = 0;
+      },
+      prev() {
+        this.page--;
+        if (this.page < 0) {
+          this.last();
+        }
+      },
+      next() {
+        this.page++;
+        if (this.page >= this.count) {
+          this.first();
+        }
+      },
+      last() {
+        this.page = this.count - 1;
+      },
+    };
+        
    
 
   };
+  $scope.countTT = function(){
+    //count all
+  $scope.countall = [];
+  let paramall = {
+     idCustomer : 1,
+     status : null
+  }
+      $http({
+             method: "GET",
+             url: "http://localhost:8080/api/bill/billByCustomer",
+             params: paramall,
+           }).then(function (countall) {
+             $scope.countall = countall.data.length;
+           })
     //count cho xac nhan
    $scope.choxacnhan = [];
    let paramchoxacnhan = {
@@ -121,6 +166,9 @@ $http.get(urlsize).then(function (response) {
               $scope.hoantra = hoantra.data.length;
             })
 
+  }
+
+  $scope.countTT();
 
 
             $scope.getStatus = function(status){
@@ -180,15 +228,45 @@ $http.get(urlsize).then(function (response) {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
                   $http.get("http://localhost:8080/api/bill/huy/"+code).then(function(response){
+                    $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+                      for(let i = 0 ; i < resp.data.length ; i++){
+                        for(let j = 0 ; j < resp.data[i].productDetail.productDetail_size_colors.length ; j++){
+                          if(resp.data[i].productDetail.productDetail_size_colors[j].color.id == resp.data[i].idColor && resp.data[i].productDetail.productDetail_size_colors[j].size.id == resp.data[i].idSize){
+                            var param2 = {
+                              IdProduct:
+                              resp.data[i]
+                                  .productDetail.id,
+                              IdColor:
+                              resp.data[i].idColor,
+                              IdSize:
+                              resp.data[i].idSize,
+                              Quantity:
+                                parseInt(resp.data[i].productDetail.productDetail_size_colors[j].quantity) +
+                                parseInt(
+                                  resp.data[i].quantity
+                                ),
+                            };
+                            $http({
+                              method: "PUT",
+                              url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                              params: param2,
+                            });
+                          }
+                        }
+                      
+                      }
+                    })
+                    
                     Swal.fire("Hủy đơn hàng thành công !","Bạn đã hủy thành công đơn hàng " +code,"success")
                     $scope.getStatus(0);
+                    $scope.countTT();
                   })
                 }
               })
              
 
             }
-            $scope.getStatus(0);
+            $scope.getStatus(null);
 
             $scope.thanhtoan = function(code,price){
               let params = {

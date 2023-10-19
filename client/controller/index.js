@@ -57,30 +57,37 @@ app.config(function ($routeProvider, $locationProvider,$httpProvider) {
 
 });
 
-app.factory('AuthService', ['$http', '$window', function($http, $window) {
-    var authService = {};
+// app.run(function ($rootScope, $http) {
+//     // Kiểm tra xem có JWT token đã lưu trong localStorage hay không
+//     $rootScope.isLoggedIn = false;
+//     var token = localStorage.getItem('token');
+//     var name = localStorage.getItem('fullname');
+//     if (token) {
+//         // Thiết lập token trong header cho mọi yêu cầu
+//         $http.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+//         $rootScope.isLoggedIn = true;
+//         $rootScope.fullname = name;
+//     }
+//     $rootScope.logout = function(){
+        
+//         localStorage.removeItem('token');
+//         $rootScope.isLoggedIn = false;
+//     }
+// });
+app.service('AuthenticationService', function () {
+    var isAuthenticated = false;
+    var userInfo = {};
 
-    authService.getToken = function() {
-        return $window.localStorage.getItem('token');
+    return {
+        setAuthentication: function (status, user) {
+            isAuthenticated = status;
+            userInfo = user;
+        },
+        isAuthenticated: function () {
+            return isAuthenticated;
+        },
+        getUserInfo: function () {
+            return userInfo;
+        }
     };
-
-    authService.setToken = function(token) {
-        $window.localStorage.setItem('token', token);
-    };
-
-    authService.clearToken = function() {
-        $window.localStorage.removeItem('token');
-    };
-
-
-    authService.logout = function() {
-        authService.clearToken();
-    };
-
-    authService.isAuthenticated = function() {
-        var token = authService.getToken();
-        return token !== null && token !== undefined;
-    };
-
-    return authService;
-}]);
+});

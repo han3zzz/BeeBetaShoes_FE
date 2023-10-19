@@ -185,6 +185,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
         });
     
         $scope.filter = function () {
+          
           let idCategory = document.getElementById("danhmuc").value;
           let idMaterial = document.getElementById("chatlieu").value;
           let idColor = document.getElementById("mausac").value;
@@ -211,6 +212,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
           let iddesign = idDesign != "" ? idDesign : null;
     
           var params = {
+            name : '',
             idcategory: idcate,
             idmaterial: idmate,
             idcolor: idcolor,

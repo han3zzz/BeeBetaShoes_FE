@@ -68,9 +68,7 @@ window.ChatLieuController = function($scope, $http, $location,$routeParams){
                 $http.put("http://localhost:8080/api/material/delete/"+id).then(function (response){
                     if (response.status === 200){
                         Swal.fire('Xóa thành công !', '', 'success')
-                        setTimeout(() => {
-                            location.href = "#/materials/view";
-                        }, 2000);
+                        $scope.loadAll();
                     }
                     else{
                         Swal.fire('Xóa thất bại !', '', 'error')

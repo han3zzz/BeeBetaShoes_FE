@@ -1,7 +1,7 @@
 window.CartController = function ($http, $scope, $routeParams, $location) {
-  var token = localStorage.getItem('token');
+
     $scope.loadCart = function () {
-      console.log(token);
+     
       let urlcolor = "http://localhost:8080/api/color";
       let urlsize = "http://localhost:8080/api/size";
        // load color
@@ -240,6 +240,22 @@ window.CartController = function ($http, $scope, $routeParams, $location) {
             }
           });
         };
+        $scope.checkCheckOut = function(){
+           //load cart by user
+  $scope.listCartCheck = [];
+  $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
+    $scope.listCartCheck = cart.data;
+    if($scope.listCartCheck.length === 0){
+      Swal.fire('Giỏ hàng của bạn đang rỗng !','','error');
+      location.href = "#/cart";
+     
+    }
+    else{
+      location.href = "#/checkout";
+    }
+
+  });
+        }
       };
       $scope.loadCart();
 

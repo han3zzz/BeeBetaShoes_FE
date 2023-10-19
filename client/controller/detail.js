@@ -19,6 +19,7 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
           .get("http://localhost:8080/api/product/" + id)
           .then(function (response) {
             $scope.sp = response.data;
+            
             $http
               .get(
                 "http://localhost:8080/api/product/category/" +
@@ -52,9 +53,11 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
           .get("http://localhost:8080/api/color/get/" + id)
           .then(function (color) {
             $scope.colorid = color.data;
+          
+            
           });
         // $('input:radio[name="ColorRadioGroup"]').filter('[value="1"]').attr('checked', true);
-    
+       
         //check color
         var selectedVal = "";
         var selectedVal1 = "";

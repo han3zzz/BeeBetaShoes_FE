@@ -209,6 +209,18 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "khuyenmai/update.html",
             controller : KhuyenMaiController
         })
+        .when("/bill/view", {
+            templateUrl: "hoadon/index.html",
+            controller : HoaDonController
+        })
+        .when("/bill/view/:code", {
+            templateUrl: "hoadon/detail.html",
+            controller : HoaDonController
+        })
+        .when("/sell/view", {
+            templateUrl: "banhang/index.html",
+           controller : BanHangController
+        })
 
 
         

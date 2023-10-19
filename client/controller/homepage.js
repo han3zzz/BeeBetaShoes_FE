@@ -1,4 +1,17 @@
-window.HomeController = function ($http, $scope, $routeParams, $location) {
+window.HomeController = function ($http, $scope, $routeParams, $location,$rootScope,AuthenticationService) {
+  $rootScope.isLoggedIn = AuthenticationService.isAuthenticated();
+    $rootScope.userInfo = AuthenticationService.getUserInfo();
+    // if(localStorage.getItem('token')){
+    //   $rootScope.isLoggedIn = true;
+    //   var name = localStorage.getItem('fullname');
+    //   $rootScope.fullname = name;
+    //   $rootScope.logout = function(){
+    //     localStorage.removeItem('token');
+    //     $rootScope.isLoggedIn = false;
+    // }
+    // }
+  // $rootScope.isLoggedIn = AuthService.isLoggedIn();
+  // $rootScope.username = sessionStorage.getItem('username');
   $scope.loadProductNew = function () {
     let url = "http://localhost:8080/api/product";
     let urlcategory = "http://localhost:8080/api/category";
@@ -66,7 +79,19 @@ window.HomeController = function ($http, $scope, $routeParams, $location) {
     $http.get(urldesign).then(function (response) {
       $scope.listDesign = response.data;
     });
-
+      //load cart by user
+      $scope.listCart = [];
+      $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
+        $scope.listCart = cart.data;
+        sessionStorage.setItem("listCart1",cart.data)
+        $scope.tongTien = 0;
+        for (let i = 0; i < $scope.listCart.length; i++) {
+          $scope.tongTien +=
+            $scope.listCart[i].unitPrice * $scope.listCart[i].quantity;
+        }
+        sessionStorage.setItem("tongTien",$scope.tongTien)
+      });
+     
    
     // pagation
     $scope.pager = {

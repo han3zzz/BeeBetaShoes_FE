@@ -35,7 +35,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="cart in listCart">
-                                        <td class="text-left">{{cart.productDetail.product.name}}</td>
+                                        <td class="text-left">{{cart.productDetail.product.name}} <br> SKU : {{cart.productDetail.product.code}}</td>
                                         <td><span ng-if="cart.productDetail.discount > 0">
                                             {{cart.productDetail.price - (cart.productDetail.price * (cart.productDetail.discount * 0.01)) | currency:'':0}} VNĐ
                                         </span>
@@ -64,12 +64,16 @@
                                 </tbody>
                                 <tfoot class="font-weight-600">
                                     <tr>
+                                        <td colspan="5" class="text-right">Tổng tiền </td>
+                                        <td>{{tongTien | currency:'':0}} VNĐ</td>
+                                    </tr>
+                                    <tr>
                                         <td colspan="5" class="text-right">Phí ship </td>
                                         <td>{{phiShip | currency:'':0}} VNĐ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="5" class="text-right">Giảm giá </td>
-                                        <td>0 VNĐ</td>
+                                        <td>{{giamGia | currency:'':0}} VNĐ</td>
                                     </tr>
                                     <tr>
                                         <td colspan="5" class="text-right">Tổng tiền cần thanh toán</td>
@@ -81,10 +85,40 @@
                     </div>
                     
                     <hr />
-                    <div class="discount-coupon">
+                    <div class="discount-coupon" >
+                       
                         <div id="coupon" class="coupon-dec tab-pane active">
+        
+                            <div id="voucher" ng-if="checkVoucher == true && voucherIs == false && voucherType === true">{{voucherName}} | Giảm {{discountVoucher}} áp dụng trên trên hóa đơn  (- {{voucherGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeVoucher()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                            <div id="voucher" ng-if="checkVoucher == true && voucherIs == false && voucherType === false">{{voucherName}} | Giảm {{cashVoucher}} áp dụng trên hóa đơn  (- {{voucherGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeVoucher()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                            <div id="voucher" ng-if="checkVoucher == true && voucherIs == true && voucherType === true">{{voucherName}} | Giảm {{discountVoucher}} áp dụng trên trên sản phẩm  (- {{voucherGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeVoucher()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                              
+                                <div>Áp dụng cho sản phẩm : </div>
+                                <div ng-repeat="sp in listSPVoucher">
+                                    - [{{sp.productDetail.product.name}} - SKU : {{sp.productDetail.product.code}}]
+                                </div>
+                            </div>
+                            <div id="voucher" ng-if="checkVoucher == true && voucherIs == true && voucherType === false">{{voucherName}} | Giảm tối đa {{cashVoucher}} áp dụng trên sản phẩm  (- {{voucherGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeVoucher()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                                <div>Áp dụng cho sản phẩm : </div>
+                                <div ng-repeat="sp in listSPVoucher">
+                                    - [{{sp.productDetail.product.name}} - SKU : {{sp.productDetail.product.code}}]
+                                </div>
+                            </div>
+
+                            <div id="voucher1"  ng-if="checkCoupon == true && couponType == true">{{couponName}} | Giảm {{discountCoupon}} trên hóa đơn (- {{couponGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeCoupon()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
+                            <div id="voucher1"  ng-if="checkCoupon == true && couponType == false">{{couponName}} | Giảm {{cashCoupon}} trên hóa đơn (- {{couponGiamGia | currency:'':0}} VNĐ)
+                                <button ng-click="removeCoupon()" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash-can"></i></button>
+                            </div>
                             <input id="coupon-code" required="" type="text" class="mb-3" placeholder="Áp mã giảm giá (nếu có)">
-                            <button class="coupon-btn btn" type="submit"><i class="fa-solid fa-gift"></i> Áp Mã Giảm Giá</button>
+                            <button ng-click="apMa()" class="coupon-btn btn" type="submit"><i class="fa-solid fa-gift"></i> Áp Mã Giảm Giá</button>
                         </div>
                     </div>
                   
@@ -101,12 +135,13 @@
                                 <div class="form-group col-md-12 col-lg-12 col-xl-12">
                                    
                                     <label for="input-company">Địa chỉ nhận hàng <span class="required-f">*</span>
-                                    <!-- <span style="float: right;"><a href="#">Thêm địa chỉ mới</a></span> -->
+                                  
                                     </label>
                     
                                    <select id="idAddress" ng-click="changeAddress()" >
                                     <option ng-repeat="add in listAddress" value="{{add.id}}">{{add.fullname}} - {{add.phone}} | {{add.address}}, {{add.wardName}}, {{add.districtName}}, {{add.cityName}}</option>
                                    </select>
+                                   <button style="float: right;"><i class="fa-solid fa-plus"></i> Thêm địa chỉ mới</button>
                                 </div>
                             </div>
                         </fieldset>

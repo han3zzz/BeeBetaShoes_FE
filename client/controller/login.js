@@ -1,4 +1,7 @@
-window.LoginController = function ($http, $scope, $routeParams, $rootScope,AuthService) {
+window.LoginController = function ($http, $scope, $routeParams, $rootScope,AuthenticationService) {
+ 
+
+    $rootScope.isLoggedIn = false;
     $scope.login = function(){
         $http.post('http://localhost:8080/api/auth/login', {
             username : $scope.username,
@@ -8,13 +11,13 @@ window.LoginController = function ($http, $scope, $routeParams, $rootScope,AuthS
             if(response.status === 200){
                 var token = response.data.token;
             // Lưu token vào local storage hoặc session storage
-            AuthService.setToken(token);
-            // sessionStorage.setItem('token', token);
-            $rootScope.token = token;
+        //    console.log(response.data.user.fullname);
+        AuthenticationService.setAuthentication(true, response.data.user);
             
            
             // Redirect đến trang bảo mật hoặc thực hiện các hành động khác sau khi đăng nhập thành công
             Swal.fire("Đăng nhập thành công !","","success");
+            location.href= '#/home'
             
             }
         })
@@ -29,8 +32,6 @@ window.LoginController = function ($http, $scope, $routeParams, $rootScope,AuthS
 
         })
     }
-    $rootScope.logout = function(){
-        alert("Please log out");
-    }
+   
 
 }
