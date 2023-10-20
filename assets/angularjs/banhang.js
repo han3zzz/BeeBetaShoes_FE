@@ -1,5 +1,5 @@
 window.BanHangController = function($scope, $http, $location,$routeParams){
-   
+
     //tạo hóa đơn
     $scope.addbill = function(){
            // add bill
@@ -11,7 +11,7 @@ window.BanHangController = function($scope, $http, $location,$routeParams){
            })
            .then(function (bill) {
             Swal.fire("Tạo hóa đơn " + bill.data.code + " thành công !" ,"","success");
-            window.location.reload();
+            $scope.getAllBill();
            })
     }
 
@@ -157,7 +157,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
     TotalGam +=
     $scope.listItem[i].productDetail.weight * $scope.listItem[i].quantity;
     }
-    $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
+    $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - $scope.giamGia;
     // lấy thông tin địa chỉ giao hàng
     
     var params = {
@@ -397,7 +397,12 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                                   params: param2,
                                                 }).then(function (resp) {
                                                   Swal.fire("Đã thêm vào giỏ !","","success");
+                                                 
                                                   $scope.choose(codeBill,idBill);
+                                                
+                                               
+                                                   
+                                                  
                                                   if($scope.isPopupVisible == true){
                                                     $scope.getAllProduct();
                                                   }
@@ -405,6 +410,8 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                                     console.log(pro.data.id);
                                                     $scope.getAllByQR(pro.data.id);
                                                   }
+                                                  
+                                                  
       
                                               })
       
@@ -743,9 +750,10 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                       }).then(function (resp) {
                                           $http.get("http://localhost:8080/api/bill/deleteBillDetail/"+id).then(function(resp){
                                               Swal.fire("Xóa thành công !","","success");
-                                              
+  
                                               $scope.choose(codeBill,idBill);
                                               $scope.getAllProduct();
+                                            
                                           })
                                        
                                        
@@ -767,6 +775,38 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                         }
                     })
                   }
+                     //check trạng thái thanh toán online khi trả về
+   if ($location.search().vnp_TransactionStatus === "00") {
+    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ $location.search().vnp_OrderInfo,{
+      payStatus : 1
+    
+    });
+         Swal.fire('Thanh toán thành công' ,'','success');
+              setTimeout(() => {
+                Swal.fire({
+                  title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + $location.search().vnp_OrderInfo + ' ?',
+                  showCancelButton: true,
+                  confirmButtonText: 'In',
+              }).then((result) => {
+                  if (result.isConfirmed){
+                    $scope.choose(null,null);
+                    alert('đã in');
+                  }
+                  else{
+                    location.href = '#/sell/view';
+                  }
+                })
+            }, 2000);
+  }
+  if ($location.search().vnp_TransactionStatus === "02") {
+    Swal.fire('Thanh toán không thành công' ,'','error');
+    $scope.choose($location.search().vnp_OrderInfo,null);
+    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ $location.search().vnp_OrderInfo,{
+      status : 10
+    
+    });
+    
+  }
 
                   //hủy hóa đơn
                   
@@ -1384,6 +1424,7 @@ $scope.voucherGiamGia = 0;
 $scope.couponGiamGia = 0;
 $scope.phiShip = 0;
 let checkk = 0;
+let idCoupon = null;
 $scope.apCoupon = function(){
   let code = document.getElementById('code-coupon').value;
  
@@ -1434,6 +1475,7 @@ $scope.apCoupon = function(){
           checkk++;
           $scope.listCheck1.push(checkCode1);
           $scope.checkCoupon = true;
+          idCoupon = $scope.listCoupon[i].id;
           Swal.fire("Áp mã thành công !","","success");
           document.getElementById('code-coupon').value = '';
           $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - ($scope.couponGiamGia + $scope.voucherGiamGia);
@@ -1465,6 +1507,7 @@ $scope.apCoupon = function(){
 
 }
 
+let idVoucher = null;
 $scope.apCTKM = function(){
   $scope.phiShip = 0;
   $scope.giamGia = $scope.giamGia - $scope.voucherGiamGia;
@@ -1508,8 +1551,8 @@ $scope.apCTKM = function(){
          
        
             $scope.checkVoucher = true;
+            idVoucher = $scope.listVoucher[i].id;
             Swal.fire("Áp mã thành công !","","success");
-            document.getElementById('coupon-code').value = '';
             if($scope.tongTien < $scope.giamGia){
               Swal.fire('Số tiền giảm đã ở mức tối đa','','error');
               $scope.checkVoucher = true;
@@ -1586,10 +1629,9 @@ $scope.apCTKM = function(){
             }
             else{
               $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - ($scope.couponGiamGia + $scope.voucherGiamGia);
-
+              idVoucher = $scope.listVoucher[i].id;
               $scope.checkVoucher = true;
               Swal.fire("Áp mã thành công !","","success");
-              document.getElementById('coupon-code').value = '';
             }
             if($scope.tongTien < $scope.giamGia){
               Swal.fire('Số tiền giảm đã ở mức tối đa','','error');
@@ -1644,6 +1686,7 @@ $scope.removeVoucher = function(){
   $scope.listCheck = [];
   $scope.giamGia = 0;
   $scope.voucherType = false;
+  idVoucher = null;
   
     $scope.checkVoucher = false;
     $scope.giamGia = $scope.couponGiamGia - $scope.giamGia;
@@ -1655,7 +1698,7 @@ $scope.removeCoupon = function(){
   $scope.couponGiamGia = 0;
   $scope.listCheck1 = [];
   $scope.giamGia = 0;
- 
+ idCoupon = null;
     $scope.checkCoupon = false;
     $scope.giamGia = $scope.voucherGiamGia - $scope.giamGia;
     $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - $scope.voucherGiamGia +  $scope.couponGiamGia;
@@ -1672,7 +1715,7 @@ $scope.removeCoupon = function(){
       let cityId = document.getElementById('tinh').value;
       let districtId = document.getElementById('huyen').value;
       let wardId = document.getElementById('xa').value;
-      let cityName = document.getElementById('cityName').value;
+    
       Swal.fire({
         title: "Xác nhận thanh toán đơn hàng " + code + " ?",
         showCancelButton: true,
@@ -1683,8 +1726,9 @@ $scope.removeCoupon = function(){
           var typePay = document.getElementById("typePay").value;
           //nếu chọn thanh toán tại tiền mặt
           if (typePay === "pay1") {
-            alert(cityName);
+          //mua tại quầy thanh toán tiền mặt
             if(document.getElementById('hinhThucMuaHang').value === 'hinhThuc1'){
+              //khách lẻ
               if(document.getElementById('khachhang').value === '0'){
                 $http.post('http://localhost:8080/api/address',{
                 fullname : tennguoimua,
@@ -1693,193 +1737,365 @@ $scope.removeCoupon = function(){
                 cityId : cityId,
                 districtId : districtId,
                 wardId : wardId
-                }).then(function(add){
-
-                  
+                }).then(function(adds){
+                  $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                    totalPrice : $scope.tongTien,
+                    shipPrice : 0,
+                    totalPriceLast : $scope.giamGia,
+                    note : ghichu,
+                    payType : 0,
+                    payStatus : 1 ,
+                    idAddress : adds.data.id,
+                    idVoucher : idVoucher == null ? 0 : idVoucher,
+                    idCoupon : idCoupon,
+                    status : 4
+                  })
+               
+                    
                 })
+              
+    
+                
+              }
+              //khách hàng đã có
+              else{
+                //chọn địa chỉ
+                if(document.getElementById('diachichon'.checked === true)){
+                  $http.post('http://localhost:8080/api/address',{
+                    fullname : tennguoimua,
+                    phone : sodienthoai,
+                    address : diachicuthe,
+                    cityId : cityId,
+                    districtId : districtId,
+                    wardId : wardId
+                    }).then(function(adds){
+                      $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                        totalPrice : $scope.tongTien,
+                        shipPrice : 0,
+                        totalPriceLast : $scope.giamGia,
+                        note : ghichu,
+                        payType : 0,
+                        payStatus : 1 ,
+                        idAddress : adds.data.id,
+                        idVoucher : idVoucher == null ? 0 : idVoucher,
+                        idCoupon : idCoupon,
+                        status : 4
+                      })
+                   
+                        
+                    })
+                  
+                 
+                }
+                // địa chỉ có sẵn
+                else{
+                  let idAddressCoSan = document.getElementById('diachiCustomer').value;
+             
+                      $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                        totalPrice : $scope.tongTien,
+                        shipPrice : 0,
+                        totalPriceLast : $scope.giamGia,
+                        note : ghichu,
+                        payType : 0,
+                        payStatus : 1 ,
+                        idAddress : idAddressCoSan,
+                        idVoucher : idVoucher == null ? 0 : idVoucher,
+                        idCoupon : idCoupon,
+                        status : 4
+                      });
+        
+
+                }
               }
             }
+            //mua online thanh toán tiền mặt
             else{
+                 //khách lẻ
+                 if(document.getElementById('khachhang').value === '0'){
+                  $http.post('http://localhost:8080/api/address',{
+                  fullname : tennguoimua,
+                  phone : sodienthoai,
+                  address : diachicuthe,
+                  cityId : cityId,
+                  districtId : districtId,
+                  wardId : wardId
+                  }).then(function(adds){
+                    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                      totalPrice : $scope.tongTien,
+                      shipPrice : $scope.phiShip,
+                      totalPriceLast : $scope.giamGia,
+                      note : ghichu,
+                      payType : 0,
+                      payStatus : 0 ,
+                      idAddress : adds.data.id,
+                      idVoucher : idVoucher == null ? 0 : idVoucher,
+                      idCoupon : idCoupon,
+                      status : 1
+                    })
+                 
+                      
+                  })
+                
+      
+                  
+                }
+                //khách hàng đã có
+                else{
+                  //chọn địa chỉ
+                  if(document.getElementById('diachichon'.checked === true)){
+                    $http.post('http://localhost:8080/api/address',{
+                      fullname : tennguoimua,
+                      phone : sodienthoai,
+                      address : diachicuthe,
+                      cityId : cityId,
+                      districtId : districtId,
+                      wardId : wardId
+                      }).then(function(adds){
+                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                          totalPrice : $scope.tongTien,
+                          shipPrice : $scope.phiShip,
+                          totalPriceLast : $scope.giamGia,
+                          note : ghichu,
+                          payType : 0,
+                          payStatus : 0 ,
+                          idAddress : adds.data.id,
+                          idVoucher : idVoucher == null ? 0 : idVoucher,
+                          idCoupon : idCoupon,
+                          status : 1
+                        })
+                     
+                          
+                      })
+                    
+                   
+                  }
+                  // địa chỉ có sẵn
+                  else{
+                    let idAddressCoSan = document.getElementById('diachiCustomer').value;
+               
+                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                          totalPrice : $scope.tongTien,
+                          shipPrice : $scope.phiShip,
+                          totalPriceLast : $scope.giamGia,
+                          note : ghichu,
+                          payType : 0,
+                          payStatus : 0 ,
+                          idAddress : idAddressCoSan,
+                          idVoucher : idVoucher == null ? 0 : idVoucher,
+                          idCoupon : idCoupon,
+                          status : 1
+                        });
+          
+  
+                  }
+                }
+              
 
             }
-        
+            Swal.fire('Thanh toán thành công' ,'','success');
+            setTimeout(() => {
+              Swal.fire({
+                title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + codeBill + ' ?',
+                showCancelButton: true,
+                confirmButtonText: 'In',
+            }).then((result) => {
+                if (result.isConfirmed){
+                  $scope.choose(null,null);
+                  alert('đã in');
+                }
+                else{
+                  location.reload();
+                }
+              })
+          }, 2000);
+         
 
           } else if (typePay === "pay2") {
             //thanh toán qua vnpay
-            //check số lượng còn hàng trước khi cho đặt hàng
-            $http
-              .get("http://localhost:8080/api/cart/1")
-              .then(function (CheckCart) {
-                for (let i = 0; i < CheckCart.data.length; i++) {
-                  //get số lượng sản phẩm đang có
-                  var getPram = {
-                    IdProduct: CheckCart.data[i].productDetail.id,
-                    IdColor: CheckCart.data[i].idColor,
-                    IdSize: CheckCart.data[i].idSize,
-                  };
+               //mua tại quầy thanh toán online
+               if(document.getElementById('hinhThucMuaHang').value === 'hinhThuc1'){
+                //khách lẻ
+                if(document.getElementById('khachhang').value === '0'){
+                  $http.post('http://localhost:8080/api/address',{
+                  fullname : tennguoimua,
+                  phone : sodienthoai,
+                  address : diachicuthe,
+                  cityId : cityId,
+                  districtId : districtId,
+                  wardId : wardId
+                  }).then(function(adds){
+                    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                      totalPrice : $scope.tongTien,
+                      shipPrice : 0,
+                      totalPriceLast : $scope.giamGia,
+                      note : ghichu,
+                      payType : 1,
+                      payStatus : 0 ,
+                      idAddress : adds.data.id,
+                      idVoucher : idVoucher == null ? 0 : idVoucher,
+                      idCoupon : idCoupon,
+                    });
+                    let params = {
+                      totalPrice:
+                        $scope.tienThanhToan,
+                      code: codeBill,
+                    };
+                    $http({
+                      method: "GET",
+                      url: "http://localhost:8080/api/vnpaytaiquay",
+                      params: params,
+                      transformResponse: [
+                        function (data) {
+                          location.href = data;
+                        },
+                      ],
+                    });
 
-                  $http({
-                    method: "GET",
-                    url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                    params: getPram,
-                  }).then(function (resp) {
-                    if (CheckCart.data[i].quantity > resp.data) {
-                      Swal.fire(
-                        "Số lượng sản phẩm " +
-                          CheckCart.data[i].productDetail.product
-                            .name +
-                          " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
-                        "",
-                        "error"
-                      );
-                      // cập lại số lượng hiện có vào giỏ hàng
-                      $http
-                        .put(
-                          "http://localhost:8080/api/cart/updateCart/" +
-                            CheckCart.data[i].id,
-                          {
-                            idCart: 1,
-                            idProductDetail:
-                              CheckCart.data[i].productDetail.id,
-                            idColor: CheckCart.data[i].idColor,
-                            idSize: CheckCart.data[i].idSize,
-                            quantity: resp.data,
-                            unitPrice: CheckCart.data[i].unitPrice,
-                          }
-                        )
-                        .then(function (cart) {
-                          if (cart.status === 200) {
-                            //load lại sau khi tăng thành công !
-                            $scope.loadCart();
-                          }
-                        });
-                      return;
-                    }
-                    // nếu số lượng hết thì xóa khỏi giỏ hàng
-                    if (resp.data === 0) {
-                      Swal.fire(
-                        "Số lượng sản phẩm " +
-                          CheckCart.data[i].productDetail.product
-                            .name +
-                          " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
-                        "",
-                        "success"
-                      );
-                      $http.delete(
-                        "http://localhost:8080/api/cart/" +
-                          CheckCart.data[i].id
-                      );
-                      $scope.loadCart();
-                      return;
-                    }
-
-                  });
-                }
+                 
+                      
+                  })
                 
-                    // add bill
-                    $http.post("http://localhost:8080/api/bill", {
-                        totalPrice: TotalPrice,
-                        shipPrice: ship.data.data.total,
-                        totalPriceLast:
-                         $scope.giamGia,
-                        note: document.getElementById("note").value,
-                        payType: 1,
-                        payStatus: 0,
-                        idCoupon: 0,
-                        idAddress: idAddress,
-                        idCustomer: 1,
-                        status: 0,
-                        typeStatus : 1
+      
+                  
+                }
+                //khách hàng đã có
+                else{
+                  //chọn địa chỉ
+                  if(document.getElementById('diachichon'.checked === true)){
+                    $http.post('http://localhost:8080/api/address',{
+                      fullname : tennguoimua,
+                      phone : sodienthoai,
+                      address : diachicuthe,
+                      cityId : cityId,
+                      districtId : districtId,
+                      wardId : wardId
+                      }).then(function(adds){
+                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                          totalPrice : $scope.tongTien,
+                          shipPrice : 0,
+                          totalPriceLast : $scope.giamGia,
+                          note : ghichu,
+                          payType : 0,
+                          payStatus : 1 ,
+                          idAddress : adds.data.id,
+                          idVoucher : idVoucher == null ? 0 : idVoucher,
+                          idCoupon : idCoupon,
+                          status : 4
+                        })
+                     
+                          
                       })
-                      .then(function (bill) {
-                        $http
-                          .get("http://localhost:8080/api/cart/1")
-                          .then(function (CartToBill) {
-                            for (
-                              let i = 0;
-                              i < CartToBill.data.length;
-                              i++
-                            ) {
-                              $http
-                                .post(
-                                  "http://localhost:8080/api/bill/addBillDetail",
-                                  {
-                                    // add bill detail
-                                    idBill: bill.data.id,
-                                    idProductDetail:
-                                      CartToBill.data[i].productDetail
-                                        .id,
-                                    idColor:
-                                      CartToBill.data[i].idColor,
-                                    idSize: CartToBill.data[i].idSize,
-                                    quantity:
-                                      CartToBill.data[i].quantity,
-                                    unitPrice:
-                                      CartToBill.data[i].unitPrice,
-                                  }
-                                )
-                                .then(function (billdetail) {
-                                  //xóa giỏ hàng by user
-                                  $http.delete(
-                                    "http://localhost:8080/api/cart/deleteAllCart/1"
-                                  );
-
-                                  //get số lượng sản phẩm đang có
-                                  var getPram = {
-                                    IdProduct:
-                                      CartToBill.data[i].productDetail
-                                        .id,
-                                    IdColor:
-                                      CartToBill.data[i].idColor,
-                                    IdSize: CartToBill.data[i].idSize,
-                                  };
-                                  $http({
-                                    method: "GET",
-                                    url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                                    params: getPram,
-                                  }).then(function (resp) {
-                                    var param2 = {
-                                      IdProduct:
-                                        CartToBill.data[i]
-                                          .productDetail.id,
-                                      IdColor:
-                                        CartToBill.data[i].idColor,
-                                      IdSize:
-                                        CartToBill.data[i].idSize,
-                                      Quantity:
-                                        parseInt(resp.data) -
-                                        parseInt(
-                                          CartToBill.data[i].quantity
-                                        ),
-                                    };
-                                    $http({
-                                      method: "PUT",
-                                      url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
-                                      params: param2,
-                                    }).then(function (resp) {
-                                      let params = {
-                                        totalPrice:
-                                          $scope.tienThanhToan,
-                                        code: bill.data.code,
-                                      };
-                                      $http({
-                                        method: "GET",
-                                        url: "http://localhost:8080/api/vnpay",
-                                        params: params,
-                                        transformResponse: [
-                                          function (data) {
-                                            location.href = data;
-                                          },
-                                        ],
-                                      });
-                                    });
-                                  });
-                                });
-                            }
+                    
+                   
+                  }
+                  // địa chỉ có sẵn
+                  else{
+                    let idAddressCoSan = document.getElementById('diachiCustomer').value;
+               
+                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                          totalPrice : $scope.tongTien,
+                          shipPrice : 0,
+                          totalPriceLast : $scope.giamGia,
+                          note : ghichu,
+                          payType : 0,
+                          payStatus : 1 ,
+                          idAddress : idAddressCoSan,
+                          idVoucher : idVoucher == null ? 0 : idVoucher,
+                          idCoupon : idCoupon,
+                          status : 4
+                        });
+          
+  
+                  }
+                }
+              }
+              //mua online thanh toán tiền mặt
+              else{
+                   //khách lẻ
+                   if(document.getElementById('khachhang').value === '0'){
+                    $http.post('http://localhost:8080/api/address',{
+                    fullname : tennguoimua,
+                    phone : sodienthoai,
+                    address : diachicuthe,
+                    cityId : cityId,
+                    districtId : districtId,
+                    wardId : wardId
+                    }).then(function(adds){
+                      $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                        totalPrice : $scope.tongTien,
+                        shipPrice : $scope.phiShip,
+                        totalPriceLast : $scope.giamGia,
+                        note : ghichu,
+                        payType : 0,
+                        payStatus : 0 ,
+                        idAddress : adds.data.id,
+                        idVoucher : idVoucher == null ? 0 : idVoucher,
+                        idCoupon : idCoupon,
+                        status : 1
+                      })
+                   
+                        
+                    })
+                  
+        
+                    
+                  }
+                  //khách hàng đã có
+                  else{
+                    //chọn địa chỉ
+                    if(document.getElementById('diachichon'.checked === true)){
+                      $http.post('http://localhost:8080/api/address',{
+                        fullname : tennguoimua,
+                        phone : sodienthoai,
+                        address : diachicuthe,
+                        cityId : cityId,
+                        districtId : districtId,
+                        wardId : wardId
+                        }).then(function(adds){
+                          $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                            totalPrice : $scope.tongTien,
+                            shipPrice : $scope.phiShip,
+                            totalPriceLast : $scope.giamGia,
+                            note : ghichu,
+                            payType : 0,
+                            payStatus : 0 ,
+                            idAddress : adds.data.id,
+                            idVoucher : idVoucher == null ? 0 : idVoucher,
+                            idCoupon : idCoupon,
+                            status : 1
+                          })
+                       
+                            
+                        })
+                      
+                     
+                    }
+                    // địa chỉ có sẵn
+                    else{
+                      let idAddressCoSan = document.getElementById('diachiCustomer').value;
+                 
+                          $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                            totalPrice : $scope.tongTien,
+                            shipPrice : $scope.phiShip,
+                            totalPriceLast : $scope.giamGia,
+                            note : ghichu,
+                            payType : 0,
+                            payStatus : 0 ,
+                            idAddress : idAddressCoSan,
+                            idVoucher : idVoucher == null ? 0 : idVoucher,
+                            idCoupon : idCoupon,
+                            status : 1
                           });
-                      });
-              });
-
+            
+    
+                    }
+                  }
+                
+  
+              }
+         
+           
+         
           } else {
             Swal.fire("Có lỗi xảy ra !", "", "error");
           }
