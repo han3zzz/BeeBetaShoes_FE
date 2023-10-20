@@ -1,4 +1,4 @@
-    <h3> Quản Lý Giày</h3>
+    <h3><i class="fa-solid fa-paper-plane"></i> Quản Lý Giày</h3>
         <div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo mã hoặc tên giày.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
         <div>
          <div style="padding-left: 5px;">
@@ -359,7 +359,7 @@
                       <td>Số lượng đã bán</td>
                       <td>Doanh thu</td>
                      </tr>
-                     <tr ng-repeat="c in listProductSold">
+                     <tr ng-repeat="c in pagerSold.items">
                       <td>
                         <span ng-repeat="color in listColor">
                           <span ng-if="color.id == c.idColor">{{color.name}}</span>
@@ -371,12 +371,27 @@
                         </span>
                       </td>
                       <td>{{c.quantity}}</td>
-                      <td>{{c.unitPrice * c.quantity | currency:'':0}} VNĐ</td>
+                      <td>{{c.price | currency:'':0}} VNĐ</td>
                      </tr>
 
 
                       
                     </table>
+                    <div class="text-center" ng-if="listProductSold.length > 0">
+                      <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <button ng-click="pagerSold.first()" type="button"
+                                class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>
+                        <button ng-click="pagerSold.prev()" type="button"
+                                class="btn btn-outline-secondary"><i class="fa-solid fa-angle-left"></i></button>
+                        <button type="button" class="btn btn-outline-secondary">{{pagerSold.page+1}}
+                          of
+                          {{pagerSold.count}}</button>
+                        <button ng-click="pagerSold.next()" type="button"
+                                class="btn btn-outline-secondary"><i class="fa-solid fa-angle-right"></i></button>
+                        <button ng-click="pagerSold.last()" type="button"
+                                class="btn btn-outline-secondary"><i class="fa-solid fa-angles-right"></i></button>
+                      </div>
+                    </div>
                   </div>
                   </div>
                   </div>

@@ -1,4 +1,4 @@
-<h3> Bán Hàng Tại Quầy</h3>
+<h3><i class="fa-brands fa-shopify"></i> Bán Hàng Tại Quầy</h3>
 
  <div style="padding: 10px;">
   <button ng-click="addbill()" class="btn btn-dark"><i class="fa-solid fa-plus"></i> Tạo hóa đơn</button>
@@ -9,7 +9,7 @@
     </span>
     
    
-      <div>
+      <div ng-if="listBill.length > 0">
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <button ng-click="pager.first()" type="button"
                   class="btn btn-dark"><i class="fa-solid fa-angles-left"></i></button>
@@ -36,7 +36,7 @@
     </div>
     <div class="col-md-9">
       <div>
-        <h4>Giỏ hàng</h4>
+        <h4><i class="fa-solid fa-cart-plus"></i> Giỏ hàng</h4>
         <button ng-click="togglePopup()" style="text-align: right;" class="btn btn-success"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button>
         <button ng-click="webcam()" style="text-align: right;" class="btn btn-success"><i class="fa-solid fa-qrcode"></i> Scan QR</button>
         <table class="table">
@@ -480,3 +480,130 @@
 
 </div>
 </div>
+
+
+<!-- exportbill -->
+   <div style="display: none;">
+    <section id="exportbill">
+ 
+      <div class="invoice">
+        <div class="top_line"></div>
+        <div class="header">
+          <div class="i_row">
+            <div class="i_logo">
+             <img style="width: 200px; height: 100px;" src="../../assets/images/logo.png">
+            </div>
+            <div class="i_title">
+              <h2>Hóa Đơn</h2>
+            </div>
+          </div>
+          <div class="i_row">
+            <div class="i_number">
+              <p class="p_title">Mã Hóa Đơn: {{billexport.code}}</p>
+              <p class="p_title">Thông tin giao hàng : {{addressexport.fullname}} - {{addressexport.phone}} | {{addressexport.address}}, {{addressexport.wardName}}, {{addressexport.districtName}}, {{addressexport.cityName}}</p>
+              <p class="p_title">Phương thức thanh toán : {{billexport.payType === 0 ? 'Tiền mặt' : 'Online qua VNPay'}}</p>
+              <p class="p_title">Phương thức mua hàng : {{billexport.typeStatus === 1 ? 'Mua tại quầy' : 'Mua online'}}</p>
+            </div>
+          
+          </div>
+        </div>
+        <div class="body">
+          <div class="i_table">
+            <div class="i_table_head">
+              <div class="i_row">
+                <div class="i_col w_55">
+                  <p class="p_title">Sản Phẩm</p>
+                </div>
+                <div class="i_col w_15">
+                  <p class="p_title">Số Lượng</p>
+                </div>
+                <div class="i_col w_15">
+                  <p class="p_title">Đơn Giá</p>
+                </div>
+                <div class="i_col w_15">
+                  <p class="p_title">Thành Tiền</p>
+                </div>
+              </div>
+            </div>
+            <div class="i_table_body">
+              <div class="i_row" ng-repeat="bill in listItemExport">
+               
+                <div class="i_col w_55">
+
+          <td class="cart__meta small--text-left cart-flex-item">
+              <div class="list-view-item__title">
+               
+              
+                  {{bill.productDetail.product.name}}
+                  <br>
+                  SKU : {{bill.productDetail.product.code}}
+      
+              </div>
+              <div class="cart__meta-text">
+                  Màu: 
+                  <span ng-repeat="color in listColor">
+                      <span ng-if="color.id == bill.idColor">
+                          {{color.name}}
+                      </span>
+                  </span>
+                  <br> 
+                  Kích Thước: 
+                  <span ng-repeat="size in listSize">
+                      <span ng-if="size.id == bill.idSize">
+                          {{size.name}}
+                      </span>
+                  </span>
+                  <br>
+              </div>
+          </td>
+                </div>
+                <div class="i_col w_15">
+                  <p>{{bill.quantity}}</p>
+                </div>
+                <div class="i_col w_15">
+                  <p>{{bill.unitPrice | currency:'':0}}</p>
+                </div>
+                <div class="i_col w_15">
+                  <p>{{bill.unitPrice * bill.quantity | currency:'':0}}</p>
+                </div>
+              </div>
+            </div>
+            <div class="i_table_foot">
+              <div class="i_row">
+                <div class="i_col w_15">
+                  <p></p>
+                </div>
+                <div class="i_col w_55">
+                  <p></p>
+                </div>
+                <div class="i_col w_15">
+                  <p>Tổng Tiền</p>
+                  <p>Phí Ship</p>
+                  <p>Giảm Giá</p>
+                </div>
+                <div class="i_col w_25">
+                  <p>{{billexport.totalPrice | currency:'':0}}</p>
+                  <p>{{billexport.shipPrice | currency:'':0}}</p>
+                  <p>{{billexport.totalPriceLast | currency:'':0}}</p>
+                </div>
+              </div>
+              <div class="i_row grand_total_wrap">
+                <div class="i_col w_50">
+                </div>
+                <div class="i_col w_50 grand_total">
+                  <p><span>Tổng Tiền Thanh Toán :</span>
+                    <span>{{billexport.totalPrice + billexport.shipPrice - billexport.totalPriceLast | currency:'':0}} VNĐ</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer">
+          <div style="text-align: center;font-weight: bold;">Cảm ơn bạn đã mua sắm tại BeeBetaShoes! <br>
+             Chúc bạn một ngày tốt lành.</div>
+        </div>
+        <div class="bottom_line"></div>
+      </div>
+    </section>
+   </div>

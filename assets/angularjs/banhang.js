@@ -160,33 +160,33 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
     $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - $scope.giamGia;
     // lấy thông tin địa chỉ giao hàng
     
-    var params = {
-    service_type_id: 2,
-    insurance_value: parseInt($scope.tongTien),
-    coupon: null,
-    from_district_id: 1482,
-    to_district_id: 2264,
-    to_ward_code: 90816,
-    height: 0,
-    length: 0,
-    weight: parseInt(TotalGam),
-    width: 0,
-    };
-    // get phí ship từ GHN
-    $http({
-    method: "GET",
-    url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
-    params: params,
-    headers: {
-    "Content-Type": undefined,
-    token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
-    shop_id: 4603004,
-    },
-    }).then(function (resp) {
-    $scope.phiShip = resp.data.data.total;
+    // var params = {
+    // service_type_id: 2,
+    // insurance_value: parseInt($scope.tongTien),
+    // coupon: null,
+    // from_district_id: 1482,
+    // to_district_id: 2264,
+    // to_ward_code: 90816,
+    // height: 0,
+    // length: 0,
+    // weight: parseInt(TotalGam),
+    // width: 0,
+    // };
+    // // get phí ship từ GHN
+    // $http({
+    // method: "GET",
+    // url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+    // params: params,
+    // headers: {
+    // "Content-Type": undefined,
+    // token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
+    // shop_id: 4603004,
+    // },
+    // }).then(function (resp) {
+    // $scope.phiShip = resp.data.data.total;
 
   
-    });
+    // });
     
     })
 
@@ -397,7 +397,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                                   params: param2,
                                                 }).then(function (resp) {
                                                   Swal.fire("Đã thêm vào giỏ !","","success");
-                                                 
+                                              
                                                   $scope.choose(codeBill,idBill);
                                                 
                                                
@@ -750,7 +750,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                       }).then(function (resp) {
                                           $http.get("http://localhost:8080/api/bill/deleteBillDetail/"+id).then(function(resp){
                                               Swal.fire("Xóa thành công !","","success");
-  
+                                    
                                               $scope.choose(codeBill,idBill);
                                               $scope.getAllProduct();
                                             
@@ -775,38 +775,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                         }
                     })
                   }
-                     //check trạng thái thanh toán online khi trả về
-   if ($location.search().vnp_TransactionStatus === "00") {
-    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ $location.search().vnp_OrderInfo,{
-      payStatus : 1
-    
-    });
-         Swal.fire('Thanh toán thành công' ,'','success');
-              setTimeout(() => {
-                Swal.fire({
-                  title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + $location.search().vnp_OrderInfo + ' ?',
-                  showCancelButton: true,
-                  confirmButtonText: 'In',
-              }).then((result) => {
-                  if (result.isConfirmed){
-                    $scope.choose(null,null);
-                    alert('đã in');
-                  }
-                  else{
-                    location.href = '#/sell/view';
-                  }
-                })
-            }, 2000);
-  }
-  if ($location.search().vnp_TransactionStatus === "02") {
-    Swal.fire('Thanh toán không thành công' ,'','error');
-    $scope.choose($location.search().vnp_OrderInfo,null);
-    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ $location.search().vnp_OrderInfo,{
-      status : 10
-    
-    });
-    
-  }
+          
 
                   //hủy hóa đơn
                   
@@ -1477,6 +1446,8 @@ $scope.apCoupon = function(){
           $scope.checkCoupon = true;
           idCoupon = $scope.listCoupon[i].id;
           Swal.fire("Áp mã thành công !","","success");
+          $scope.hinhThucMuaHang();
+            $scope.tinhPhiShip();
           document.getElementById('code-coupon').value = '';
           $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - ($scope.couponGiamGia + $scope.voucherGiamGia);
         
@@ -1553,6 +1524,8 @@ $scope.apCTKM = function(){
             $scope.checkVoucher = true;
             idVoucher = $scope.listVoucher[i].id;
             Swal.fire("Áp mã thành công !","","success");
+            $scope.hinhThucMuaHang();
+            $scope.tinhPhiShip();
             if($scope.tongTien < $scope.giamGia){
               Swal.fire('Số tiền giảm đã ở mức tối đa','','error');
               $scope.checkVoucher = true;
@@ -1632,6 +1605,8 @@ $scope.apCTKM = function(){
               idVoucher = $scope.listVoucher[i].id;
               $scope.checkVoucher = true;
               Swal.fire("Áp mã thành công !","","success");
+              $scope.hinhThucMuaHang();
+            $scope.tinhPhiShip();
             }
             if($scope.tongTien < $scope.giamGia){
               Swal.fire('Số tiền giảm đã ở mức tối đa','','error');
@@ -1704,7 +1679,116 @@ $scope.removeCoupon = function(){
     $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - $scope.voucherGiamGia +  $scope.couponGiamGia;
 
 }
+           //check trạng thái thanh toán online khi trả về
+   if ($location.search().vnp_TransactionStatus === "00") {
+    $http.put('http://localhost:8080/api/bill/updateStatus1/'+ $location.search().vnp_OrderInfo,{
+      payStatus : 1,
+    
+    }).then(function (response) {
+      Swal.fire('Thanh toán thành công' ,'','success');
+      $scope.billexport = {};
+      $scope.addressexport = {};
+      $scope.listItemExport = [];
+      $http.get('http://localhost:8080/api/bill/getbycode/'+$location.search().vnp_OrderInfo).then(function(billexport){
+        $scope.billexport = billexport.data;
+        // $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
+        //   $scope.addressexport = add.data;
+        // })
+       
+      })
+      $http.get("http://localhost:8080/api/bill/getallbybill/"+$location.search().vnp_OrderInfo).then(function(resp){
+        $scope.listItemExport = resp.data;
+    })
+      setTimeout(() => {
+     
+      
+        Swal.fire({
+          title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + $location.search().vnp_OrderInfo + ' ?',
+          showCancelButton: true,
+          confirmButtonText: 'In',
+      }).then((result) => {
+      
+          if (result.isConfirmed){
+           
+            var element = document.getElementById('exportbill'); 
+  
+  
+  
+  //custom file name
+  html2pdf().set({filename: $location.search().vnp_OrderInfo+'.pdf'}).from(element).save();
+  Swal.fire('Đã xuất hóa đơn' ,'','success');
+  setTimeout(() => {
+  location.reload();
+  }, 2000);
+          }
+          else{
+            location.reload();
+          }
+        })
+    }, 2000);
+      
+    })
+  }
+  if ($location.search().vnp_TransactionStatus === "02") {
+    
+    $http.put('http://localhost:8080/api/bill/updateStatus/'+ $location.search().vnp_OrderInfo,{
+      payStatus : 0,
+      paymentDate : null,
+      delyveryDate : null,
+      status : 10
+    
+    });
+    Swal.fire('Đơn hàng ' + $location.search().vnp_OrderInfo + ' chưa được thanh toán !' ,'','error');
+    setTimeout(() => {
+        location.href = '#/sell/view';
+    }, 2000);
 
+  }
+
+//export bill
+  $scope.exportBill = function(){
+    Swal.fire('Thanh toán thành công' ,'','success');
+    $scope.billexport = {};
+    $scope.addressexport = {};
+    $scope.listItemExport = [];
+    $http.get('http://localhost:8080/api/bill/getbycode/'+codeBill).then(function(billexport){
+      $scope.billexport = billexport.data;
+      $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
+        $scope.addressexport = add.data;
+      })
+     
+    })
+    $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function(resp){
+      $scope.listItemExport = resp.data;
+  })
+    setTimeout(() => {
+   
+    
+      Swal.fire({
+        title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + codeBill + ' ?',
+        showCancelButton: true,
+        confirmButtonText: 'In',
+    }).then((result) => {
+    
+        if (result.isConfirmed){
+         
+          var element = document.getElementById('exportbill'); 
+
+
+
+//custom file name
+html2pdf().set({filename: codeBill+'.pdf'}).from(element).save();
+Swal.fire('Đã xuất hóa đơn' ,'','success');
+setTimeout(() => {
+location.reload();
+}, 2000);
+        }
+        else{
+          location.reload();
+        }
+      })
+  }, 2000);
+  }
 
     // dat hang
     $scope.buy = function (code) {
@@ -1715,7 +1799,22 @@ $scope.removeCoupon = function(){
       let cityId = document.getElementById('tinh').value;
       let districtId = document.getElementById('huyen').value;
       let wardId = document.getElementById('xa').value;
-    
+    // Get the select element by its id
+const selectElement = document.getElementById('tinh');
+
+// Get the selected option's text content (ProvinceName)
+const cityName = selectElement.options[selectElement.selectedIndex].textContent;
+    // Get the select element by its id
+    const selectElement1 = document.getElementById('huyen');
+
+    // Get the selected option's text content (ProvinceName)
+    const districtName = selectElement1.options[selectElement1.selectedIndex].textContent;
+      // Get the select element by its id
+      const selectElement2 = document.getElementById('xa');
+
+      // Get the selected option's text content (ProvinceName)
+      const wardName = selectElement2.options[selectElement2.selectedIndex].textContent;
+
       Swal.fire({
         title: "Xác nhận thanh toán đơn hàng " + code + " ?",
         showCancelButton: true,
@@ -1736,7 +1835,11 @@ $scope.removeCoupon = function(){
                 address : diachicuthe,
                 cityId : cityId,
                 districtId : districtId,
-                wardId : wardId
+                wardId : wardId,
+                cityName : cityName,
+                districtName : districtName,
+                wardName : wardName
+             
                 }).then(function(adds){
                   $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                     totalPrice : $scope.tongTien,
@@ -1748,8 +1851,14 @@ $scope.removeCoupon = function(){
                     idAddress : adds.data.id,
                     idVoucher : idVoucher == null ? 0 : idVoucher,
                     idCoupon : idCoupon,
-                    status : 4
+                    paymentDate : new Date(),
+                    delyveryDate : new Date(),
+                    status : 3
+                  }).then(function(resp){
+                    $scope.exportBill();
+                    return;
                   })
+                  
                
                     
                 })
@@ -1767,7 +1876,10 @@ $scope.removeCoupon = function(){
                     address : diachicuthe,
                     cityId : cityId,
                     districtId : districtId,
-                    wardId : wardId
+                    wardId : wardId,
+                    cityName : cityName,
+                    districtName : districtName,
+                    wardName : wardName
                     }).then(function(adds){
                       $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                         totalPrice : $scope.tongTien,
@@ -1779,7 +1891,12 @@ $scope.removeCoupon = function(){
                         idAddress : adds.data.id,
                         idVoucher : idVoucher == null ? 0 : idVoucher,
                         idCoupon : idCoupon,
-                        status : 4
+                        paymentDate : new Date(),
+                        delyveryDate : new Date(),
+                        status : 3
+                      }).then(function(resp){
+                        $scope.exportBill();
+                        return;
                       })
                    
                         
@@ -1801,8 +1918,13 @@ $scope.removeCoupon = function(){
                         idAddress : idAddressCoSan,
                         idVoucher : idVoucher == null ? 0 : idVoucher,
                         idCoupon : idCoupon,
-                        status : 4
-                      });
+                        paymentDate : new Date(),
+                        delyveryDate : new Date(),
+                        status : 3
+                      }).then(function(resp){
+                        $scope.exportBill();
+                        return;
+                      })
         
 
                 }
@@ -1818,7 +1940,10 @@ $scope.removeCoupon = function(){
                   address : diachicuthe,
                   cityId : cityId,
                   districtId : districtId,
-                  wardId : wardId
+                  wardId : wardId,
+                  cityName : cityName,
+                  districtName : districtName,
+                  wardName : wardName
                   }).then(function(adds){
                     $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                       totalPrice : $scope.tongTien,
@@ -1831,6 +1956,9 @@ $scope.removeCoupon = function(){
                       idVoucher : idVoucher == null ? 0 : idVoucher,
                       idCoupon : idCoupon,
                       status : 1
+                    }).then(function(resp){
+                      $scope.exportBill();
+                      return;
                     })
                  
                       
@@ -1849,7 +1977,10 @@ $scope.removeCoupon = function(){
                       address : diachicuthe,
                       cityId : cityId,
                       districtId : districtId,
-                      wardId : wardId
+                      wardId : wardId,
+                      cityName : cityName,
+                      districtName : districtName,
+                      wardName : wardName
                       }).then(function(adds){
                         $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                           totalPrice : $scope.tongTien,
@@ -1862,6 +1993,9 @@ $scope.removeCoupon = function(){
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
                           status : 1
+                        }).then(function(resp){
+                          $scope.exportBill();
+                          return;
                         })
                      
                           
@@ -1884,7 +2018,10 @@ $scope.removeCoupon = function(){
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
                           status : 1
-                        });
+                        }).then(function(resp){
+                          $scope.exportBill();
+                          return;
+                        })
           
   
                   }
@@ -1892,23 +2029,10 @@ $scope.removeCoupon = function(){
               
 
             }
-            Swal.fire('Thanh toán thành công' ,'','success');
-            setTimeout(() => {
-              Swal.fire({
-                title: 'Bạn có muốn in hóa đơn cho đơn hàng ' + codeBill + ' ?',
-                showCancelButton: true,
-                confirmButtonText: 'In',
-            }).then((result) => {
-                if (result.isConfirmed){
-                  $scope.choose(null,null);
-                  alert('đã in');
-                }
-                else{
-                  location.reload();
-                }
-              })
-          }, 2000);
-         
+          
+          
+          
+           
 
           } else if (typePay === "pay2") {
             //thanh toán qua vnpay
@@ -1922,7 +2046,10 @@ $scope.removeCoupon = function(){
                   address : diachicuthe,
                   cityId : cityId,
                   districtId : districtId,
-                  wardId : wardId
+                  wardId : wardId,
+                  cityName : cityName,
+                  districtName : districtName,
+                  wardName : wardName
                   }).then(function(adds){
                     $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                       totalPrice : $scope.tongTien,
@@ -1934,23 +2061,9 @@ $scope.removeCoupon = function(){
                       idAddress : adds.data.id,
                       idVoucher : idVoucher == null ? 0 : idVoucher,
                       idCoupon : idCoupon,
+                      status : 3
                     });
-                    let params = {
-                      totalPrice:
-                        $scope.tienThanhToan,
-                      code: codeBill,
-                    };
-                    $http({
-                      method: "GET",
-                      url: "http://localhost:8080/api/vnpaytaiquay",
-                      params: params,
-                      transformResponse: [
-                        function (data) {
-                          location.href = data;
-                        },
-                      ],
-                    });
-
+                  
                  
                       
                   })
@@ -1968,7 +2081,10 @@ $scope.removeCoupon = function(){
                       address : diachicuthe,
                       cityId : cityId,
                       districtId : districtId,
-                      wardId : wardId
+                      wardId : wardId,
+                      cityName : cityName,
+                      districtName : districtName,
+                      wardName : wardName
                       }).then(function(adds){
                         $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                           totalPrice : $scope.tongTien,
@@ -1980,8 +2096,9 @@ $scope.removeCoupon = function(){
                           idAddress : adds.data.id,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
-                          status : 4
+                          status : 3
                         })
+                        
                      
                           
                       })
@@ -2002,14 +2119,30 @@ $scope.removeCoupon = function(){
                           idAddress : idAddressCoSan,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
-                          status : 4
+                          status : 3
                         });
           
   
                   }
                 }
+                let params = {
+                  totalPrice:
+                    $scope.tienThanhToan,
+                  code: codeBill,
+                };
+                $http({
+                  method: "GET",
+                  url: "http://localhost:8080/api/vnpaytaiquay",
+                  params: params,
+                  transformResponse: [
+                    function (data) {
+                      location.href = data;
+                    },
+                  ],
+                });
+
               }
-              //mua online thanh toán tiền mặt
+              //mua online thanh toán online
               else{
                    //khách lẻ
                    if(document.getElementById('khachhang').value === '0'){
@@ -2019,7 +2152,10 @@ $scope.removeCoupon = function(){
                     address : diachicuthe,
                     cityId : cityId,
                     districtId : districtId,
-                    wardId : wardId
+                    wardId : wardId,
+                    cityName : cityName,
+                    districtName : districtName,
+                    wardName : wardName
                     }).then(function(adds){
                       $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                         totalPrice : $scope.tongTien,
@@ -2050,7 +2186,10 @@ $scope.removeCoupon = function(){
                         address : diachicuthe,
                         cityId : cityId,
                         districtId : districtId,
-                        wardId : wardId
+                        wardId : wardId,
+                        cityName : cityName,
+                        districtName : districtName,
+                        wardName : wardName
                         }).then(function(adds){
                           $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                             totalPrice : $scope.tongTien,
@@ -2093,6 +2232,21 @@ $scope.removeCoupon = function(){
                 
   
               }
+              let params = {
+                totalPrice:
+                  $scope.tienThanhToan,
+                code: codeBill,
+              };
+              $http({
+                method: "GET",
+                url: "http://localhost:8080/api/vnpaytaiquay",
+                params: params,
+                transformResponse: [
+                  function (data) {
+                    location.href = data;
+                  },
+                ],
+              });
          
            
          
