@@ -87,12 +87,12 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         $http.put("http://localhost:8080/api/voucher/update/"+id,{
             code : $scope.form.code,
             name : $scope.form.name,
-            typevoucher : $scope.form.typevoucher,
-            isvoucher : $scope.form.isvoucher,
+            typeVoucher : $scope.form.typevoucher,
+            isVoucher : $scope.form.isvoucher,
             discount : $scope.form.discount,
             cash : $scope.form.cash,
-            startdate : $scope.form.startdate,
-            enddate : $scope.form.enddate,
+            startDate : $scope.form.startdate,
+            endDate : $scope.form.enddate,
         }).then(function(resp){
             if(resp.status === 200){
                 Swal.fire('Sửa thành công !', '', 'success')
