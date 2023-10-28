@@ -37,8 +37,8 @@
     <div class="col-md-9">
       <div>
         <h4><i class="fa-solid fa-cart-plus"></i> Giỏ hàng</h4>
-        <button ng-click="togglePopup()" style="text-align: right;" class="btn btn-success"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button>
-        <button ng-click="webcam()" style="text-align: right;" class="btn btn-success"><i class="fa-solid fa-qrcode"></i> Scan QR</button>
+        <button ng-click="togglePopup()" style="text-align: right;" class="btn btn-dark"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button>
+        <button ng-click="webcam()" style="text-align: right;" class="btn btn-dark"><i class="fa-solid fa-qrcode"></i> Scan QR</button>
         <table class="table">
           <thead class="cart__row cart__header">
               <tr>
@@ -98,7 +98,12 @@
               <td><button ng-click="deleteBillDetail(cart.id)" class="btn btn-dark"><i class="fa-solid fa-trash"></i></button></td>
           </tr>
           <tr ng-if="listItem.length == 0">
-            <td colspan="5">Không có sản phẩm nào !</td>
+            <td colspan="13">
+              <div style="text-align: center;">
+                <div><img style="width: 80px; height: 80px;" src="../../assets/images/box.png"></div>
+                <h4>Không có sản phẩm nào</h4>
+              </div>
+            </td>
           </tr>
              
              
@@ -114,18 +119,27 @@
       <h4>Thông Tin Giao Hàng</h4>
       <div>
         <div>
-          <label>Khách hàng</label>
-          <select class="form-select-sm" ng-click="chondiachi()" id="khachhang" >
+          Khách hàng <button style="border: none;"><i class="fa-solid fa-circle-plus"></i></button>
+          <select class="haninput" ng-click="chondiachi()" id="khachhang" >
             <option value="0">Khách lẻ</option>
             <option  ng-repeat="kh in listCustomer" value="{{kh.id}}">{{kh.fullname}} ({{kh.code}})</option>
           </select>
-        </div>
-        <div id="diachi" style="display: none;">
-          <input ng-click="chondiachi1()" type="radio" id="diachichon" name="diachi" checked>Địa chỉ chọn
-          <input ng-click="chondiachi1()" type="radio" id="diachicosan" name="diachi">Địa chỉ có sẵn
           
         </div>
-        <div id="diachichon2">
+        <div id="diachi" style="display: none;" class="custom-radio">
+          <input ng-click="chondiachi1()" type="radio" id="diachichon" name="diachi" checked><label for="diachichon">Địa chỉ chọn</label>
+          <input ng-click="chondiachi1()" type="radio" id="diachicosan" name="diachi"><label for="diachicosan">Địa chỉ có sẵn</label>
+          
+        </div>
+        <span>Hình thức mua hàng</span>
+        <div class="radio-buttonhan">
+          <input type="radio" id="hinhThuc1" ng-click="hinhThucMuaHang();chondiachi()" value="hinhThuc1" name="radio-group" checked>
+          <label for="hinhThuc1"><i class="fa-solid fa-store"></i> Tại quầy</label>
+          <input type="radio" id="hinhThuc2" ng-click="hinhThucMuaHang();tinhPhiShip();chondiachi()" value="hinhThuc2" name="radio-group">
+          <label for="hinhThuc2"><i class="fa-solid fa-earth-americas"></i> Online</label>
+        </div>
+        
+        <div id="diachichon2" style="display: none;">
           
           <div>
             <label>Tỉnh/TP </label>
@@ -145,48 +159,59 @@
               <option ng-repeat="xa in listXa" value="{{xa.WardCode}}">{{xa.WardName}}</option>
             </select>
           </div>
+          <div id="nguoimua" style="display: block;">
+            Tên người mua 
+            <input class="input-group-text" style="width: 250px;" type="text" id="tennguoimua">
+            Số điện thoại 
+            <input class="input-group-text" style="width: 250px;" type="text" id="sodienthoai">
+          </div>
           Địa chỉ cụ thể
-          <textarea class="haninput3" type="text" id="diachicuthe"></textarea>
+          <textarea class="haninput3" type="text" id="diachicuthe" style="display: block;"></textarea>
         </div>
         <div id="diachichon1" style="display: none;">
-          <label>Địa chỉ</label>
+         Địa chỉ giao hàng
           <select class="form-select-sm" id="diachiCustomer" ng-click="doidiachi()">
             <option ng-repeat="add in listAddress" value="{{add.id}}">{{add.fullname}} - {{add.phone}} | {{add.address}}, {{add.wardName}}, {{add.districtName}}, {{add.cityName}}</option>
           </select>
         </div>
       </div>
       <div>
-        <div>
+        <span>Hình thức thanh toán</span>
+        <div class="radio-buttonhan">
+          <input type="radio" id="pay1" name="radio-group1" checked>
+          <label for="pay1"><i class="fa-solid fa-wallet"></i> Tiền mặt</label>
+          <input type="radio" id="pay2" name="radio-group1">
+          <label for="pay2"><i class="fa-solid fa-credit-card"></i> VNPAY</label>
+        </div>
+        <!-- <div>
           <label>Hình thức mua hàng</label>
           <select id="hinhThucMuaHang" class="form-select-sm" ng-click="hinhThucMuaHang();tinhPhiShip()">
             <option value="hinhThuc1">Tại quầy</option>
             <option value="hinhThuc2">Online</option>
           </select>
-        </div>
-        <div>
+        </div> -->
+        <!-- <div>
           <label>Hình thức thanh toán</label>
           <select class="form-select-sm" id="typePay">
             <option value="pay1">Tiền mặt</option>
             <option value="pay2">Thanh toán online qua VNPAY</option>
           </select>
-        </div>
+        </div> -->
         <div id="muaonline" style="display: none;">
           Đơn vị vận chuyển
           <div><img style="width: 100px; height: 50px;" src="../../assets/images/Logo-GHN.png"></div>
         </div>
-        <div id="nguoimua">
-          Tên người mua 
-          <input class="input-group-text" style="width: 250px;" type="text" id="tennguoimua">
-          Số điện thoại 
-          <input class="input-group-text" style="width: 250px;" type="text" id="sodienthoai">
-        </div>
+        
         <div >
          
           Ghi chú
           <textarea class="haninput3" type="text" id="ghichu"></textarea>
          
-          <input ng-click="magiamgia()" type="radio"  id="chuongtrinhkhuyenmaiCheck" name="magiam" checked><span style="font-size: 13px;">Chương trình khuyến mãi</span>
-          <span id="maGiamGiaKH" style="display: none;"><input ng-click="magiamgia()" type="radio"  id="magiamgiaCheck" name="magiam"><span id="magiamgiaCheck" style="font-size: 13px;" >Phiếu giảm giá</span></span>
+          <div class="custom-radio">
+            <input ng-click="magiamgia()" type="radio"  id="chuongtrinhkhuyenmaiCheck" name="magiam" checked><label for="chuongtrinhkhuyenmaiCheck">Chương trình khuyến mãi</label></span>
+            <span id="maGiamGiaKH" style="display: none;"><input ng-click="magiamgia()" type="radio"  id="magiamgiaCheck" name="magiam"><label for="magiamgiaCheck">Phiếu giảm giá</label></span>
+          </div>
+         
           <div id="magiamgia">
             <input class="input-group-text" style="width: 250px;" type="text" id="code-coupon" placeholder="Mã giảm giá nếu có...">
           <button ng-click="apCoupon()" style="padding: 5px;" class="btn btn-dark">Áp dụng</button>
@@ -500,7 +525,7 @@
           <div class="i_row">
             <div class="i_number">
               <p class="p_title">Mã Hóa Đơn: {{billexport.code}}</p>
-              <p class="p_title">Thông tin giao hàng : {{addressexport.fullname}} - {{addressexport.phone}} | {{addressexport.address}}, {{addressexport.wardName}}, {{addressexport.districtName}}, {{addressexport.cityName}}</p>
+              <p class="p_title" ng-if="billexport.typeStatus === 0">Thông tin giao hàng : {{addressexport.fullname}} - {{addressexport.phone}} | {{addressexport.address}}, {{addressexport.wardName}}, {{addressexport.districtName}}, {{addressexport.cityName}}</p>
               <p class="p_title">Phương thức thanh toán : {{billexport.payType === 0 ? 'Tiền mặt' : 'Online qua VNPay'}}</p>
               <p class="p_title">Phương thức mua hàng : {{billexport.typeStatus === 1 ? 'Mua tại quầy' : 'Mua online'}}</p>
             </div>
@@ -530,11 +555,10 @@
                
                 <div class="i_col w_55">
 
-          <td class="cart__meta small--text-left cart-flex-item">
               <div class="list-view-item__title">
                
               
-                  {{bill.productDetail.product.name}}
+                  {{bill.productDetail.product.name | uppercase}}
                   <br>
                   SKU : {{bill.productDetail.product.code}}
       
@@ -607,3 +631,6 @@
       </div>
     </section>
    </div>
+   <div class="loading-overlay" ng-show="isLoading">
+    <div class="loading-spinner"></div>
+  </div>

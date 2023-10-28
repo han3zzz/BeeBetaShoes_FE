@@ -95,6 +95,49 @@
            $http.get(urldesign).then(function (response){
                $scope.listDesign = response.data;
            })
+           // load design
+           $scope.list1 = [];
+           $http.get("http://localhost:8080/api/product/findAll").then(function (response){
+               $scope.list1 = response.data;
+           })
+
+           $scope.operationhistory = [];
+           $http.get("http://localhost:8080/api/operationhistory").then(function(resp){
+            $scope.operationhistory = resp.data;
+              // pagation
+           $scope.pagerop = {
+            page: 0,
+            size: 10,
+            get items() {
+                var start = this.page * this.size;
+                return $scope.operationhistory.slice(start, start + this.size);
+            },
+            get count() {
+                return Math.ceil(1.0 * $scope.operationhistory.length / this.size);
+            },
+
+            first() {
+                this.page = 0;
+            },
+            prev() {
+                this.page--;
+                if (this.page < 0) {
+                    this.last();
+                }
+            },
+            next() {
+                this.page++;
+                if (this.page >= this.count) {
+                    this.first();
+                }
+            },
+            last() {
+                this.page = this.count - 1;
+            }
+        }
+          
+           })
+           
        }
        $scope.loadAll();
        $scope.giamGia = function(){
@@ -190,62 +233,62 @@
           
        };
 
-     $scope.addNhaCungCap  = function(){
-        if($scope.nhaCungCap != null){
-            Swal.fire('Hiện tại đã có nhà cung cấp !','','error');
-            return;
-        }
-        let name1 = document.getElementById("tenncc").value;
-        let phone1 = document.getElementById("sdtncc").value;
-        let address1 =document.getElementById("diachincc").value;
-        let agree1 = document.getElementById("thoathuanncc").value;
-        if(name1.trim() === ''){
-            Swal.fire('Tên không được để trống !','','error');
-            return;
-        }
-        if(name1.trim().length > 100){
-            Swal.fire('Tên nhỏ hơn 100 kí tự !','','error');
-            return;
-        }
-        if(phone1.trim() === ''){
-            Swal.fire('Số điện thoại không được để trống !','','error');
-            return;
-        }
-        if(phone1.trim().length != 10){
-            Swal.fire('Số điện thoại 10 số  !','','error');
-            return;
-        }
-        var numberRegex = /^[0-9]+$/;
-        if (!numberRegex.test(phone1)) {
-          Swal.fire("Số điện thoại phải là số !!", "", "error");
-            return;
-        }
-        if(address1.trim() === ''){
-            Swal.fire('Địa chỉ không được để trống !','','error');
-            return;
-        }
-        if(address1.trim().length > 255){
-            Swal.fire('Địa chỉ nhỏ hơn 255 kí tự !','','error');
-            return;
-        }
-        if(agree1.trim() === ''){
-            Swal.fire('Thỏa thuận không được để trống !','','error');
-            return;
-        }
-        if(agree1.trim().length > 255){
-            Swal.fire('Thỏa thuận nhỏ hơn 255 kí tự !','','error');
-            return;
-        }
+    //  $scope.addNhaCungCap  = function(){
+    //     if($scope.nhaCungCap != null){
+    //         Swal.fire('Hiện tại đã có nhà cung cấp !','','error');
+    //         return;
+    //     }
+    //     let name1 = document.getElementById("tenncc").value;
+    //     let phone1 = document.getElementById("sdtncc").value;
+    //     let address1 =document.getElementById("diachincc").value;
+    //     let agree1 = document.getElementById("thoathuanncc").value;
+    //     if(name1.trim() === ''){
+    //         Swal.fire('Tên không được để trống !','','error');
+    //         return;
+    //     }
+    //     if(name1.trim().length > 100){
+    //         Swal.fire('Tên nhỏ hơn 100 kí tự !','','error');
+    //         return;
+    //     }
+    //     if(phone1.trim() === ''){
+    //         Swal.fire('Số điện thoại không được để trống !','','error');
+    //         return;
+    //     }
+    //     if(phone1.trim().length != 10){
+    //         Swal.fire('Số điện thoại 10 số  !','','error');
+    //         return;
+    //     }
+    //     var numberRegex = /^[0-9]+$/;
+    //     if (!numberRegex.test(phone1)) {
+    //       Swal.fire("Số điện thoại phải là số !!", "", "error");
+    //         return;
+    //     }
+    //     if(address1.trim() === ''){
+    //         Swal.fire('Địa chỉ không được để trống !','','error');
+    //         return;
+    //     }
+    //     if(address1.trim().length > 255){
+    //         Swal.fire('Địa chỉ nhỏ hơn 255 kí tự !','','error');
+    //         return;
+    //     }
+    //     if(agree1.trim() === ''){
+    //         Swal.fire('Thỏa thuận không được để trống !','','error');
+    //         return;
+    //     }
+    //     if(agree1.trim().length > 255){
+    //         Swal.fire('Thỏa thuận nhỏ hơn 255 kí tự !','','error');
+    //         return;
+    //     }
         
-        $scope.nhaCungCap = {
-            name : name1,
-            phone : phone1,
-            address : address1,
-            agree : agree1
-        }
-        Swal.fire("Đã thêm NCC !","","success");
-        $scope.isNhaCungCap = false;
-     }
+    //     $scope.nhaCungCap = {
+    //         name : name1,
+    //         phone : phone1,
+    //         address : address1,
+    //         agree : agree1
+    //     }
+    //     Swal.fire("Đã thêm NCC !","","success");
+    //     $scope.isNhaCungCap = false;
+    //  }
        
        $scope.addItem = function() {
        
@@ -352,6 +395,7 @@
         }
         //add product
         $scope.add = function(){
+            let check  = 0;
             let phanTram  = 0;
             let discountDate = null;
             if(document.getElementById("giamGia").checked == true){
@@ -459,7 +503,7 @@
                         description : $scope.form.description,
                     }).then(function (product){
                         //add voucher
-                      
+                    
                         let listVoucher = $scope.voucherList;
                         if(listVoucher.length > 0){
                             for(let i = 0 ; i < listVoucher.length ; i++){
@@ -528,6 +572,12 @@
                             discountDate : discountDate
                         }).then(function (productdetail){
                             if (productdetail.status === 200){
+
+                                $http.post("http://localhost:8080/api/operationhistory",{
+                                    status : 1 ,
+                                    createBy : 'hanzzz',
+                                    idProductDetail :  productdetail.data.id
+                                });
                                 //add material
                                 let listMaterial = $scope.listMaterial;
                                 for (let i = 0; i < listMaterial.length; i++) {
@@ -616,6 +666,12 @@
             }).then((result) => {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
+                    
+                    $http.post("http://localhost:8080/api/operationhistory",{
+                        status : 3 ,
+                        createBy : 'hanzzz',
+                        idProductDetail :  idProductDetail
+                    });
                     $http.put("http://localhost:8080/api/product/"+idProductDetail).then(function (response){
                         if (response.status === 200){
                             Swal.fire('Xóa thành công !', '', 'success')
@@ -680,16 +736,16 @@
                         document.getElementById("phanTramGiamGia").value = $scope.form.discount;
                     }
                 }
-                if(detail.data.suppliers.length > 0){
-                    for(let i = 0 ; i< detail.data.suppliers.length ; i++){
-                        $scope.nhaCungCap = {
-                            name : detail.data.suppliers[i].name,
-                            phone : detail.data.suppliers[i].phone,
-                            address : detail.data.suppliers[i].address,
-                            agree : detail.data.suppliers[i].agree
-                        }
-                    }
-                }
+                // if(detail.data.suppliers.length > 0){
+                //     for(let i = 0 ; i< detail.data.suppliers.length ; i++){
+                //         $scope.nhaCungCap = {
+                //             name : detail.data.suppliers[i].name,
+                //             phone : detail.data.suppliers[i].phone,
+                //             address : detail.data.suppliers[i].address,
+                //             agree : detail.data.suppliers[i].agree
+                //         }
+                //     }
+                // }
                 
                 for(let i = 0 ; i< detail.data.product.productImages.length ; i++){
                     if(detail.data.product.productImages[i].mainImage === false){
@@ -917,6 +973,11 @@
                                 discountDate : discountDate
                             }).then(function (productDetail) {
 
+                                $http.post("http://localhost:8080/api/operationhistory",{
+                                    status : 2 ,
+                                    createBy : 'hanzzz',
+                                    idProductDetail :  productDetail.data.id
+                                });
                                 //update product
                                 $http.put("http://localhost:8080/api/sanpham/" + productDetail.data.product.id,{
                                     name : $scope.form.product.name,
@@ -971,35 +1032,37 @@
                                                     url: imagelist.data[i],
                                                     mainImage: false,
                                                     idProduct: product.data.id
-                                                });
+                                                }).then(function(imgg){
+                                                    for(let i = 0; i <$scope.images.length; i++) {
+                                                        if($scope.images[i].startsWith('http')){
+                                                            if($scope.imageDelete.length > 0){
+                                                                for(let j = 0; j < $scope.imageDelete.length; j++) {
+                                                                    if($scope.imageDelete[j] !== $scope.images[i]){
+                                                                        $http.post("http://localhost:8080/api/image", {
+                                                                            url: $scope.images[i],
+                                                                            mainImage: false,
+                                                                            idProduct: product.data.id
+                                                                        });
+                                                                    }
+                                                                }
+                                                            }
+                                                            else{
+                                                                $http.post("http://localhost:8080/api/image", {
+                                                                    url: $scope.images[i],
+                                                                    mainImage: false,
+                                                                    idProduct: product.data.id
+                                                                });
+                                                            }
+                                                           
+                                                        }
+                                                    }
+                                                })
                                             })
 
                                             
                                         }
                                         
-                                        for(let i = 0; i <$scope.images.length; i++) {
-                                            if($scope.images[i].startsWith('http')){
-                                                if($scope.imageDelete.length > 0){
-                                                    for(let j = 0; j < $scope.imageDelete.length; j++) {
-                                                        if($scope.imageDelete[j] !== $scope.images[i]){
-                                                            $http.post("http://localhost:8080/api/image", {
-                                                                url: $scope.images[i],
-                                                                mainImage: false,
-                                                                idProduct: product.data.id
-                                                            });
-                                                        }
-                                                    }
-                                                }
-                                                else{
-                                                    $http.post("http://localhost:8080/api/image", {
-                                                        url: $scope.images[i],
-                                                        mainImage: false,
-                                                        idProduct: product.data.id
-                                                    });
-                                                }
-                                               
-                                            }
-                                        }
+                                      
 
                                     }
                                    if(ListImage.length == 0){
@@ -1022,36 +1085,38 @@
                                                     url: imagelist.data[i],
                                                     mainImage: false,
                                                     idProduct: product.data.id
-                                                });
+                                                }).then(function(imgg){
+                                                    for(let i = 0; i <$scope.images.length; i++) {
+                                                        if($scope.images[i].startsWith('http')){
+                                                            if($scope.imageDelete.length > 0){
+                                                                for(let j = 0; j < $scope.imageDelete.length; j++) {
+                                                                    if($scope.imageDelete[j] !== $scope.images[i]){
+                                                                        $http.post("http://localhost:8080/api/image", {
+                                                                            url: $scope.images[i],
+                                                                            mainImage: false,
+                                                                            idProduct: product.data.id
+                                                                        });
+                                                                    }
+                                                                }
+                                                            }
+                                                            else{
+                                                                $http.post("http://localhost:8080/api/image", {
+                                                                            url: $scope.images[i],
+                                                                            mainImage: false,
+                                                                            idProduct: product.data.id
+                                                                        });
+                                                            }
+                                                           
+                                                        }
+                                                    }
+            
+                                                })
                                             })
 
                                             
                                         }
                                         
-                                        for(let i = 0; i <$scope.images.length; i++) {
-                                            if($scope.images[i].startsWith('http')){
-                                                if($scope.imageDelete.length > 0){
-                                                    for(let j = 0; j < $scope.imageDelete.length; j++) {
-                                                        if($scope.imageDelete[j] !== $scope.images[i]){
-                                                            $http.post("http://localhost:8080/api/image", {
-                                                                url: $scope.images[i],
-                                                                mainImage: false,
-                                                                idProduct: product.data.id
-                                                            });
-                                                        }
-                                                    }
-                                                }
-                                                else{
-                                                    $http.post("http://localhost:8080/api/image", {
-                                                                url: $scope.images[i],
-                                                                mainImage: false,
-                                                                idProduct: product.data.id
-                                                            });
-                                                }
-                                               
-                                            }
-                                        }
-
+                                      
                                     
                                     }
                                    }
@@ -1131,20 +1196,20 @@
                                     }
                                 }
 
-                                var nccc = {
-                                    name : null,
-                                    phone : null,
-                                    address : null,
-                                    agree : null
-                                }
-                                if($scope.history.suppliers.length > 0){
-                                     nccc = {
-                                        name : $scope.history.suppliers[0].name,
-                                        phone : $scope.history.suppliers[0].phone,
-                                        address : $scope.history.suppliers[0].address,
-                                        agree : $scope.history.suppliers[0].agree
-                                    }
-                                }
+                                // var nccc = {
+                                //     name : null,
+                                //     phone : null,
+                                //     address : null,
+                                //     agree : null
+                                // }
+                                // if($scope.history.suppliers.length > 0){
+                                //      nccc = {
+                                //         name : $scope.history.suppliers[0].name,
+                                //         phone : $scope.history.suppliers[0].phone,
+                                //         address : $scope.history.suppliers[0].address,
+                                //         agree : $scope.history.suppliers[0].agree
+                                //     }
+                                // }
                                 
                                 $http.post("http://localhost:8080/api/productdetailhistory",{
                                     updateDate : new Date(),
@@ -1168,10 +1233,7 @@
                                     idVoucher : mangVoucher,
                                     discount : $scope.history.discount,
                                     discountDate : $scope.history.discountDate,
-                                    supplierName : nccc.name,
-                                    supplierPhone : nccc.phone,
-                                    supplierAddress : nccc.address,
-                                    supplierAgree : nccc.agree 
+                                   
 
                                 });
                                 
@@ -1317,6 +1379,7 @@
             let max = document.getElementById("rangeMax").value;
             let minTL = document.getElementById("rangeMinTL").value;
             let maxTL = document.getElementById("rangeMaxTL").value;
+            let soLuong = document.getElementById("soLuong").value;
             let idcate = (idCategory != '') ? idCategory : null;
             let idbrad = (idBrand != '') ? idBrand : null;
             let idmate = (idMaterial != '') ? idMaterial : null;
@@ -1327,8 +1390,9 @@
             let idshoe = (idShoelace != '') ? idShoelace : null;
             let idheel = (idHeelcushion != '') ? idHeelcushion : null;
             let iddesign =(idDesign != '') ? idDesign : null;
-            let nameF = (name != null) ? name : null;
-            console.log(nameF);
+            let nameF = (name != '') ? name : null;
+            let sl = (soLuong != '') ? soLuong : null;
+            let sl1 = (soLuong == '10') ? 0 : -1;
             var params = {
                 name : nameF,
                 idcategory : idcate ,
@@ -1344,7 +1408,9 @@
                 min : min,
                 max : max,
                 minTL : minTL,
-                maxTL : maxTL
+                maxTL : maxTL,
+                soLuong : sl,
+                soLuong1 : sl1
             }
             $http({
                 method : 'GET',
@@ -1362,7 +1428,7 @@
             // Swal.fire("Đang phát triển...","","warning"); return;
             // document.getElementById('fileInput').click();
             let file = document.getElementById("fileInput").files;
-
+            
                if (file.length === 0){
                    Swal.fire("Vui lòng tải lên file Exel trước khi thêm !","","error");
                }else{
@@ -1470,6 +1536,7 @@ $scope.openImage = function() {
 
 $scope.change = function(){
     document.getElementById('fileList').addEventListener('change', function() {
+        console.log($scope.imagesList.length);
         var files = this.files;
         if(files.length > 3) {
           Swal.fire("Danh sách tối đa 3 ảnh !","","error");
@@ -1499,7 +1566,6 @@ $scope.imageDelete = [];
 $scope.deleteImage = function(index) {
     
     var deletedItem =$scope.images.splice(index, 1);
-
   $scope.imageDelete.push(deletedItem[0]);
 };
 $scope.isDanhMuc = false;
@@ -1588,7 +1654,7 @@ $scope.isNhaCungCap = false;
 
         })
         $http.get("http://localhost:8080/api/product/quantitySold/"+id).then(function (detail){
-            $scope.quantitySold = detail.data;
+            $scope.quantitySold = detail.data == '' ? 0 : detail.data;
         
 
         })
@@ -1671,6 +1737,7 @@ $scope.isNhaCungCap = false;
     }
       //khôi phục
       $scope.khoiPhuc = function(idHistory){
+        
         Swal.fire({
             title: 'Bạn có chắc chắn muốn khôi phục dữ liệu này ?',
             showCancelButton: true,
@@ -1705,6 +1772,36 @@ $scope.isNhaCungCap = false;
                                 name : detail.data.name,
                                 description : detail.data.description
                             }).then(function (product) {
+                                $http.delete("http://localhost:8080/api/image/" + product.data.id).then(function(resp){
+                                console.log(resp);
+                                $http.post("http://localhost:8080/api/image", {
+                                    url: detail.data.imageMain,
+                                    mainImage: true,
+                                    idProduct: product.data.id
+                                });
+                                })
+                                $http.delete("http://localhost:8080/api/image/1/" + product.data.id).then(function(resp){
+
+                                let listImm = detail.data.imageList.split(",");
+                                $scope.imageList = listImm.splice(0,listImm.length - 1);
+                     
+                              
+                           for(let i = 0 ; i < $scope.imageList.length ; i++){
+                          
+                            $http.post("http://localhost:8080/api/image", {
+                                url: $scope.imageList[i],
+                                mainImage: false,
+                                idProduct: product.data.id
+                            })
+                           }
+                            })
+                                   // update image
+                             
+                               
+                                  
+                              
+                                   
+                                 
                                 $http.delete("http://localhost:8080/api/productvoucher/"+product.data.id);
                                 let vou = detail.data.idVoucher.split(",");
                                 $scope.vouchrsss = vou.splice(0,vou.length - 1);
@@ -1718,30 +1815,8 @@ $scope.isNhaCungCap = false;
                                     }
                                 
 
-                                // update image
                              
-                                    $http.delete("http://localhost:8080/api/image/" + product.data.id)
-                                    $http.post("http://localhost:8080/api/image", {
-                                            url: detail.data.imageMain,
-                                            mainImage: true,
-                                            idProduct: product.data.id
-                                        })
-                                        
-                                    $http.delete("http://localhost:8080/api/image/1/" + product.data.id);
-                                  
-                                        let listImm = detail.data.imageList.split(",");
-                                        $scope.imageList = listImm.splice(0,listImm.length - 1);
-                             
-                                      
-                                   for(let i = 0 ; i < $scope.imageList.length ; i++){
-                                  
-                                    $http.post("http://localhost:8080/api/image", {
-                                        url: $scope.imageList[i],
-                                        mainImage: false,
-                                        idProduct: product.data.id
-                                    })
-                                   }
-                                  
+                                   
                                     
                 
                             })
@@ -2117,6 +2192,12 @@ $scope.addKichThuoc = function(){
     })
 }
 
+
+
+$scope.isLichSuThaoTac = false;
+$scope.openLichSuThaoTac = function(){
+    $scope.isLichSuThaoTac = !$scope.isLichSuThaoTac;
+}
 
 
 

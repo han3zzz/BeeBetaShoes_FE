@@ -1,4 +1,4 @@
-    <h3><i class="fa-solid fa-paper-plane"></i> Quản Lý Giày</h3>
+    <h3><img style="width: 50px;height: 50px;" src="../../assets/images/sport-shoe.png"> Quản Lý Giày</h3>
         <div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo mã hoặc tên giày.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
         <div>
          <div style="padding-left: 5px;">
@@ -102,9 +102,21 @@
                 <option ng-repeat="kichthuoc in listSize" value="{{kichthuoc.id}}">
                   Size {{kichthuoc.name}}</option></select>
             </div>
+             
+          
+            <div class="col-md-3 loc"><label>Số lượng</label>
+              <select id="soLuong" class="form-select-sm" style="width: 100px;" ng-click="filter()">
+                <option value="">Tất cả</option>
+                <option value="10">Sắp hết</option>  
+                <option value="1">Đã hết</option>
+              </select>
+            </div> 
           </div>
 
 
+        </div>
+        <div style="float: left;padding-top: 5px;">
+          <button ng-click="openLichSuThaoTac()" class="btn btn-dark"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thao tác</button>
         </div>
 <!--        <button class="btn btn-outline-dark" ng-click="loadAll()"> <i class="fa-solid fa-rotate-right"></i></button>-->
         <div style="float: right">
@@ -162,7 +174,12 @@
             </td>
           </tr>
           <tr ng-if="list.length == 0">
-            <td colspan="13">Không có sản phẩm nào</td>
+            <td colspan="13">
+              <div style="text-align: center;">
+                <div><img style="width: 80px; height: 80px;" src="../../assets/images/box.png"></div>
+                <h4>Không có sản phẩm nào</h4>
+              </div>
+            </td>
           </tr>
 
 
@@ -319,7 +336,7 @@
                   <p>Giảm giá {{form.discount}} %</p>
                   <p>Ngày kết thúc : {{form.discountDate == null ? 'Không giới hạn' : form.discountDate | date:'dd-MM-yyyy' }}</p>
                   </div>
-                  <div class="col-md-12 add" ng-if="form.suppliers.length > 0">
+                  <!-- <div class="col-md-12 add" ng-if="form.suppliers.length > 0">
                     <h5>Nhà cung cấp</h5>
                     <div ng-repeat="ncc in form.suppliers">
                       <div>Tên NCC : {{ncc.name}}</div>
@@ -327,7 +344,7 @@
                       <div>Địa chỉ : {{ncc.address}}</div>
                       <div>Thỏa thuận : {{ncc.agree}}</div>
                     </div>
-                    </div>
+                    </div> -->
                 <div class="col-md-12 add">
                   <h5>Chương trình khuyến mãi</h5>
                   <p ng-repeat="km in form.product.product_vouchers">
@@ -405,3 +422,51 @@
          
         </div>
       </div>
+      </div>
+
+      <div class="popup" ng-class="{ 'show': isLichSuThaoTac }">
+        <div class="popup-content4">
+        <h2><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử thao tác</h2>
+        <table class="table">
+          <tr>
+            <td>Thời gian</td>
+            <td>Nội dung</td>
+            <td>Nhân viên</td>
+           
+          </tr>
+          <tr ng-repeat="op in pagerop.items">
+            <td>{{op.createDate | date:'HH:mm:ss  dd/MM/yyyy' }}</td>
+            <td>{{op.status == 1 ? 'Đã thêm' : op.status == 2 ? 'Đã sửa' : op.status == 3 ? 'Đã xóa' : ''}} sản phẩm 
+              <span ng-repeat="p in list1">
+                <span ng-if="p.id == op.idProductDetail">
+                [ {{p.product.code}} - {{p.product.name}} ]
+                </span>
+              </span>
+
+            </td>
+            <td>{{op.createBy}}</td>
+          </tr>
+        </table>
+        <div class="text-center" ng-if="operationhistory.length > 0">
+          <div class="btn-group" role="group" aria-label="Basic outlined example">
+            <button ng-click="pagerop.first()" type="button"
+                    class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>
+            <button ng-click="pagerop.prev()" type="button"
+                    class="btn btn-outline-secondary"><i class="fa-solid fa-angle-left"></i></button>
+            <button type="button" class="btn btn-outline-secondary">{{pagerop.page+1}}
+              of
+              {{pagerop.count}}</button>
+            <button ng-click="pagerop.next()" type="button"
+                    class="btn btn-outline-secondary"><i class="fa-solid fa-angle-right"></i></button>
+            <button ng-click="pagerop.last()" type="button"
+                    class="btn btn-outline-secondary"><i class="fa-solid fa-angles-right"></i></button>
+          </div>
+        </div>
+       <div style="padding-top: 10px;">
+        <button class="btn btn-primary" ng-click="openLichSuThaoTac()">X</button>
+       </div>
+      
+         
+        </div>
+      </div>
+    </div>

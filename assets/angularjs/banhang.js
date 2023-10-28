@@ -11,6 +11,12 @@ window.BanHangController = function($scope, $http, $location,$routeParams){
            })
            .then(function (bill) {
             Swal.fire("Tạo hóa đơn " + bill.data.code + " thành công !" ,"","success");
+            $http.post('http://localhost:8080/api/billhistory',{
+              createBy : null,
+              note : null,
+              status : 0,
+              idBill : bill.data.id
+            });
             $scope.getAllBill();
            })
     }
@@ -80,7 +86,6 @@ window.BanHangController = function($scope, $http, $location,$routeParams){
             return;
         }
         document.getElementById("diachi").style.display = 'none';
-        document.getElementById("diachichon2").style.display = 'block';
         document.getElementById("diachichon1").style.display = 'none';
         document.getElementById("diachichon").checked = true;
 
@@ -788,6 +793,44 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                   /* Read more about isConfirmed, isDenied below */
                   if (result.isConfirmed) {
                     $http.get("http://localhost:8080/api/bill/huy/"+code).then(function(response){
+                      $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+                        for(let i = 0; i < resp.data.length; i++){
+                           //get số lượng sản phẩm đang có
+                           var getPram = {
+                             IdProduct:
+                             resp.data[i].productDetail
+                                 .id,
+                             IdColor:
+                             resp.data[i].idColor,
+                             IdSize: resp.data[i].idSize,
+                           };
+                           $http({
+                             method: "GET",
+                             url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                             params: getPram,
+                           }).then(function (soluong) {
+                             var param2 = {
+                               IdProduct:
+                               resp.data[i]
+                                   .productDetail.id,
+                               IdColor:
+                               resp.data[i].idColor,
+                               IdSize:
+                               resp.data[i].idSize,
+                               Quantity:
+                                 parseInt(soluong.data) +
+                                 parseInt(
+                                   resp.data[i].quantity
+                                 ),
+                             };
+                             $http({
+                               method: "PUT",
+                               url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                               params: param2,
+                             })
+                        })
+                        }
+                       })
                         Swal.fire("Hủy đơn hàng thành công !","Bạn đã hủy thành công đơn hàng " +code,"success")
                         $scope.getAllBill();
                         $scope.choose(null,null);
@@ -801,6 +844,17 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
               $scope.chondiachi = function(){
                 var check = document.getElementById("khachhang").value;
                 if(check === '0'){
+                  if(document.getElementById("hinhThuc1").checked === true){
+                    document.getElementById("diachi").style.display = 'none';
+                    document.getElementById("diachichon2").style.display = 'none';
+                    document.getElementById("diachichon1").style.display = 'none';
+                    document.getElementById('maGiamGiaKH').style.display = 'none';
+                  document.getElementById('chuongtrinhkhuyenmai').style.display = 'block';
+                  document.getElementById('magiamgia').style.display = 'none';
+                  document.getElementById('chuongtrinhkhuyenmaiCheck').checked = true;
+
+                  }
+                  else{
                     document.getElementById("diachi").style.display = 'none';
                     document.getElementById("diachichon2").style.display = 'block';
                     document.getElementById("diachichon1").style.display = 'none';
@@ -810,11 +864,20 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                   document.getElementById('chuongtrinhkhuyenmai').style.display = 'block';
                   document.getElementById('magiamgia').style.display = 'none';
 
+                  }
+                  
                 }else{
-                    document.getElementById("diachi").style.display = 'block';
-                    document.getElementById('maGiamGiaKH').style.display = 'block';
-                    if(document.getElementById('hinhThucMuaHang').value === 'hinhThuc1'){
+                  
+
+                   
+                    if(document.getElementById("hinhThuc1").checked === true){
+                      document.getElementById('maGiamGiaKH').style.display = 'block';
+                  document.getElementById('magiamgia').style.display = 'block';
                       $scope.phiShip = 0;
+                    }
+                    else{
+                      document.getElementById("diachi").style.display = 'block';
+                      document.getElementById('maGiamGiaKH').style.display = 'block';
                     }
                    
 
@@ -865,7 +928,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
     shop_id: 4603004,
     },
     }).then(function (resp) {
-      if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+      if(document.getElementById("hinhThuc1").checked === true){
         $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
         $scope.phiShip = 0;
       }else{
@@ -929,7 +992,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
               },
             }).then(function (resp) {
               // $scope.phiShip = resp.data.data.total;
-              if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+              if(document.getElementById("hinhThuc1").checked === true){
                 $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
                 $scope.phiShip = 0;
               }else{
@@ -955,11 +1018,11 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                 var idSize = document.getElementById("kichthuoc").value;
                 let idcolor = (idColor != '') ? idColor : null;
                 let idsize = (idSize != '') ? idSize : null;
-                
+                let text1 = (text != '' ? text : null)
               
                 
                 var param = {
-                    keyword : text,
+                    keyword : text1,
                     idColor : idcolor,
                     idSize : idsize
 
@@ -1051,7 +1114,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
               },
             }).then(function (resp) {
               // $scope.phiShip = resp.data.data.total;
-              if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+              if(document.getElementById("hinhThuc1").checked === true){
                 $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
               }else{
                 $scope.tienThanhToan = $scope.tongTien + resp.data.data.total - $scope.giamGia;
@@ -1103,7 +1166,7 @@ token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
 shop_id: 4603004,
 },
 }).then(function (resp) {
-  if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+  if(document.getElementById("hinhThuc1").checked === true){
     $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
     $scope.phiShip = 0;
   }else{
@@ -1116,14 +1179,18 @@ shop_id: 4603004,
 }
 
     $scope.hinhThucMuaHang = function(){
-        if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+        if(document.getElementById("hinhThuc1").checked === true){
             document.getElementById("muaonline").style.display = "none";
             document.getElementById("muaonline1").style.display = "none";
+            document.getElementById('diachichon2').style.display = "none";
+            document.getElementById('diachi').style.display = "none";
+            document.getElementById('diachichon1').style.display = "none";
             $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
         }
         else{
             document.getElementById("muaonline").style.display = "block";
             document.getElementById("muaonline1").style.display = "block";
+            document.getElementById('diachichon2').style.display = "block";
                              //get tỉnh
     // $scope.listTinh = [];
     // $http({
@@ -1215,7 +1282,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
     shop_id: 4603004,
     },
     }).then(function (resp) {
-      if(document.getElementById("hinhThucMuaHang").value === 'hinhThuc1'){
+      if(document.getElementById("hinhThuc1").checked === true){
         $scope.tienThanhToan = $scope.tongTien - $scope.giamGia;
         $scope.phiShip = 0;
       }else{
@@ -1686,19 +1753,33 @@ $scope.removeCoupon = function(){
     
     }).then(function (response) {
       Swal.fire('Thanh toán thành công' ,'','success');
-      $scope.billexport = {};
-      $scope.addressexport = {};
-      $scope.listItemExport = [];
-      $http.get('http://localhost:8080/api/bill/getbycode/'+$location.search().vnp_OrderInfo).then(function(billexport){
-        $scope.billexport = billexport.data;
-        // $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
-        //   $scope.addressexport = add.data;
-        // })
-       
+      let urlcolor = "http://localhost:8080/api/color";
+      let urlsize = "http://localhost:8080/api/size";
+             // load color
+             $scope.listColor = [];
+             $http.get(urlcolor).then(function (response) {
+               $scope.listColor = response.data;
+             });
+             // load size
+             $scope.listSize = [];
+             $http.get(urlsize).then(function (response) {
+               $scope.listSize = response.data;
+             });
+    $scope.isLoading = false;
+    $scope.billexport = {};
+    $scope.addressexport = {};
+    $scope.listItemExport = [];
+    $http.get('http://localhost:8080/api/bill/getbycode/'+$location.search().vnp_OrderInfo).then(function(billexport){
+      $scope.billexport = billexport.data;
+      $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
+        $scope.addressexport = add.data;
       })
-      $http.get("http://localhost:8080/api/bill/getallbybill/"+$location.search().vnp_OrderInfo).then(function(resp){
-        $scope.listItemExport = resp.data;
+     
     })
+    $http.get("http://localhost:8080/api/bill/getallbybill/"+$location.search().vnp_OrderInfo).then(function(resp){
+      $scope.listItemExport = resp.data;
+  })
+  console.log($scope.listItemExport);
       setTimeout(() => {
      
       
@@ -1718,11 +1799,11 @@ $scope.removeCoupon = function(){
   html2pdf().set({filename: $location.search().vnp_OrderInfo+'.pdf'}).from(element).save();
   Swal.fire('Đã xuất hóa đơn' ,'','success');
   setTimeout(() => {
-  location.reload();
+    location.href = '#/sell/view'
   }, 2000);
           }
           else{
-            location.reload();
+            location.href = '#/sell/view'
           }
         })
     }, 2000);
@@ -1748,6 +1829,7 @@ $scope.removeCoupon = function(){
 //export bill
   $scope.exportBill = function(){
     Swal.fire('Thanh toán thành công' ,'','success');
+    $scope.isLoading = false;
     $scope.billexport = {};
     $scope.addressexport = {};
     $scope.listItemExport = [];
@@ -1792,6 +1874,31 @@ location.reload();
 
     // dat hang
     $scope.buy = function (code) {
+      if($scope.listItem.length === 0){
+        Swal.fire('Giỏ hàng của bạn đang rỗng !','','error');
+        return;
+      }
+      if(document.getElementById('diachicuthe').style.display == 'block' && document.getElementById('diachicuthe').value.trim()  === '' && document.getElementById("hinhThuc2").checked === true){
+        Swal.fire('Vui lòng nhập địa chỉ !','','error');
+        return;
+      }
+      if(document.getElementById('nguoimua').style.display === 'block' && document.getElementById('tennguoimua').value.trim()  === '' && document.getElementById("hinhThuc2").checked === true){
+        Swal.fire('Vui lòng nhập tên người mua !','','error');
+        return;
+      }
+      let regex =  /^\d{10}$/;
+      if(document.getElementById('nguoimua').style.display === 'block' && document.getElementById('sodienthoai').value.trim()  === '' && document.getElementById("hinhThuc2").checked === true){
+        Swal.fire('Vui lòng nhập số điện thoại !','','error');
+        return;
+      }
+      if(document.getElementById('nguoimua').style.display === 'block' && !regex.test(document.getElementById('sodienthoai').value.trim()) && document.getElementById("hinhThuc2").checked === true){
+        Swal.fire('Số điện thoại phải là số và có 10 chữ số !','','error');
+        return;
+      }
+      if($scope.tienThanhToan === 0 && document.getElementById("pay2").checked === true){
+        Swal.fire('Tiền thanh toán 0đ nên bạn không được phép thanh toán online !','','error');
+        return;
+      }
       let tennguoimua = document.getElementById('tennguoimua').value;
       let sodienthoai = document.getElementById('sodienthoai').value;
       let ghichu = document.getElementById('ghichu').value;
@@ -1799,6 +1906,7 @@ location.reload();
       let cityId = document.getElementById('tinh').value;
       let districtId = document.getElementById('huyen').value;
       let wardId = document.getElementById('xa').value;
+      let idCustomer = document.getElementById('khachhang').value == '0' ? 0 : document.getElementById('khachhang').value;
     // Get the select element by its id
 const selectElement = document.getElementById('tinh');
 
@@ -1822,112 +1930,58 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
       }).then((result) => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
-          var typePay = document.getElementById("typePay").value;
+          $scope.isLoading = true;
+          // var typePay = document.getElementById("typePay").value;
           //nếu chọn thanh toán tại tiền mặt
-          if (typePay === "pay1") {
+          if (document.getElementById("pay1").checked === true) {
           //mua tại quầy thanh toán tiền mặt
-            if(document.getElementById('hinhThucMuaHang').value === 'hinhThuc1'){
+            if(document.getElementById("hinhThuc1").checked === true){
               //khách lẻ
               if(document.getElementById('khachhang').value === '0'){
-                $http.post('http://localhost:8080/api/address',{
-                fullname : tennguoimua,
-                phone : sodienthoai,
-                address : diachicuthe,
-                cityId : cityId,
-                districtId : districtId,
-                wardId : wardId,
-                cityName : cityName,
-                districtName : districtName,
-                wardName : wardName
-             
-                }).then(function(adds){
-                  $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                     totalPrice : $scope.tongTien,
                     shipPrice : 0,
                     totalPriceLast : $scope.giamGia,
                     note : ghichu,
                     payType : 0,
                     payStatus : 1 ,
-                    idAddress : adds.data.id,
                     idVoucher : idVoucher == null ? 0 : idVoucher,
                     idCoupon : idCoupon,
+                    idAddress : 0,
+                    idCustomer : idCustomer,
                     paymentDate : new Date(),
                     delyveryDate : new Date(),
                     status : 3
                   }).then(function(resp){
+
                     $scope.exportBill();
                     return;
                   })
-                  
-               
-                    
-                })
-              
     
                 
               }
               //khách hàng đã có
               else{
-                //chọn địa chỉ
-                if(document.getElementById('diachichon'.checked === true)){
-                  $http.post('http://localhost:8080/api/address',{
-                    fullname : tennguoimua,
-                    phone : sodienthoai,
-                    address : diachicuthe,
-                    cityId : cityId,
-                    districtId : districtId,
-                    wardId : wardId,
-                    cityName : cityName,
-                    districtName : districtName,
-                    wardName : wardName
-                    }).then(function(adds){
-                      $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
-                        totalPrice : $scope.tongTien,
-                        shipPrice : 0,
-                        totalPriceLast : $scope.giamGia,
-                        note : ghichu,
-                        payType : 0,
-                        payStatus : 1 ,
-                        idAddress : adds.data.id,
-                        idVoucher : idVoucher == null ? 0 : idVoucher,
-                        idCoupon : idCoupon,
-                        paymentDate : new Date(),
-                        delyveryDate : new Date(),
-                        status : 3
-                      }).then(function(resp){
-                        $scope.exportBill();
-                        return;
-                      })
-                   
-                        
-                    })
-                  
-                 
-                }
-                // địa chỉ có sẵn
-                else{
-                  let idAddressCoSan = document.getElementById('diachiCustomer').value;
-             
-                      $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
-                        totalPrice : $scope.tongTien,
-                        shipPrice : 0,
-                        totalPriceLast : $scope.giamGia,
-                        note : ghichu,
-                        payType : 0,
-                        payStatus : 1 ,
-                        idAddress : idAddressCoSan,
-                        idVoucher : idVoucher == null ? 0 : idVoucher,
-                        idCoupon : idCoupon,
-                        paymentDate : new Date(),
-                        delyveryDate : new Date(),
-                        status : 3
-                      }).then(function(resp){
-                        $scope.exportBill();
-                        return;
-                      })
-        
+                $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                    totalPrice : $scope.tongTien,
+                    shipPrice : 0,
+                    totalPriceLast : $scope.giamGia,
+                    note : ghichu,
+                    payType : 0,
+                    payStatus : 1 ,
+                    idVoucher : idVoucher == null ? 0 : idVoucher,
+                    idCoupon : idCoupon,
+                    idAddress : 0,
+                    idCustomer : idCustomer,
+                    paymentDate : new Date(),
+                    delyveryDate : new Date(),
+                    status : 3
+                  }).then(function(resp){
 
-                }
+                    $scope.exportBill();
+                    return;
+                  })
+                
               }
             }
             //mua online thanh toán tiền mặt
@@ -1952,6 +2006,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                       note : ghichu,
                       payType : 0,
                       payStatus : 0 ,
+                      idCustomer : idCustomer,
                       idAddress : adds.data.id,
                       idVoucher : idVoucher == null ? 0 : idVoucher,
                       idCoupon : idCoupon,
@@ -1988,6 +2043,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                           totalPriceLast : $scope.giamGia,
                           note : ghichu,
                           payType : 0,
+                          idCustomer : idCustomer,
                           payStatus : 0 ,
                           idAddress : adds.data.id,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
@@ -2013,6 +2069,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                           totalPriceLast : $scope.giamGia,
                           note : ghichu,
                           payType : 0,
+                          idCustomer : idCustomer,
                           payStatus : 0 ,
                           idAddress : idAddressCoSan,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
@@ -2034,96 +2091,49 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
           
            
 
-          } else if (typePay === "pay2") {
+          } else if (document.getElementById("pay2").checked === true) {
             //thanh toán qua vnpay
                //mua tại quầy thanh toán online
-               if(document.getElementById('hinhThucMuaHang').value === 'hinhThuc1'){
+               if(document.getElementById("hinhThuc1").checked === true){
                 //khách lẻ
                 if(document.getElementById('khachhang').value === '0'){
-                  $http.post('http://localhost:8080/api/address',{
-                  fullname : tennguoimua,
-                  phone : sodienthoai,
-                  address : diachicuthe,
-                  cityId : cityId,
-                  districtId : districtId,
-                  wardId : wardId,
-                  cityName : cityName,
-                  districtName : districtName,
-                  wardName : wardName
-                  }).then(function(adds){
-                    $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
-                      totalPrice : $scope.tongTien,
-                      shipPrice : 0,
-                      totalPriceLast : $scope.giamGia,
-                      note : ghichu,
-                      payType : 1,
-                      payStatus : 0 ,
-                      idAddress : adds.data.id,
-                      idVoucher : idVoucher == null ? 0 : idVoucher,
-                      idCoupon : idCoupon,
-                      status : 3
-                    });
+                  $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                    totalPrice : $scope.tongTien,
+                    shipPrice : 0,
+                    totalPriceLast : $scope.giamGia,
+                    note : ghichu,
+                    payType : 1,
+                    payStatus : 0 ,
+                    idVoucher : idVoucher == null ? 0 : idVoucher,
+                    idCoupon : idCoupon,
+                    idAddress : 0,
+                    idCustomer : idCustomer,
+                    paymentDate : new Date(),
+                    delyveryDate : new Date(),
+                    status : 3
+                  });
                   
-                 
-                      
-                  })
-                
+
       
                   
                 }
                 //khách hàng đã có
                 else{
-                  //chọn địa chỉ
-                  if(document.getElementById('diachichon'.checked === true)){
-                    $http.post('http://localhost:8080/api/address',{
-                      fullname : tennguoimua,
-                      phone : sodienthoai,
-                      address : diachicuthe,
-                      cityId : cityId,
-                      districtId : districtId,
-                      wardId : wardId,
-                      cityName : cityName,
-                      districtName : districtName,
-                      wardName : wardName
-                      }).then(function(adds){
-                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
-                          totalPrice : $scope.tongTien,
-                          shipPrice : 0,
-                          totalPriceLast : $scope.giamGia,
-                          note : ghichu,
-                          payType : 0,
-                          payStatus : 1 ,
-                          idAddress : adds.data.id,
-                          idVoucher : idVoucher == null ? 0 : idVoucher,
-                          idCoupon : idCoupon,
-                          status : 3
-                        })
-                        
-                     
-                          
-                      })
-                    
-                   
-                  }
-                  // địa chỉ có sẵn
-                  else{
-                    let idAddressCoSan = document.getElementById('diachiCustomer').value;
-               
-                        $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
-                          totalPrice : $scope.tongTien,
-                          shipPrice : 0,
-                          totalPriceLast : $scope.giamGia,
-                          note : ghichu,
-                          payType : 0,
-                          payStatus : 1 ,
-                          idAddress : idAddressCoSan,
-                          idVoucher : idVoucher == null ? 0 : idVoucher,
-                          idCoupon : idCoupon,
-                          status : 3
-                        });
-          
-  
-                  }
+                  $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
+                    totalPrice : $scope.tongTien,
+                    shipPrice : 0,
+                    totalPriceLast : $scope.giamGia,
+                    note : ghichu,
+                    payType : 1,
+                    payStatus : 0 ,
+                    idVoucher : idVoucher == null ? 0 : idVoucher,
+                    idCoupon : idCoupon,
+                    idAddress : 0,
+                    idCustomer : idCustomer,
+                    paymentDate : new Date(),
+                    delyveryDate : new Date(),
+                    status : 3
+                  });
                 }
                 let params = {
                   totalPrice:
@@ -2162,6 +2172,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                         shipPrice : $scope.phiShip,
                         totalPriceLast : $scope.giamGia,
                         note : ghichu,
+                        idCustomer : idCustomer,
                         payType : 0,
                         payStatus : 0 ,
                         idAddress : adds.data.id,
@@ -2196,6 +2207,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             shipPrice : $scope.phiShip,
                             totalPriceLast : $scope.giamGia,
                             note : ghichu,
+                            idCustomer : idCustomer,
                             payType : 0,
                             payStatus : 0 ,
                             idAddress : adds.data.id,
@@ -2220,6 +2232,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             note : ghichu,
                             payType : 0,
                             payStatus : 0 ,
+                            idCustomer : idCustomer,
                             idAddress : idAddressCoSan,
                             idVoucher : idVoucher == null ? 0 : idVoucher,
                             idCoupon : idCoupon,

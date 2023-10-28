@@ -153,7 +153,7 @@
               <input class="haninput" type="date" id="thoiGianGiamGia">
             </div>
           </div>
-          <div class="col-md-12 add">
+          <!-- <div class="col-md-12 add">
             Nhà Cung Cấp
             <button ng-click="themNhaCungCap()" class="addttsp1"><i class="fa-solid fa-plus"></i></button>
             <div ng-if="nhaCungCap != null" id="ncc">
@@ -164,7 +164,7 @@
              <div> Thỏa thuận : {{nhaCungCap.agree}}</div>
 
             </div>
-            </div>
+            </div> -->
           <div class="col-md-12 add">
       
             <label>Chất Liệu <span class="vaid">*</span></label>
@@ -182,7 +182,7 @@
           <div>
             <div ng-repeat="mausac in listColor">
               <div ng-show="colorStates[mausac.id]" style="padding-top: 15px;">
-                  <label>Số lượng {{ mausac.name }}</label>
+                  <label>Số lượng màu {{ mausac.name }}</label>
                   <br>
                   <button style="border-radius: 5px;width: 25px;background-color: black;color: white;" ng-click="themkichthuoc(mausac.id)"><i class="fa-solid fa-plus"></i></button>
                   <!-- Hiển thị danh sách kích thước và số lượng -->
@@ -193,7 +193,7 @@
                         <span ng-repeat="s in listSize">
                           <span ng-repeat="size in sizes">
                           <span ng-if="size.size == s.id">
-                            <span style="padding-left: 10px; padding-bottom: 10px">Size</span> {{ s.name }} <input id="Color{{ mausac.id }}Size{{ s.id }}" type="number" value="{{size.quantity}}" style="width: 50px">
+                            <span style="padding-left: 10px; padding-bottom: 10px">Size</span> {{ s.name }}  <input class="han" id="Color{{ mausac.id }}Size{{ s.id }}" type="number" value="{{size.quantity}}" style="width: 50px">
                             <button ng-click="removeItemBySize(mausac.id,size.size)" style="color: rgb(247, 3, 3);border: none;"><i class="fa-solid fa-trash"></i></button>
                           </span>
                         </span>

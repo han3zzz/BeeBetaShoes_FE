@@ -19,6 +19,7 @@ window.CheckOutController = function ($http, $scope, $routeParams, $location) {
       $http.put(
         "http://localhost:8080/api/bill/" + $location.search().vnp_OrderInfo
       );
+      
       let amount = parseInt($location.search().vnp_Amount) / 100;
       Swal.fire(
         "Thanh toán thành công !",
@@ -267,13 +268,21 @@ window.CheckOutController = function ($http, $scope, $routeParams, $location) {
                                            url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
                                            params: param2,
                                          }).then(function (resp) {
-                                           Swal.fire(
-                                             "Đặt hàng thành công !",
-                                             "",
-                                             "success"
-                                           );
-
-                                           location.href = "#/myorder";
+                                          $http.post('http://localhost:8080/api/billhistory',{
+                                            createBy : null,
+                                            note : null,
+                                            status : 0,
+                                            idBill : bill.data.id
+                                          }).then(function(resp){
+                                            Swal.fire(
+                                              "Đặt hàng thành công !",
+                                              "",
+                                              "success"
+                                            );
+ 
+                                            location.href = "#/myorder";
+                                          })
+                                          
                                          });
                                        });
                                      });
@@ -368,6 +377,12 @@ window.CheckOutController = function ($http, $scope, $routeParams, $location) {
                                   status: 0,
                                 })
                                 .then(function (bill) {
+                                  $http.post('http://localhost:8080/api/billhistory',{
+                                    createBy : null,
+                                    note : null,
+                                    status : 0,
+                                    idBill : bill.data.id
+                                  });
                                   $http
                                     .get("http://localhost:8080/api/cart/1")
                                     .then(function (CartToBill) {
