@@ -1,6 +1,7 @@
- window.MyOrderController = function($http, $scope, $routeParams, $location){
+ window.MyOrderController = function($http, $scope, $routeParams, $location,AuthService){
 
   $scope.myorder = function(){
+    let IdCustomer = AuthService.getCustomer();
     let urlcolor = "http://localhost:8080/api/color";
     let urlsize = "http://localhost:8080/api/size";
     let url = "http://localhost:8080/api/product";
@@ -74,7 +75,7 @@ $http.get(urlsize).then(function (response) {
     //count all
   $scope.countall = [];
   let paramall = {
-     idCustomer : 1,
+     idCustomer : IdCustomer,
      status : null
   }
       $http({
@@ -87,7 +88,7 @@ $http.get(urlsize).then(function (response) {
     //count cho xac nhan
    $scope.choxacnhan = [];
    let paramchoxacnhan = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 0
    }
        $http({
@@ -101,7 +102,7 @@ $http.get(urlsize).then(function (response) {
     //count cho giao hang
    $scope.chogiaohang = [];
    let paramchogiaohang = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 1
    }
        $http({
@@ -115,7 +116,7 @@ $http.get(urlsize).then(function (response) {
      //count dang giao hang
    $scope.danggiaohang = [];
    let paramdanggiaohang = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 2
    }
        $http({
@@ -129,7 +130,7 @@ $http.get(urlsize).then(function (response) {
         //count da giao hang
    $scope.dagiaohang = [];
    let paramdagiaohang = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 3
    }
        $http({
@@ -142,7 +143,7 @@ $http.get(urlsize).then(function (response) {
              //count da huy
    $scope.dahuy = [];
    let paramdahuy = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 4
    }
        $http({
@@ -155,7 +156,7 @@ $http.get(urlsize).then(function (response) {
               //count hoan tra
    $scope.hoantra = [];
    let paramhoantra = {
-      idCustomer : 1,
+      idCustomer : IdCustomer,
       status : 5
    }
        $http({
@@ -174,7 +175,7 @@ $http.get(urlsize).then(function (response) {
             $scope.getStatus = function(status){
               $scope.list = [];
               let paramlist = {
-                idCustomer : 1,
+                idCustomer : IdCustomer,
                 status : status
              }
                  $http({

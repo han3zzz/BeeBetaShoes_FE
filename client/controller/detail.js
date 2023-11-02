@@ -1,5 +1,9 @@
-window.DetailController = function ($http, $scope, $routeParams, $location) {
+window.DetailController = function ($http, $scope, $routeParams, $location,$rootScope,AuthService) {
     $scope.detail = function () {
+      
+      let IdCustomer = AuthService.getCustomer();
+      var selectedVal = "";
+      var selectedVal1 = "";
         let urlcolor = "http://localhost:8080/api/color";
         let urlsize = "http://localhost:8080/api/size";
          // load color
@@ -19,6 +23,7 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
           .get("http://localhost:8080/api/product/" + id)
           .then(function (response) {
             $scope.sp = response.data;
+           
             
             $http
               .get(
@@ -53,14 +58,62 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
           .get("http://localhost:8080/api/color/get/" + id)
           .then(function (color) {
             $scope.colorid = color.data;
-          
+            
+         
+            $scope.selectedColor = color.data[0]; // Assign the default color ID
+            selectedVal = color.data[0];
+            $scope.listKT = [];
+            var params = {
+              IdProduct: id,
+              IdColor: color.data[0],
+            };
+            $http({
+              method: "GET",
+              url: "http://localhost:8080/api/productdetail_color_size/getbycolor",
+              params: params,
+            }).then(function (resp) {
+              $scope.listKT = resp.data;
+             
+              $scope.selectedSize = resp.data[0].size.id;  // Assign the default size ID
+              selectedVal1 = resp.data[0].size.id;
+            
+            });
+      
+            $http({
+              method: "GET",
+              url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColor",
+              params: params,
+            }).then(function (resp) {
+              $scope.quantity = resp.data;
+            });
             
           });
-        // $('input:radio[name="ColorRadioGroup"]').filter('[value="1"]').attr('checked', true);
+        
        
         //check color
-        var selectedVal = "";
-        var selectedVal1 = "";
+     
+    
+        // var selected = $("input[type='radio'][name='ColorRadioGroup']:checked");
+        // if (selected.length > 0) {
+        //     selectedVal = selected.prop('value');
+        //     $scope.selectedVal = selected.prop('value');
+        // }
+        
+        // $scope.listKT = [];
+        // var params = {
+        //   IdProduct: id,
+        //   IdColor: selectedVal,
+        // };
+        // $http({
+        //   method: "GET",
+        //   url: "http://localhost:8080/api/productdetail_color_size/getbycolor",
+        //   params: params,
+        // }).then(function (resp) {
+        //   $scope.listKT = resp.data;
+        // });
+       
+  
+     
     
         $scope.check = function () {
           var selected = $("input[type='radio'][name='ColorRadioGroup']:checked");
@@ -79,6 +132,8 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
             params: params,
           }).then(function (resp) {
             $scope.listKT = resp.data;
+            $scope.selectedSize = resp.data[0].size.id;  // Assign the default size ID
+            selectedVal1 = resp.data[0].size.id;
           });
     
           $http({
@@ -112,6 +167,10 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
     
         //thêm sản phẩm vào giỏ hàng
         $scope.addToCart = function () {
+          if(IdCustomer == null){
+            Swal.fire("Vui lòng đăng nhập !!", "", "error");
+            return;
+          }
           if (selectedVal === "") {
             Swal.fire("Vui lòng chọn màu sắc !!", "", "error");
             return;
@@ -162,15 +221,21 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                 unitPrice = response.data.price;
                 $scope.unitPrice = unitPrice;
               }
-              //get cart by user
+            
+              $http.get("http://localhost:8080/api/cart/getCartByCustomer/"+ IdCustomer).then(function(idd){
+                let idCart = idd.data.id;
+                  //get cart by user
               $scope.listCart = [];
-              $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
+              $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cart) {
+             
+              
                 $scope.listCart = cart.data;
+               
                 // add to cart
                 if ($scope.listCart.length === 0) {
                   $http
                     .post("http://localhost:8080/api/cart", {
-                      idCart: 1,
+                      idCart: idCart,
                       idProductDetail: id,
                       idColor: selectedVal,
                       idSize: selectedVal1,
@@ -179,6 +244,14 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                     })
                     .then(function (cart) {
                       if (cart.status === 200) {
+                        $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
+                          $rootScope.listCartIndex = cartL.data;
+                          $rootScope.tongTienIndex = 0;
+                          for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                            $rootScope.tongTienIndex +=
+                              $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                          }
+                      })
                         Swal.fire("Đã thêm vào giỏ !!", "", "success");
                       }
                     });
@@ -206,7 +279,7 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                           "http://localhost:8080/api/cart/updateCart/" +
                             $scope.listCart[i].id,
                           {
-                            idCart: 1,
+                            idCart: idCart,
                             idProductDetail: id,
                             idColor: selectedVal,
                             idSize: selectedVal1,
@@ -218,6 +291,15 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                         )
                         .then(function (cart) {
                           if (cart.status === 200) {
+                            $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
+                              $rootScope.listCartIndex = cartL.data;
+                              $rootScope.tongTienIndex = 0;
+                              for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                                $rootScope.tongTienIndex +=
+                                  $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                              }
+                          })
+                           
                             Swal.fire("Đã thêm vào giỏ !!", "", "success");
                           }
                         });
@@ -227,7 +309,7 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                   // add to cart
                   $http
                     .post("http://localhost:8080/api/cart", {
-                      idCart: 1,
+                      idCart: idCart,
                       idProductDetail: id,
                       idColor: selectedVal,
                       idSize: selectedVal1,
@@ -236,11 +318,21 @@ window.DetailController = function ($http, $scope, $routeParams, $location) {
                     })
                     .then(function (cart) {
                       if (cart.status === 200) {
+                        $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
+                          $rootScope.listCartIndex = cartL.data;
+                          $rootScope.tongTienIndex = 0;
+                          for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                            $rootScope.tongTienIndex +=
+                              $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                          }
+                      })
                         Swal.fire("Đã thêm vào giỏ !!", "", "success");
                       }
                     });
                 }
               });
+              })
+            
             });
         };
       };

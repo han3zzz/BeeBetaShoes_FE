@@ -1,17 +1,5 @@
-window.HomeController = function ($http, $scope, $routeParams, $location,$rootScope,AuthenticationService) {
-  $rootScope.isLoggedIn = AuthenticationService.isAuthenticated();
-    $rootScope.userInfo = AuthenticationService.getUserInfo();
-    // if(localStorage.getItem('token')){
-    //   $rootScope.isLoggedIn = true;
-    //   var name = localStorage.getItem('fullname');
-    //   $rootScope.fullname = name;
-    //   $rootScope.logout = function(){
-    //     localStorage.removeItem('token');
-    //     $rootScope.isLoggedIn = false;
-    // }
-    // }
-  // $rootScope.isLoggedIn = AuthService.isLoggedIn();
-  // $rootScope.username = sessionStorage.getItem('username');
+window.HomeController = function ($http, $scope, $routeParams, $location,$rootScope,AuthService) {
+ 
   $scope.loadProductNew = function () {
     let url = "http://localhost:8080/api/product";
     let urlcategory = "http://localhost:8080/api/category";

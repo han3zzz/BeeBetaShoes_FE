@@ -221,6 +221,18 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "banhang/index.html",
            controller : BanHangController
         })
+        .when("/login", {
+            templateUrl: "account/login.html",
+           controller : LoginAdminController
+        })
+        .when("/forget", {
+            templateUrl: "account/forget.html",
+           controller : ForgetController
+        })
+        .when("/change", {
+            templateUrl: "account/change.html",
+           
+        })
 
 
         
@@ -229,4 +241,92 @@ app.config(function ($routeProvider, $locationProvider) {
             redirectTo: "/products/view",
         });
 
+});
+app.factory('AuthInterceptor', function ($location,AuthService) {
+    return {
+        request: function (config) {
+            var token = AuthService.getToken();
+            if (token === null && $location.path() !== '/login' ||token === null && $location.path() !== '/forget') {
+                $location.path('/login');
+            }
+            if (token !== null && $location.path() === '/login' || token !== null && $location.path() === '/forget') {
+               
+                $location.path('/product/view');
+            }
+            // if($rootScope.user.role.id === 2 && $location.path() === '/employee' || $rootScope.user.role.id === 2 && $location.path() === '/voucher'){
+            //     Swal.fire('Không có quyền truy cập','','warning')
+            //     $location.path('/product/view');
+            // }
+            return config;
+        }
+    };
+});
+
+app.config(function ($httpProvider) {
+    $httpProvider.interceptors.push('AuthInterceptor');
+});
+// Tạo một service để quản lý thông tin đăng nhập
+app.factory('AuthService', function() {
+    var authService = {};
+
+    authService.saveToken = function(token) {
+        localStorage.setItem('token', token);
+    };
+
+    authService.getToken = function() {
+        return localStorage.getItem('token');
+    };
+
+    authService.clearToken = function() {
+        localStorage.removeItem('token');
+    };
+
+    
+
+    return authService;
+});
+
+app.run(function ($rootScope, $http,AuthService) {
+  
+    if(AuthService.getToken() != null){
+        var token = AuthService.getToken();
+
+          $http({
+            method: "GET",
+            url: "http://localhost:8080/api/auth/admin/get",
+            params: {token : token},
+          }).then(function (username) {
+           
+            $http.get('http://localhost:8080/api/employee/getByUsername/'+username.data.username).then(function(user){
+                $rootScope.user = user.data;
+            })
+
+          })
+          .catch(function (error) {
+            console.log("Error fetching username:", error);
+            // Xử lý lỗi ở đây nếu cần
+        });
+    }
+
+    $rootScope.logout = function(){
+        Swal.fire({
+            title: 'Bạn có chắc muốn đăng xuất ?',
+            showCancelButton: true,
+            confirmButtonText: 'Đăng xuất',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                AuthService.clearToken();
+                $rootScope.user = null;
+                Swal.fire('Đăng xuất thành công !','',"success");
+                location.href = "#/login"
+               
+            }
+    })
+       
+    }
+    $rootScope.submenu = false;
+    $rootScope.menu = function(){
+        $rootScope.submenu = !$rootScope.submenu;
+    }
 });

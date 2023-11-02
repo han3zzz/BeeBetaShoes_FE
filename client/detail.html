@@ -28,7 +28,7 @@
                                     <h1 class="product-single__title">{{sp.product.name}}</h1>
                                     
                                     <div class="prInfoRow">
-                                        <div class="product-stock"> <span ng-if="quantity > 0"><span class="instock ">Còn hàng ({{quantity}})</span></span>  <span ng-if="quantity ==0"><span style="color: red;" class="outstock">Tạm hết hàng</span></span></div>
+                                        <div class="product-stock">Tình trạng : <span ng-if="quantity > 0"><span class="instock ">Còn hàng</span></span>  <span ng-if="quantity ==0"><span style="color: red;" class="outstock">Tạm hết hàng</span></span></div>
                                         <div class="product-sku">Code: <span class="variant-sku">{{sp.product.code}}</span></div>
                                         <div class="product-review"><a class="reviewLink" href="#tab2"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><span class="spr-badge-caption">6 reviews</span></a></div>
                                     </div>
@@ -62,12 +62,12 @@
                                             </div>
                                         <div class="product-form__item">
                                           <label class="header">Màu Sắc : </label>
-                                          <span class="colorButton custom-radio-button" ng-repeat="c in colorid">
+                                          <span class="colorButton radio-buttonhan" ng-repeat="c in colorid">
     
                                                 <span ng-repeat="color in listColor">
                                                
                                                     <span ng-if="c == color.id">
-                                                    <input ng-click="check()" type="radio" id="Color{{color.id}}" value="{{color.id}}" name="ColorRadioGroup">
+                                                    <input ng-click="check()" ng-checked="selectedColor === color.id" type="radio" id="Color{{color.id}}" value="{{color.id}}" name="ColorRadioGroup">
                                                     <label for="Color{{color.id}}">{{color.name}}</label>
                                                     </span>
                                                 </span>
@@ -83,14 +83,15 @@
                                         <div class="product-form__item">
                                           <label class="header">Kích Thước : </label>
                                        
-                                            <span class="colorButton custom-radio-button" ng-repeat="kt in listKT">
-                                                <input ng-click="checkSize()" type="radio" id="Size{{kt.size.id}}" value="{{kt.size.id}}" name="SizeRadioGroup">
-                                                <label for="Size{{kt.size.id}}">Size {{kt.size.name}}</label>
+                                            <span class="colorButton radio-buttonhan" ng-repeat="kt in listKT">
+                                                <input ng-click="checkSize()" ng-checked="selectedSize === kt.size.id" type="radio" id="Size{{kt.size.id}}" value="{{kt.size.id}}" name="SizeRadioGroup">
+                                                <label for="Size{{kt.size.id}}">{{kt.size.name}}</label>
                                                 
                                         </span>
                                 
                                         </div>
                                     </div>
+                                    <div class="product-stock">Còn {{quantity}} sản phẩm có sẵn </div>
                                   
                                     <div class="product-action clearfix">
                                         <div class="product-form__item--quantity">

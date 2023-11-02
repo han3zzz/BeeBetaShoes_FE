@@ -1,4 +1,4 @@
-window.HoaDonController = function($scope, $http, $location,$routeParams){
+window.HoaDonController = function($scope, $http, $location,$routeParams,$rootScope){
     $scope.list = [];
     $http.get("http://localhost:8080/api/bill/getall").then(function(rest){
         $scope.list = rest.data;
@@ -162,7 +162,7 @@ $http.get(urlsize).then(function (response) {
                       }).then((result) => {
                         if (result.isConfirmed) {
                           $http.post('http://localhost:8080/api/billhistory',{
-                            createBy : null,
+                            createBy : $rootScope.user.username,
                             note : result.value,
                             status : 1,
                             idBill : id
@@ -197,7 +197,7 @@ $http.get(urlsize).then(function (response) {
                       }).then((result) => {
                         if (result.isConfirmed) {
                           $http.post('http://localhost:8080/api/billhistory',{
-                            createBy : null,
+                            createBy : $rootScope.user.username,
                             note : result.value,
                             status : 2,
                             idBill : id
@@ -232,7 +232,7 @@ $http.get(urlsize).then(function (response) {
                       }).then((result) => {
                         if (result.isConfirmed) {
                           $http.post('http://localhost:8080/api/billhistory',{
-                            createBy : null,
+                            createBy : $rootScope.user.username,
                             note : result.value,
                             status : 3,
                             idBill : id
@@ -346,7 +346,7 @@ $http.get(urlsize).then(function (response) {
                     }).then((result) => {
                       if (result.isConfirmed) {
                         $http.post('http://localhost:8080/api/billhistory',{
-                          createBy : null,
+                          createBy : $rootScope.user.username,
                           note : result.value,
                           status : 5,
                           idBill : id

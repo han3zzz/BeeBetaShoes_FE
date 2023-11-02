@@ -1,4 +1,4 @@
-window.BanHangController = function($scope, $http, $location,$routeParams){
+window.BanHangController = function($scope, $http, $location,$routeParams,$rootScope){
 
     //tạo hóa đơn
     $scope.addbill = function(){
@@ -6,7 +6,7 @@ window.BanHangController = function($scope, $http, $location,$routeParams){
            $http
            .post("http://localhost:8080/api/bill/billTaiQuay", {
              status: 10,
-             idEmployee : 1 ,
+             idEmployee : $rootScope.user.id ,
              typeStatus : 1
            })
            .then(function (bill) {
@@ -81,13 +81,15 @@ window.BanHangController = function($scope, $http, $location,$routeParams){
                   let idBill = null;
                   let codeBill = null;
     $scope.choose = function(code,id){
+     
         if(code == null || id == null){
             document.getElementById("chitiet").style.display = "none";
             return;
         }
+        document.getElementById("diachichon").checked = true;
         document.getElementById("diachi").style.display = 'none';
         document.getElementById("diachichon1").style.display = 'none';
-        document.getElementById("diachichon").checked = true;
+        
 
         idBill =id;
         codeBill = code;
@@ -624,7 +626,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                                             url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
                                             params: getPram,
                                           }).then(function (soluong) {
-                                            if(soluong.data <= parseInt(document.getElementById('quantity'+id).value)){
+                                            if(soluong.data === 0){
                                                 Swal.fire("Đã đạt số lượng tối đa","","error");
                                                 return;
                                             }

@@ -42,10 +42,10 @@
                 <div class="col-2 col-sm-4 col-md-3 col-lg-4 text-right">
                 	<span class="user-menu d-block d-lg-none"><i class="anm anm-user-al" aria-hidden="true"></i></span>
                     <ul class="customer-links list-inline">
-                            <li ng-if="isLoggedIn == false"><a href="#login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng nhập</a></li>
-                            <li ng-if="isLoggedIn == false"><a href="#register"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
-                            <li ng-if="isLoggedIn == true"><a>Xin chào,<i class="fa-solid fa-user-tie"></i> {{fullname}}</a></li>
-                            <li ng-if="isLoggedIn == true"><a ng-click="logout()"><i class="fa-solid fa-power-off"></i> Đăng xuất</a></li>
+                            <li ng-if="user == null"><a href="#login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng nhập</a></li>
+                            <li ng-if="user == null"><a href="#register"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
+                            <li ng-if="user != null"><a><i class="fa-solid fa-user-tie"></i> Xin chào, {{user.fullname}}</a></li>
+                            <li ng-if="user != null"><a ng-click="logout()"><i class="fa-solid fa-power-off"></i> Đăng xuất</a></li>
                        
                        
                     </ul>
@@ -103,48 +103,72 @@
                 <!--Mobile Logo-->
                 <div class="col-4 col-sm-3 col-md-3 col-lg-2">
                     <div class="site-cart">
-                    	<a href="#;" class="site-header__cart" title="Cart">
+                    	<a href="javascript:void(0)" class="site-header__cart" title="Cart">
                         	<i class="icon anm anm-bag-l"></i>
-                            <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">2</span>
+                            <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">{{listCartIndex.length}}</span>
                         </a>
                         <!--Minicart Popup-->
                         <div id="header-cart" class="block block-cart">
                         	<ul class="mini-products-list">
-                                <li class="item" ng-repeat="cart in listCart1">
+                                <li class="item" ng-repeat="c in listCartIndex" ng-if="listCartIndex.length > 0">
                                 	<a class="product-image" href="#">
-                                        <span ng-repeat="img in cart.productDetail.product.productImages">
+                                        <span ng-repeat="img in c.productDetail.product.productImages">
                                             <span ng-if="img.mainImage == true">
-                                                <a href="#"><img class="cart__image" src="{{img.url}}" alt="Elastic Waist Dress - Navy / Small"></a>
+                                               
+                                                <img height="85px" class="cart__image" src="{{img.url}}">
                                             </span>
                                         </span>
                                     </a>
                                     <div class="product-details">
-                                    	<a href="#" class="remove"><i class="anm anm-times-l" aria-hidden="true"></i></a>
-                                        <a href="#" class="edit-i remove"><i class="anm anm-edit" aria-hidden="true"></i></a>
-                                        <a class="pName" href="cart.html">{{cart.productDetail.product.name}}</a>
-                                        <div class="variant-cart">Gray / XXL</div>
-                                        <div class="wrapQtyBtn">
+                                    	
+                                        <a class="pName">{{c.productDetail.product.name | uppercase }}
+                                            <br> SKU : {{c.productDetail.product.code}}
+                                        </a>
+                                       
+                                        <div class="variant-cart"> <span ng-repeat="color in listColorIndex">
+                                            <span ng-if="color.id == c.idColor">
+                                                {{color.name}}
+                                            </span>
+                                        </span> /  <span ng-repeat="size in listSizeIndex">
+                                            <span ng-if="size.id == c.idSize">
+                                                {{size.name}}
+                                            </span>
+                                        </span></div>
+                                        <div class="wrapQtyBtn" ng-if="editQuantityIndex == false">
                                             <div class="qtyField">
                                             	<span class="label">Qty:</span>
-                                                <a class="qtyBtn minus" href="javascript:void(0);"><i class="fa anm anm-minus-r" aria-hidden="true"></i></a>
-                                                <input type="text" id="Quantity" name="quantity" value="1" class="product-form__input qty">
-                                                <a class="qtyBtn plus" href="javascript:void(0);"><i class="fa anm anm-plus-r" aria-hidden="true"></i></a>
+                                                <a class="qtyBtn minus" ng-click="giamIndex(c.id,c.productDetail.id,c.idColor,c.idSize)"><i class="fa anm anm-minus-r" aria-hidden="true"></i></a>
+                                                <input type="text" ng-keyup="EnterQuantityIndex(c.id,c.productDetail.id,c.idColor,c.idSize)" id="qtyIndex{{c.id}}" name="quantity" value="{{c.quantity}}" class="product-form__input qty">
+                                                <a class="qtyBtn plus" ng-click="tangIndex(c.id,c.productDetail.id,c.idColor,c.idSize)"><i class="fa anm anm-plus-r" aria-hidden="true"></i></a>
+                                                <button ng-click="deleteByCartIndex(c.id)" style="border: none;font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
                                             </div>
+                                           
                                         </div>
                                        	<div class="priceRow">
                                             <div class="product-price">
-                                                <span class="money">$99.00</span>
+                                                <span class="money">{{c.unitPrice * c.quantity | currency:'':0}} VNĐ</span>
                                             </div>
                                         </div>
                                     </div>
                                 </li>
+                                <li ng-if="listCartIndex.length == 0">
+                                    <div style="text-align: center;"><img style="width: 50px;height: 50px;" src="./assets/images/empty-cart.png">
+                                    <p>Không có sản phẩm nào trong giỏ</p>
+                                    </div>
+                                </li>
+                                <li ng-if="user == null" >
+                                    <div style="text-align: center;"><img style="width: 50px;height: 50px;" src="./assets/images/empty-cart.png">
+                                    <p>Vui lòng đăng nhập</p>
+                                    </div>
+                                </li>
                             </ul> 
-                            <div class="total">
+                            <div class="total" ng-if="user != null">
                             	<div class="total-in">
-                                	<span class="label">Tổng tiền :</span><span class="product-price"><span class="money">{{tongTien}}</span></span>
+                                	<span class="label">Tổng tiền :</span><span class="product-price"><span class="money">{{tongTienIndex | currency:'':0}} VNĐ</span></span>
                                 </div>
                                  <div class="buttonSet text-center">
                                     <a href="#cart" class="btn btn-secondary btn--small">Xem Giỏ Hàng</a>
+                                    <a href="#checkout" class="btn btn-secondary btn--small">Thanh Toán</a>
                                     <!-- <a href="#checkout" class="btn btn-secondary btn--small">Thanh Toán</a> -->
                                 </div>
                             </div>

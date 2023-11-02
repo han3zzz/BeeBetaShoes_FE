@@ -35,10 +35,13 @@
                                 </td>
                                 <td class="cart__meta small--text-left cart-flex-item">
                                     <div class="list-view-item__title">
-                                        <a href="#/detail/{{cart.productDetail.id}}"><h4>{{cart.productDetail.product.name}}</h4> </a>
+                                        <a href="#/detail/{{cart.productDetail.id}}">{{cart.productDetail.product.name | uppercase}}
+                                            
+                                        </a>
                                     </div>
                                     
                                     <div class="cart__meta-text">
+                                         SKU : {{cart.productDetail.product.code}}<br>
                                         Màu : 
                                         <span ng-repeat="color in listColor">
                                             <span ng-if="color.id == cart.idColor">
@@ -81,7 +84,9 @@
                                     <td><button class="btn btn-dark" ng-click="deleteByCart(cart.id)"><i class="fa-solid fa-trash"></i></button></td>
                             </tr>
                             <tr ng-if="listCart.length == 0">
-                                <td colspan="6">Không có sản phẩm nào trong giỏ</td>
+                                <td style="text-align: center;" colspan="6"><img style="width: 100px;height: 100px;" src="./assets/images/empty-cart.png">
+                                <h3>Không có sản phẩm nào trong giỏ</h3>
+                                </td>
                                 </tr>
                            
                           

@@ -56,38 +56,395 @@ app.config(function ($routeProvider, $locationProvider,$httpProvider) {
         });
 
 });
-
-// app.run(function ($rootScope, $http) {
-//     // Kiểm tra xem có JWT token đã lưu trong localStorage hay không
-//     $rootScope.isLoggedIn = false;
-//     var token = localStorage.getItem('token');
-//     var name = localStorage.getItem('fullname');
-//     if (token) {
-//         // Thiết lập token trong header cho mọi yêu cầu
-//         $http.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-//         $rootScope.isLoggedIn = true;
-//         $rootScope.fullname = name;
-//     }
-//     $rootScope.logout = function(){
-        
-//         localStorage.removeItem('token');
-//         $rootScope.isLoggedIn = false;
-//     }
-// });
-app.service('AuthenticationService', function () {
-    var isAuthenticated = false;
-    var userInfo = {};
-
+app.factory('AuthInterceptor', function ($location,AuthService,$rootScope) {
     return {
-        setAuthentication: function (status, user) {
-            isAuthenticated = status;
-            userInfo = user;
-        },
-        isAuthenticated: function () {
-            return isAuthenticated;
-        },
-        getUserInfo: function () {
-            return userInfo;
+        request: function (config) {
+            var token = AuthService.getToken();
+            $rootScope.editQuantityIndex = false;
+            if ((token === null && $location.path() == '/cart') || (token === null && $location.path() == '/checkout') || (token === null && $location.path() == '/myorder')) {
+                $location.path('/login');
+            }
+            if ((token !== null && $location.path() == '/cart') || (token !== null && $location.path() == '/checkout')) {
+                $rootScope.editQuantityIndex = true;
+            }
+            if ((token !== null && $location.path() == '/login') || (token !== null && $location.path() == '/register') || (token !== null && $location.path() == '/forget')) {
+               
+                $location.path('/home');
+            }
+           
+            return config;
         }
     };
+});
+
+app.config(function ($httpProvider) {
+    $httpProvider.interceptors.push('AuthInterceptor');
+});
+
+// Tạo một service để quản lý thông tin đăng nhập
+app.factory('AuthService', function() {
+    var authService = {};
+
+    authService.saveToken = function(token) {
+        localStorage.setItem('token', token);
+    };
+
+    authService.getToken = function() {
+        return localStorage.getItem('token');
+    };
+
+    authService.clearToken = function() {
+        localStorage.removeItem('token');
+    };
+    authService.saveCustomer = function(id) {
+        localStorage.setItem('customer', id);
+    };
+
+    authService.getCustomer = function() {
+        return localStorage.getItem('customer');
+    };
+    authService.clearCustomer = function() {
+        localStorage.removeItem('customer');
+    };
+
+    
+
+    return authService;
+});
+
+app.run(function ($rootScope, $http,AuthService) {
+    if(AuthService.getToken() != null){
+        var token = AuthService.getToken();
+
+          $http({
+            method: "GET",
+            url: "http://localhost:8080/api/auth/get",
+            params: {token : token},
+          }).then(function (username) {
+           
+            $http.get('http://localhost:8080/api/customer/getByUsername/'+username.data.username).then(function(user){
+                $rootScope.user = user.data;
+                AuthService.saveCustomer(user.data.id)
+
+
+                //get cart
+                let urlcolor = "http://localhost:8080/api/color";
+                let urlsize = "http://localhost:8080/api/size";
+                 // load color
+            $rootScope.listColorIndex = [];
+            $http.get(urlcolor).then(function (response) {
+              $rootScope.listColorIndex = response.data;
+            });
+            // load size
+            $rootScope.listSizeIndex = [];
+            $http.get(urlsize).then(function (response) {
+              $rootScope.listSizeIndex = response.data;
+            });
+            //load cart by user
+            $rootScope.listCartIndex = [];
+            $http.get("http://localhost:8080/api/cart/"+user.data.id).then(function (cart) {
+              $rootScope.listCartIndex = cart.data;
+              $rootScope.tongTienIndex = 0;
+              for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                $rootScope.tongTienIndex +=
+                  $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+              }
+            });
+            $http.get("http://localhost:8080/api/cart/getCartByCustomer/"+ user.data.id).then(function(idd){
+                let idCart = idd.data.id;
+               
+            
+               //delete product from cart
+               $rootScope.deleteByCartIndex = function (id) {
+                 Swal.fire({
+                   title: "Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng ?",
+                   showCancelButton: true,
+                   confirmButtonText: "Xóa",
+                 }).then((result) => {
+                   /* Read more about isConfirmed, isDenied below */
+                   if (result.isConfirmed) {
+                     $http.delete("http://localhost:8080/api/cart/" + id);
+                  
+                     Swal.fire("Đã xóa khỏi giỏ hàng !", "", "success");
+                     setTimeout(() => {
+                      $http.get("http://localhost:8080/api/cart/"+ user.data.id).then(function (cartL) {
+                        $rootScope.listCartIndex = cartL.data;
+                        $rootScope.tongTienIndex = 0;
+                        for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                          $rootScope.tongTienIndex +=
+                            $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                        }
+                    //load cart by user
+                    $rootScope.listCart = cartL.data;
+                    $rootScope.tongTien = 0;
+                   for (let i = 0; i < $rootScope.listCart.length; i++) {
+                   $rootScope.tongTien +=
+                       $rootScope.listCart[i].unitPrice * $rootScope.listCart[i].quantity;
+                   }
+                    })
+                       location.href = "#cart";
+                     }, 500);
+                   }
+                 });
+               };
+            
+               //giảm số lượng trong cart
+               $rootScope.giamIndex = function (idCartDetail, idProductDetail, idColor, idSize) {
+                 var getQuanity = parseInt(
+                   document.getElementById("qtyIndex" + idCartDetail).value
+                 );
+                 
+                
+                 getQuanity = getQuanity - 1;
+                 //nếu product về số lượng là 0 thì check có thể xóa
+                 if (getQuanity <= 0) {
+                   $rootScope.deleteByCartIndex(idCartDetail);
+                   getQuanity = 1;
+                   return;
+                 }
+                 //get đơn giá ở thời điểm hiện tại
+                 $http
+                   .get("http://localhost:8080/api/product/" + idProductDetail)
+                   .then(function (response) {
+                     var unitPrice = 0;
+                     if (response.data.discount > 0) {
+                       unitPrice =
+                         response.data.price -
+                         response.data.price * (response.data.discount * 0.01);
+                     } else {
+                       unitPrice = response.data.price;
+                     }
+            
+                     // nếu thỏa mãn thì giảm số lượng trong giỏ hàng
+                     $http
+                       .put("http://localhost:8080/api/cart/updateCart/" + idCartDetail, {
+                         idCart: idCart,
+                         idProductDetail: idProductDetail,
+                         idColor: idColor,
+                         idSize: idSize,
+                         quantity: getQuanity,
+                         unitPrice: unitPrice,
+                       })
+                       .then(function (cart) {
+                         if (cart.status === 200) {
+                          $http.get("http://localhost:8080/api/cart/"+ user.data.id).then(function (cartL) {
+                            $rootScope.listCartIndex = cartL.data;
+                            $rootScope.tongTienIndex = 0;
+                            for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                              $rootScope.tongTienIndex +=
+                                $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                            }
+                            
+                        })
+                           //load lại sau khi giảm thành công !
+                       
+                         }
+                       });
+                   });
+               };
+               // tăng số lượng trong giỏ
+               $rootScope.tangIndex = function (idCartDetail, idProductDetail, idColor, idSize) {
+                 // check số lượng của sản phẩm đang còn
+                 
+                 var params = {
+                   IdProduct: idProductDetail,
+                   IdColor: idColor,
+                   IdSize: idSize,
+                 };
+                 $http({
+                   method: "GET",
+                   url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                   params: params,
+                 }).then(function (resp) {
+                   $rootScope.quantity = resp.data;
+            
+                   if (
+                     document.getElementById("qtyIndex" + idCartDetail).value >= $rootScope.quantity
+                   ) {
+                     Swal.fire(
+                       "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
+                       "",
+                       "error"
+                     );
+                     return;
+                   }
+                   document.getElementById("qtyIndex" + idCartDetail).value =
+                     parseInt(document.getElementById("qtyIndex" + idCartDetail).value) + 1;
+            
+                   //get đơn giá ở thời điểm hiện tại
+                   $http
+                     .get("http://localhost:8080/api/product/" + idProductDetail)
+                     .then(function (response) {
+                       var unitPrice = 0;
+                       if (response.data.discount > 0) {
+                         unitPrice =
+                           response.data.price -
+                           response.data.price * (response.data.discount * 0.01);
+                       } else {
+                         unitPrice = response.data.price;
+                       }
+            
+                       // nếu thỏa mãn thì tăng số lượng trong giỏ hàng
+                       $http
+                         .put(
+                           "http://localhost:8080/api/cart/updateCart/" + idCartDetail,
+                           {
+                             idCart: idCart,
+                             idProductDetail: idProductDetail,
+                             idColor: idColor,
+                             idSize: idSize,
+                             quantity: parseInt(
+                               document.getElementById("qtyIndex" + idCartDetail).value
+                             ),
+                             unitPrice: unitPrice,
+                           }
+                         )
+                         .then(function (cart) {
+                           if (cart.status === 200) {
+                            $http.get("http://localhost:8080/api/cart/"+ user.data.id).then(function (cartL) {
+                              $rootScope.listCartIndex = cartL.data;
+                              $rootScope.tongTienIndex = 0;
+                              for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                                $rootScope.tongTienIndex +=
+                                  $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                              }
+                            
+                     
+                          })
+                            
+                           }
+                         });
+                     });
+                 });
+               };
+            
+               $rootScope.EnterQuantityIndex = function (
+                 idCartDetail,
+                 idProductDetail,
+                 idColor,
+                 idSize
+               ) {
+                 var numberRegex = /^[0-9]+$/;
+                 if (
+                   !numberRegex.test(document.getElementById("qtyIndex" + idCartDetail).value)
+                 ) {
+                   Swal.fire("Số lượng phải là số nguyên dương !!", "", "error");
+                   $http
+                     .get(
+                       "http://localhost:8080/api/cart/getQuantityByCartDetail/" +
+                         idCartDetail
+                     )
+                     .then(function (resp) {
+                       document.getElementById("qtyIndex" + idCartDetail).value = resp.data;
+                     });
+                   return;
+                 }
+                 var params = {
+                   IdProduct: idProductDetail,
+                   IdColor: idColor,
+                   IdSize: idSize,
+                 };
+                 $http({
+                   method: "GET",
+                   url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                   params: params,
+                 }).then(function (resp) {
+                   $rootScope.quantity = resp.data;
+            
+                   if (
+                     document.getElementById("qtyIndex" + idCartDetail).value > $rootScope.quantity
+                   ) {
+                     Swal.fire(
+                       "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
+                       "",
+                       "error"
+                     );
+                     $http
+                       .get(
+                         "http://localhost:8080/api/cart/getQuantityByCartDetail/" +
+                           idCartDetail
+                       )
+                       .then(function (resp) {
+                         document.getElementById("qtyIndex" + idCartDetail).value = resp.data;
+                       });
+                   } else {
+                     //get đơn giá ở thời điểm hiện tại
+                     $http
+                       .get("http://localhost:8080/api/product/" + idProductDetail)
+                       .then(function (response) {
+                         var unitPrice = 0;
+                         if (response.data.discount > 0) {
+                           unitPrice =
+                             response.data.price -
+                             response.data.price * (response.data.discount * 0.01);
+                         } else {
+                           unitPrice = response.data.price;
+                         }
+            
+                         // nếu thỏa mãn thì tăng số lượng trong giỏ hàng
+                         $http
+                           .put(
+                             "http://localhost:8080/api/cart/updateCart/" + idCartDetail,
+                             {
+                               idCart: idCart,
+                               idProductDetail: idProductDetail,
+                               idColor: idColor,
+                               idSize: idSize,
+                               quantity: parseInt(
+                                 document.getElementById("qtyIndex" + idCartDetail).value
+                               ),
+                               unitPrice: unitPrice,
+                             }
+                           )
+                           .then(function (cart) {
+                             if (cart.status === 200) {
+                
+                              $http.get("http://localhost:8080/api/cart/"+ user.data.id).then(function (cartL) {
+                                $rootScope.listCartIndex = cartL.data;
+                                $rootScope.tongTienIndex = 0;
+                                for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                                  $rootScope.tongTienIndex +=
+                                    $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                                }
+                               
+                            })
+                               //load lại sau khi tăng thành công !
+                          
+                             }
+                           });
+                       });
+                   }
+                 });
+               };
+            })
+
+        })
+          
+
+          })
+          .catch(function (error) {
+            console.log("Error fetching username:", error);
+            // Xử lý lỗi ở đây nếu cần
+        });
+    }
+
+    $rootScope.logout = function(){
+        Swal.fire({
+            title: 'Bạn có chắc muốn đăng xuất ?',
+            showCancelButton: true,
+            confirmButtonText: 'Đăng xuất',
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                AuthService.clearToken();
+                AuthService.clearCustomer();
+                $rootScope.user = null;
+                $rootScope.listCartIndex = [];
+                Swal.fire('Đăng xuất thành công !','',"success");
+                location.href = "#/login"
+               
+            }
+    })
+       
+    }
 });

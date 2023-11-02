@@ -1,5 +1,5 @@
 
-    window.SanPhamController = function($scope, $http, $location,$routeParams){
+    window.SanPhamController = function($scope, $http, $location,$routeParams,$rootScope){
         let url = "http://localhost:8080/api/product";
         let urlcategory = "http://localhost:8080/api/category";
         let urlbrand = "http://localhost:8080/api/brand";
@@ -575,7 +575,7 @@
 
                                 $http.post("http://localhost:8080/api/operationhistory",{
                                     status : 1 ,
-                                    createBy : 'hanzzz',
+                                    createBy : $rootScope.user.username,
                                     idProductDetail :  productdetail.data.id
                                 });
                                 //add material
@@ -614,15 +614,15 @@
                                         }
                                     }
                                 }
-                                if($scope.nhaCungCap != null){
-                                    $http.post("http://localhost:8080/api/supplier",{
-                                        name : $scope.nhaCungCap.name,
-                                        phone : $scope.nhaCungCap.phone,
-                                        address : $scope.nhaCungCap.address,
-                                        agree : $scope.nhaCungCap.agree,
-                                        idProductDetail : productdetail.data.id
-                                    })
-                                }
+                                // if($scope.nhaCungCap != null){
+                                //     $http.post("http://localhost:8080/api/supplier",{
+                                //         name : $scope.nhaCungCap.name,
+                                //         phone : $scope.nhaCungCap.phone,
+                                //         address : $scope.nhaCungCap.address,
+                                //         agree : $scope.nhaCungCap.agree,
+                                //         idProductDetail : productdetail.data.id
+                                //     })
+                                // }
                               
                                 Swal.fire('Thêm thành công !', '', 'success')
                                 setTimeout(() => {
@@ -669,7 +669,7 @@
                     
                     $http.post("http://localhost:8080/api/operationhistory",{
                         status : 3 ,
-                        createBy : 'hanzzz',
+                        createBy : $rootScope.user.username,
                         idProductDetail :  idProductDetail
                     });
                     $http.put("http://localhost:8080/api/product/"+idProductDetail).then(function (response){
@@ -975,7 +975,7 @@
 
                                 $http.post("http://localhost:8080/api/operationhistory",{
                                     status : 2 ,
-                                    createBy : 'hanzzz',
+                                    createBy : $rootScope.user.username,
                                     idProductDetail :  productDetail.data.id
                                 });
                                 //update product
@@ -1132,16 +1132,16 @@
                                         });
                                     }
                                 }
-                                if($scope.nhaCungCap != null){
-                                    $http.delete("http://localhost:8080/api/supplier/"+productDetail.data.id);
-                                    $http.post("http://localhost:8080/api/supplier",{
-                                        name : $scope.nhaCungCap.name,
-                                        phone : $scope.nhaCungCap.phone,
-                                        address : $scope.nhaCungCap.address,
-                                        agree : $scope.nhaCungCap.agree,
-                                        idProductDetail : productDetail.data.id
-                                    })
-                                }
+                                // if($scope.nhaCungCap != null){
+                                //     $http.delete("http://localhost:8080/api/supplier/"+productDetail.data.id);
+                                //     $http.post("http://localhost:8080/api/supplier",{
+                                //         name : $scope.nhaCungCap.name,
+                                //         phone : $scope.nhaCungCap.phone,
+                                //         address : $scope.nhaCungCap.address,
+                                //         agree : $scope.nhaCungCap.agree,
+                                //         idProductDetail : productDetail.data.id
+                                //     })
+                                // }
 
                                 // update size and color
 
@@ -1213,7 +1213,7 @@
                                 
                                 $http.post("http://localhost:8080/api/productdetailhistory",{
                                     updateDate : new Date(),
-                                    updateBy : 'hanzzz',
+                                    updateBy : $rootScope.user.username,
                                     name : $scope.history.product.name,
                                     price : $scope.history.price,
                                     weight : $scope.history.weight,
@@ -1766,7 +1766,11 @@ $scope.isNhaCungCap = false;
                             idToe: detail.data.idToe,
                             discountDate : detail.data.discountDate
                         }).then(function (productDetail) {
-
+                            $http.post("http://localhost:8080/api/operationhistory",{
+                                status : 2 ,
+                                createBy : $rootScope.user.username,
+                                idProductDetail :  productDetail.data.id
+                            });
                             //update product
                             $http.put("http://localhost:8080/api/sanpham/" + productDetail.data.product.id,{
                                 name : detail.data.name,
@@ -1830,16 +1834,16 @@ $scope.isNhaCungCap = false;
                                     idMaterial : listMaterial[i]
                                 });
                             }
-                            if(detail.data.supplierName != null){
-                                $http.delete("http://localhost:8080/api/supplier/"+productDetail.data.id);
-                                $http.post("http://localhost:8080/api/supplier",{
-                                    name : detail.data.supplierName,
-                                    phone : detail.data.supplierPhone,
-                                    address : detail.data.supplierAddress,
-                                    agree : detail.data.supplierAgree,
-                                    idProductDetail : productDetail.data.id
-                                })
-                            }
+                            // if(detail.data.supplierName != null){
+                            //     $http.delete("http://localhost:8080/api/supplier/"+productDetail.data.id);
+                            //     $http.post("http://localhost:8080/api/supplier",{
+                            //         name : detail.data.supplierName,
+                            //         phone : detail.data.supplierPhone,
+                            //         address : detail.data.supplierAddress,
+                            //         agree : detail.data.supplierAgree,
+                            //         idProductDetail : productDetail.data.id
+                            //     })
+                            // }
 
                             // update size and color
                             let listColorSize = detail.data.idColor_Size_Quantity.split(",");
@@ -2198,7 +2202,6 @@ $scope.isLichSuThaoTac = false;
 $scope.openLichSuThaoTac = function(){
     $scope.isLichSuThaoTac = !$scope.isLichSuThaoTac;
 }
-
 
 
 
