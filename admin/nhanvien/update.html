@@ -7,7 +7,7 @@
     <div class="col-md-3 add">
       <label>Ảnh </label>
         <img id="output"/>
-      <input file-model="image" id="fileUpload" type="file" accept="image/*" onchange="loadFile(event)" ng-model="form.image">
+      <input file-model="image" id="fileUpload" type="file" accept="image/*" onchange="loadFile1(event)" ng-model="form.image">
       <!-- <input type="file" style="width: 200px;" > -->
       <div ng-repeat="err in validationErrors">
       <span class="validate" ng-if="err.objectName == 'colorRequest' && err.field == 'image'">
