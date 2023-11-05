@@ -1,6 +1,6 @@
 
 <h3> Quản Lý Nhân Viên</h3>
-<div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo tên danh mục.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
+<div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo tên nhân viên.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
 <div>
 <div style="float: right">
   <a href="#/employee/add"><button class="btn btn-success"><i class="fa-solid fa-plus"></i> Thêm</button></a>
@@ -32,7 +32,7 @@
     <td>{{dm.username}}</td>
     <td>{{dm.password}}</td>
     <td><img style="width: 100px; height: 100px;" src="{{dm.image}}"></td>
-    <td>{{dm.gender }}</td>
+    <td>{{dm.gender == true ? 'Nam' : 'Nữ'}}</td>
     <td>{{dm.phone}}</td>
     <td>{{dm.email}}</td>
     <td><a href="#/employee/update/{{dm.id}}"><button class="btn btn-indigo"> Sửa</button></a>

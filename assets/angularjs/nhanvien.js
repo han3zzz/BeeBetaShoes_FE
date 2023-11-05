@@ -55,7 +55,16 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
     }
     //add
     $scope.add = function () {
+        var gender = true ;
+        if(document.getElementById("gtNu").checked == true){
+            gender = false ; 
+        }
+        var idRole = document.getElementById("vaitro").value;
         var MainImage = document.getElementById("fileUpload").files;
+            if (MainImage.length == 0){
+                Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
+                return;
+            }
         var img = new FormData();
         img.append("files",MainImage[0]);
         $http.post("http://localhost:8080/api/upload",img,{
@@ -70,10 +79,10 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                 username: $scope.form.username,
                 password: $scope.form.password,
                 image: upImage.data[0],
-                gender: $scope.form.gender,
+                gender: gender,
                 phone: $scope.form.phone,
                 email: $scope.form.email,
-    
+                idRole: idRole,
             }).then(function (resp) {
                 if (resp.status === 200) {
                     Swal.fire('Thêm thành công !', '', 'success')
@@ -83,6 +92,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                 }
             }).catch(function (err) {
                 if (err.status === 400) {
+                    console.log(err.data)
                     $scope.validationErrors = err.data;
                 }
     
@@ -91,7 +101,16 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
     }
     //update 
     $scope.update = function () {
+        var gender = true ;
+        if(document.getElementById("gtNu").checked == true){
+            gender = false ; 
+        }
+        var idRole = document.getElementById("vaitro").value;
         var MainImage = document.getElementById("fileUpload").files;
+            if (MainImage.length == 0){
+                Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
+                return;
+            }
         if(MainImage.length > 0){
             var img = new FormData();
             img.append("files",MainImage[0]);
@@ -108,9 +127,10 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                     username: $scope.form.username,
                     password: $scope.form.password,
                     image: upImage.data[0],
-                    gender: $scope.form.gender,
+                    gender: gender,
                     phone: $scope.form.phone,
                     email: $scope.form.email,
+                    idRole: idRole,
                 }).then(function (resp) {
                     if (resp.status === 200) {
                         Swal.fire('Sửa thành công !', '', 'success')
@@ -185,6 +205,20 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
         let id = $routeParams.id;
         $http.get("http://localhost:8080/api/employee/" + id).then(function (resp) {
             $scope.form = resp.data;
+            if(resp.data.role.id == 1 ){
+                document.getElementById("qly").selected = true
+            }else{
+                document.getElementById("nv").selected = true
+            }
+
+            $scope.form = resp.data;
+            if(resp.data.gender == true ){
+                document.getElementById("gtNam").checked = true ;
+            }else{
+                document.getElementById("gtNu").checked = true ;
+
+            }
+
         })
     }
 
