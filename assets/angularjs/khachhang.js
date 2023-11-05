@@ -22,11 +22,21 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
         email: '',
 
     }
+
     // them khach hang 
     $scope.add = function () {
-        // var selected = $("input[type='radio'][name='gioitinh']:checked");
+        var gender = true ;
+        if(document.getElementById("gtNu").checked == true){
+            gender = false ; 
+
+        }
+    
           //add image
-          var MainImage = document.getElementById("fileUpload").files;
+         var MainImage = document.getElementById("fileUpload").files;
+            if (MainImage.length == 0){
+                Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
+                return;
+            }
 
           var img = new FormData();
           img.append("files",MainImage[0]);
@@ -42,15 +52,23 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
                 username: $scope.form.username,
                 password: $scope.form.password,
                 image: upImage.data[0],
-                gender: $scope.form.gender,
+                gender: gender ,
                 phone: $scope.form.phone,
                 email: $scope.form.email
             }).then(function (resp) {
                 if (resp.status === 200) {
-                    Swal.fire('Thêm Thành Công! ', '', 'success')
+                    $http.post("http://localhost:8080/api/cart/addCart" , {
+                        idCustomer : resp.data.id
+                    }).then(function(cart){
+
+                        Swal.fire('Thêm Thành Công! ', '', 'success')
                     setTimeout(() => {
                         location.href = "#/customer/view";
                     }, 2000);
+                        
+
+                    })
+                    
                 }
             }).catch(function (err) {
                 if (err.status === 400) {
@@ -63,6 +81,11 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
     }
     // update khachs hang 
     $scope.update = function () {
+        var gender = true ;
+        if(document.getElementById("gtNu").checked == true){
+            gender = false ; 
+
+        }
         
 
         let id = $routeParams.id;
@@ -72,7 +95,7 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
             username: $scope.form.username,
             password: $scope.form.password,
             image: $scope.form.image,
-            gender: $scope.form.gender,
+            gender: gender,
             phone: $scope.form.phone,
             email: $scope.form.email
         }).then(function (resp) {
@@ -117,8 +140,12 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
         let id = $routeParams.id;
         $http.get("http://localhost:8080/api/customer/" + id).then(function (resp) {
             $scope.form = resp.data;
-            alert($scope.form.gender)
+            if(resp.data.gender == true ){
+                document.getElementById("gtNam").checked = true ;
+            }else{
+                document.getElementById("gtNu").checked = true ;
 
+            }
 
         })
 

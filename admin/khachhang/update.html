@@ -15,7 +15,7 @@
 
       <div class="row">
         <div class="col-md-6 add">
-          <label>Mã Khách Hàng <span class="vaid">*</span></label> <input ng-model="form.code">
+          <label>Mã Khách Hàng <span class="vaid">*</span></label> <input class="haninput" ng-model="form.code">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'code'">
               {{err.defaultMessage}}
@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Tên Khách Hàng <span class="vaid">*</span></label> <input ng-model="form.fullname">
+          <label>Tên Khách Hàng <span class="vaid">*</span></label> <input class="haninput" ng-model="form.fullname">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'fullname'">
               {{err.defaultMessage}}
@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Tài Khoản<span class="vaid">*</span></label> <input ng-model="form.username">
+          <label>Tài Khoản<span class="vaid">*</span></label> <input class="haninput" ng-model="form.username">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'username'">
               {{err.defaultMessage}}
@@ -39,7 +39,7 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Mật Khẩu<span class="vaid">*</span></label> <input ng-model="form.password">
+          <label>Mật Khẩu<span class="vaid">*</span></label> <input class="haninput" ng-model="form.password">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'password'">
               {{err.defaultMessage}}
@@ -47,9 +47,8 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Giới Tính<span class="vaid">*</span></label> <input name="gioitinh" ng-model="form.gender" type="radio" value="true"
-            ng-checked="form.gender == true"> Nam <input name="gioitinh" ng-model="form.gender" type="radio" value="false"
-            ng-checked="form.gender == false">Nữ
+          <label>Giới Tính<span class="vaid">*</span></label> <input id="gtNam"  name="gioitinh" type="radio"
+           value="true"  {{form.gender = true ? 'checked' : ''}}> Nam <input id="gtNu" name="gioitinh" type="radio" value="false" {{form.gender = false ? 'checked' : ''}}>Nữ
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'gender'">
               {{err.defaultMessage}}
@@ -57,7 +56,7 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Số Điện Thoại<span class="vaid">*</span></label> <input ng-model="form.phone">
+          <label>Số Điện Thoại<span class="vaid">*</span></label> <input class="haninput" ng-model="form.phone">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'phone'">
               {{err.defaultMessage}}
@@ -65,7 +64,7 @@
           </div>
         </div>
         <div class="col-md-6 add">
-          <label>Email<span class="vaid">*</span></label> <input ng-model="form.email">
+          <label>Email<span class="vaid">*</span></label> <input class="haninput" ng-model="form.email">
           <div ng-repeat="err in validationErrors">
             <span class="validate" ng-if="err.objectName == 'customerReques' && err.field == 'email'">
               {{err.defaultMessage}}
