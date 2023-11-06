@@ -1263,7 +1263,7 @@
       // pagation
         $scope.pager = {
             page: 0,
-            size: 5,
+            size: 10,
             get items() {
                 var start = this.page * this.size;
                 return $scope.list.slice(start, start + this.size);

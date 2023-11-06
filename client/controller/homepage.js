@@ -68,17 +68,17 @@ window.HomeController = function ($http, $scope, $routeParams, $location,$rootSc
       $scope.listDesign = response.data;
     });
       //load cart by user
-      $scope.listCart = [];
-      $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
-        $scope.listCart = cart.data;
-        sessionStorage.setItem("listCart1",cart.data)
-        $scope.tongTien = 0;
-        for (let i = 0; i < $scope.listCart.length; i++) {
-          $scope.tongTien +=
-            $scope.listCart[i].unitPrice * $scope.listCart[i].quantity;
-        }
-        sessionStorage.setItem("tongTien",$scope.tongTien)
-      });
+      // $scope.listCart = [];
+      // $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
+      //   $scope.listCart = cart.data;
+      //   sessionStorage.setItem("listCart1",cart.data)
+      //   $scope.tongTien = 0;
+      //   for (let i = 0; i < $scope.listCart.length; i++) {
+      //     $scope.tongTien +=
+      //       $scope.listCart[i].unitPrice * $scope.listCart[i].quantity;
+      //   }
+      //   sessionStorage.setItem("tongTien",$scope.tongTien)
+      // });
      
    
     // pagation
@@ -155,7 +155,48 @@ window.HomeController = function ($http, $scope, $routeParams, $location,$rootSc
     last() {
       this.page = this.count - 1;
     },
+    
   };
+
+
+    //load product ban chay
+    $scope.listProductSold = [];
+    $http.get("http://localhost:8080/api/product/getAllBanChay").then(function (response) {
+      $scope.listProductSold = response.data;
+    });
+    // pagation
+    $scope.pagerProductSold = {
+      page: 0,
+      size: 8,
+      get items() {
+        var start = this.page * this.size;
+        return $scope.listProductSold.slice(start, start + this.size);
+      },
+      get count() {
+        return Math.ceil((1.0 * $scope.listProductSold.length) / this.size);
+      },
+  
+      first() {
+        this.page = 0;
+      },
+      prev() {
+        this.page--;
+        if (this.page < 0) {
+          this.last();
+        }
+      },
+      next() {
+        this.page++;
+        if (this.page >= this.count) {
+          this.first();
+        }
+      },
+      last() {
+        this.page = this.count - 1;
+      },
+      
+    };
+  
 
   
  

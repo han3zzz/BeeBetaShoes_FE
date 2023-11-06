@@ -213,58 +213,32 @@
       <h1>Thêm địa chỉ </h1>
       <div class="row">
         <div class="col-md-12 ">
-          <label>Tên người nhận <span class="vaid">*</span></label> <input class="haninput" value="" ng-model="danhmucname">
-          <div ng-repeat="err in validationErrors">
-          <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'name'">
-             {{err.defaultMessage}}
-          </span>
-          </div>
+          <label>Tên người nhận <span class="vaid">*</span></label> <input class="haninput" id="tennguoimua">
+       
         </div>
         <div class="col-md-12 ">
-            <label>SĐT người nhận <span class="vaid">*</span></label> <input class="haninput" value="" ng-model="danhmucname">
-            <div ng-repeat="err in validationErrors">
-            <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'name'">
-               {{err.defaultMessage}}
-            </span>
-            </div>
+            <label>SĐT người nhận <span class="vaid">*</span></label> <input class="haninput" id="sodienthoai">
+           
           </div>
           <div class="col-md-12 ">
-            <label>Tỉnh/Thành <span class="vaid">*</span></label> <select>
-                <option>1</option>
+            <label>Tỉnh/Thành <span class="vaid">*</span></label>  <select class="form-control" id="tinh" ng-click="getHuyen();getXa()">
+                <option ng-repeat="tinh in listTinh" value="{{tinh.ProvinceID}}">{{tinh.ProvinceName}}</option>
             </select>
-            <div ng-repeat="err in validationErrors">
-            <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'name'">
-               {{err.defaultMessage}}
-            </span>
-            </div>
+           
           </div>
           <div class="col-md-12 ">
-            <label>Quận/Huyện <span class="vaid">*</span></label> <select>
-                <option>1</option>
+            <label>Quận/Huyện <span class="vaid">*</span></label>  <select class="form-control" id="huyen" ng-click="getXa()">
+                <option ng-repeat="huyen in listHuyen" value="{{huyen.DistrictID}}">{{huyen.DistrictName}}</option>
             </select>
-            <div ng-repeat="err in validationErrors">
-            <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'name'">
-               {{err.defaultMessage}}
-            </span>
-            </div>
           </div>
           <div class="col-md-12 ">
-            <label>Phường/Xã <span class="vaid">*</span></label> <select>
-                <option>1</option>
+            <label>Phường/Xã <span class="vaid">*</span></label>  <select class="form-control" id="xa">
+                <option ng-repeat="xa in listXa" value="{{xa.WardCode}}">{{xa.WardName}}</option>
             </select>
-            <div ng-repeat="err in validationErrors">
-            <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'name'">
-               {{err.defaultMessage}}
-            </span>
-            </div>
           </div>
         <div class="col-md-12 ">
-          <label>Địa chỉ cụ thể </label> <textarea class="haninput1" ng-model="danhmucdescription"></textarea>
-          <div ng-repeat="err in validationErrors">
-          <span class="validate" ng-if="err.objectName == 'categoryRequest' && err.field == 'description'">
-             {{err.defaultMessage}}
-          </span>
-          </div>
+          <label>Địa chỉ cụ thể </label> <textarea class="haninput1" id="diachicuthe"></textarea>
+         
         </div>
    <div style="padding-top: 10px;">
     <button class="btn btn-primary" ng-click="themDiaChi()">X</button>

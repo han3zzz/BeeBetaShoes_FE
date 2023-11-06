@@ -86,15 +86,15 @@ app.factory('AuthService', function() {
     var authService = {};
 
     authService.saveToken = function(token) {
-        localStorage.setItem('token', token);
+        localStorage.setItem('token1', token);
     };
 
     authService.getToken = function() {
-        return localStorage.getItem('token');
+        return localStorage.getItem('token1');
     };
 
     authService.clearToken = function() {
-        localStorage.removeItem('token');
+        localStorage.removeItem('token1');
     };
     authService.saveCustomer = function(id) {
         localStorage.setItem('customer', id);

@@ -86,6 +86,9 @@ window.BanHangController = function($scope, $http, $location,$routeParams,$rootS
             document.getElementById("chitiet").style.display = "none";
             return;
         }
+        document.getElementById('hinhThuc1').checked = true;
+        document.getElementById('pay1').checked = true;
+        document.getElementById('chuongtrinhkhuyenmaiCheck').checked = true;
         document.getElementById("diachichon").checked = true;
         document.getElementById("diachi").style.display = 'none';
         document.getElementById("diachichon1").style.display = 'none';
@@ -93,8 +96,7 @@ window.BanHangController = function($scope, $http, $location,$routeParams,$rootS
 
         idBill =id;
         codeBill = code;
-
-
+        
         //get all voucher
         $scope.listVoucher  =[];
         $http.get('http://localhost:8080/api/product/getAllVoucher').then(function(resp){
@@ -229,7 +231,12 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                     $scope.hoadon = {};
                     $http.get("http://localhost:8080/api/bill/getbycode/"+ code).then(function(resp){
                         $scope.hoadon = resp.data;
+                        $scope.nhanVien  ={};
+                  $http.get('http://localhost:8080/api/employee/'+ resp.data.idEmployee).then(function(resp){
+                    $scope.nhanVien = resp.data;
+                  })
                     })
+                    
                     $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
                         $scope.listItem = resp.data;
                         $scope.tongTien  = 0.0;
