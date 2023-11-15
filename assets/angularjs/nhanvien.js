@@ -2,17 +2,16 @@
 window.NhanVienController = function ($scope, $http, $location, $routeParams) {
     let url = "http://localhost:8080/api/employee";
     $scope.loadAll = function () {
-
-        // load material
         $scope.list = [];
         $http.get(url).then(function (response) {
             $scope.list = response.data;
         })
-
     }
+    $scope.listVaitro = [];
+    $http.get("http://localhost:8080/api/role").then(function (response){
+        $scope.listVaitro = response.data;
+    })
     $scope.loadAll();
-
-    // pagation
     $scope.pager = {
         page: 0,
         size: 5,
@@ -51,6 +50,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
         image: '',
         gender: '',
         phone: '',
+        status: '',
         email: '',
     }
     //add
@@ -106,6 +106,9 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
             gender = false ; 
         }
         var idRole = document.getElementById("vaitro").value;
+
+        var status = document.getElementById("trangthai").value;
+
         var MainImage = document.getElementById("fileUpload").files;
             if (MainImage.length == 0){
                 Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
@@ -130,6 +133,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                     gender: gender,
                     phone: $scope.form.phone,
                     email: $scope.form.email,
+                    status: status,
                     idRole: idRole,
                 }).then(function (resp) {
                     if (resp.status === 200) {
@@ -210,7 +214,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
             }else{
                 document.getElementById("nv").selected = true
             }
-
+            
             $scope.form = resp.data;
             if(resp.data.gender == true ){
                 document.getElementById("gtNam").checked = true ;
@@ -219,6 +223,12 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
 
             }
 
+            $scope.form = resp.data;
+            if(resp.data.status == 0){
+                document.getElementById("lam").selected = true     
+            }else{
+                document.getElementById("nghi").selected = true
+            }
         })
     }
 
@@ -236,4 +246,21 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
         }
 
     }
+    $scope.filter = function(){
+        let idRole = document.getElementById("vaitro").value;
+        let idrole = (idRole != '') ? idRole : null;
+        var params = {
+            idrole : idrole,
+        }
+        $http({
+            method : 'GET',
+            url : 'http://localhost:8080/api/employee/filter',
+            params : params
+        }).then(function (resp){
+            $scope.list = resp.data;
+            $scope.pager.first();
+            // Swal.fire("Lọc thành công !","","success");
+        });
+    }
+  
 }
