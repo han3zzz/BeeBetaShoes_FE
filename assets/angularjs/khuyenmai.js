@@ -10,6 +10,17 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
 
     }
     $scope.loadAll();
+        $scope.check = function(){
+            if(document.getElementById("giamphantram").checked == true){
+                document.getElementById("km1").style.display = "block";
+                document.getElementById("km").style.display = "none";
+            }else{
+                document.getElementById("km1").style.display = "none";
+                document.getElementById("km").style.display = "block";
+            }
+            
+        }
+
 
     // pagation
     $scope.pager = {
@@ -83,6 +94,8 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
 
     //update 
     $scope.update = function(){
+        var startDate  = document.getElementById("ngaybatdau").value;
+        var endDate  = document.getElementById("ngayhethan").value;
         let id = $routeParams.id ;
         $http.put("http://localhost:8080/api/voucher/update/"+id,{
             code : $scope.form.code,
@@ -91,8 +104,8 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
             isVoucher : $scope.form.isvoucher,
             discount : $scope.form.discount,
             cash : $scope.form.cash,
-            startDate : $scope.form.startdate,
-            endDate : $scope.form.enddate,
+            startDate : startDate,
+            endDate : endDate,
         }).then(function(resp){
             if(resp.status === 200){
                 Swal.fire('Sửa thành công !', '', 'success')
@@ -135,7 +148,66 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         let id = $routeParams.id;
         $http.get("http://localhost:8080/api/voucher/" + id).then(function (resp) {
             $scope.form = resp.data;
-            alert($scope.form.gender)
+            if(resp.data.isVoucher == true){
+                document.getElementById("giamphantram").checked = true
+                document.getElementById("km").style.display = "block";
+                document.getElementById("km1").style.display = "none";
+            }else{
+                document.getElementById("giamtienmat").checked = true
+                document.getElementById("km").style.display = "none";
+                document.getElementById("km1").style.display = "block";
+            }
+            if(resp.data.typeVoucher == true){
+                document.getElementById("giamtheobill").checked = true 
+            }else{
+                document.getElementById("giamsanpham").checked = true
+            }
+
+
+
+            let dateInput = document.getElementById('ngaybatdau');
+    
+            // Original datetime string in 'yyyy-MM-dd hh:mm:ss.sss' format
+            var originalDateStr = $scope.form.startDate; // Replace with your original date
+            if(originalDateStr !== null){
+                // Split the original date string
+            var dateParts = originalDateStr.split('T')[0].split('-');
+
+            // Extract year, month, and day
+            var year = dateParts[0];
+            var month = dateParts[1];
+            var day = dateParts[2];
+            var formattedDate = year + '-' + month + '-' + day;
+
+            // Set the formatted date in the input field'
+        
+            dateInput.value = formattedDate;
+            
+            }            
+            
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+            let dateInput1 = document.getElementById('ngayhethan');
+
+            // Original datetime string in 'yyyy-MM-dd hh:mm:ss.sss' format
+            var originalDateStr1 = $scope.form.endDate; // Replace with your original date
+            if(originalDateStr1 !== null){
+                                      // Split the original date string
+            var dateParts1 = originalDateStr1.split('T')[0].split('-');
+
+            // Extract year, month, and day
+            var year1 = dateParts1[0];
+            var month1 = dateParts1[1];
+            var day1 = dateParts1[2];
+            var formattedDate1 = year1 + '-' + month1 + '-' + day1;
+
+            // Set the formatted date in the input field'
+        
+            dateInput1.value = formattedDate1;
+                                 }
+           
+    // Create the formatted d
+            
         })
 
     }

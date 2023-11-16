@@ -1,13 +1,11 @@
 window.VaiTroController = function ($scope, $http, $location, $routeParams) {
-    let url = "http://localhost:8080/api/role";
+    let urlrole = "http://localhost:8080/api/role";
     $scope.loadAll = function () {
-
         // load material
         $scope.list = [];
-        $http.get(url).then(function (response) {
+        $http.get(urlrole).then(function (response) {
             $scope.list = response.data;
         })
-
     }
     $scope.loadAll();
     $scope.form = {
