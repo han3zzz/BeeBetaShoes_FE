@@ -30,7 +30,7 @@
 
   <div style="margin-top: 10px;">
     <button class="btn btn-dark" ng-click="check(bill.code,bill.id)" ng-if="maxStatus < 3"><i class="fa-solid fa-check"></i> {{bill.status == 0 ? 'Xác nhận đơn hàng' : bill.status == 1 ? 'Xác nhận đang giao hàng' : bill.status == 2 ? 'Xác nhận đã giao hàng' : ''}}</button>
-    <button class="btn btn-dark" ng-click="huy(bill.code,bill.id)" ng-if="maxStatus < 2"><i class="fa-solid fa-ban"></i> Hủy đơn</button>
+    <button class="btn btn-dark" ng-click="huy(bill.code,bill.id)" ng-if="maxStatus < 2 "><i class="fa-solid fa-ban"></i> Hủy đơn</button>
     <button class="btn btn-dark" ng-click="chitiet(bill.code)"><i class="fa-solid fa-circle-info"></i> Chi tiết</button>
   </div>
 
@@ -49,11 +49,37 @@
     <h6 ng-if="bill.typeStatus != 1">Thông tin giao hàng : {{address.fullname}} - {{address.phone}} 
         ( {{address.address}}, {{address.wardName}}, {{address.districtName}}, {{address.cityName}} )   
        
-    <h6>Hình thức thanh toán : <span class="button-bill">{{bill.payType == 0 ? 'Tiền mặt' : 'VNPAY'}}</span></h6>
+    <!-- <h6>Hình thức thanh toán : <span class="button-bill">{{bill.payType == 0 ? 'Tiền mặt' : 'VNPAY'}}</span></h6>
     <h6>Trạng thái thanh toán :  <span class="button-bill" ng-if="bill.payStatus == 1">Đã thanh toán</span>
-        <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span></h6>
-    <button ng-if="maxStatus < 2" ng-click="togglePopup()" class="btn btn-dark"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button></h6>
-    <button ng-if="maxStatus < 2 && bill.typeStatus != 1" ng-click="updateAddress(bill.code)" class="btn btn-dark"><i class="fa-solid fa-pen-to-square"></i> Cập nhật thông tin giao hàng</button></h6>
+        <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span></h6> -->
+
+    <h4><i class="fa-solid fa-credit-card"></i> Thanh Toán</h4>
+    <table class="table">
+    <tr>
+      <td>
+        Hình thức thanh toán
+      </td>
+      <td>Tiền thanh toán</td>
+      <td>Trạng thái thanh toán</td>
+      <td ng-if="bill.payStatus == 1">Nhân viên xác nhận</td>
+    </tr>
+    <tr>
+      <td>
+        <span class="button-bill">{{bill.payType == 0 ? 'Tiền mặt' : 'VNPAY'}}</span>
+      </td>
+      <td>{{bill.totalPrice + bill.shipPrice - bill.totalPriceLast | currency:'':0}} VNĐ</td>
+      <td>
+        <span class="button-bill" ng-if="bill.payStatus == 1">Đã thanh toán</span>
+        <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span>
+        <button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="bill.payStatus == 0">Xác nhận thanh toán</button>
+      </td>
+      <td ng-if="bill.payStatus == 1"></td>
+    </tr>
+    </table>
+    <div>
+      <button ng-if="maxStatus < 2" ng-click="togglePopup()" class="btn btn-dark"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button>
+    <button ng-if="maxStatus < 2 && bill.typeStatus != 1" ng-click="updateAddress(bill.code)" class="btn btn-dark"><i class="fa-solid fa-pen-to-square"></i> Cập nhật thông tin giao hàng</button>
+    </div>
 <table class="table">
     <thead class="cart__row cart__header">
         <tr>
@@ -104,6 +130,7 @@
                     {{cart.unitPrice * cart.quantity | currency:'':0}} VNĐ
                 </td>
                 <td ng-if="maxStatus < 2"><button style="border: none;color: red;" ng-click="deleteBillDetail(cart.id)"><i class="fa-solid fa-trash-can"></i></button></td>
+                <td ng-if="maxStatus == 3"><button class="button-bill2"><i class="fa-solid fa-right-left"></i> Đổi hàng</button></td>
 
         </tr>
        
@@ -113,9 +140,9 @@
     </tbody>
    
 </table>
-<h6>Phí vận chuyển : {{bill.shipPrice | currency:'':0}} VNĐ</h6>
+<!-- <h6>Phí vận chuyển : {{bill.shipPrice | currency:'':0}} VNĐ</h6>
 <h6>Giảm giá : {{bill.totalPriceLast | currency:'':0}} VNĐ</h6>
-<h6>Tổng tiền thanh toán : {{bill.totalPrice + bill.shipPrice - bill.totalPriceLast | currency:'':0}} VNĐ</h6>
+<h6>Tổng tiền thanh toán : {{bill.totalPrice + bill.shipPrice - bill.totalPriceLast | currency:'':0}} VNĐ</h6> -->
 </div>
 
 <!--        <paging-control paging-size="pagingSize" noofitem="dataPerPage" total-items="totalItems" display-items="displayItems"></paging-control>-->

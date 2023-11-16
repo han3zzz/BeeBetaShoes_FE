@@ -36,15 +36,20 @@
                     </div> -->
                     <p class="phone-no"><i class="fa-solid fa-paper-plane"></i> beebetashoes@gmail.com</p>
                 </div>
-                <div class="col-sm-4 col-md-4 col-lg-4 d-none d-lg-none d-md-block d-lg-block">
+                <div class="col-sm-2 col-md-2 col-lg-2 d-none d-lg-none d-md-block d-lg-block">
                 	<div class="text-center"><p class="top-header_middle-text"> </p></div>
                 </div>
-                <div class="col-2 col-sm-4 col-md-3 col-lg-4 text-right">
+                <div class="col-2 col-sm-6 col-md-5 col-lg-6 text-right">
                 	<span class="user-menu d-block d-lg-none"><i class="anm anm-user-al" aria-hidden="true"></i></span>
                     <ul class="customer-links list-inline">
                             <li ng-if="user == null"><a href="#login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng nhập</a></li>
                             <li ng-if="user == null"><a href="#register"><i class="fa-solid fa-user-plus"></i> Đăng ký</a></li>
-                            <li ng-if="user != null"><a><i class="fa-solid fa-user-tie"></i> Xin chào, {{user.fullname}}</a></li>
+                            <li ng-if="user == null"><a href="#forget"><i class="fa-solid fa-key"></i> Quên mật khẩu</a></li>
+                            <li ng-if="user != null"><a href="#/profile"><i class="fa-solid fa-user-tie"></i> Xin chào, {{user.fullname}}</a>
+                               
+                            </li>
+                            <li ng-if="user != null"><a href="#/myorder"><i class="fa-brands fa-first-order"></i> Đơn hàng</a></li>
+                            <li ng-if="user != null"><a href="#/change"><i class="fa-solid fa-lock"></i> Đổi mật khẩu</a></li>
                             <li ng-if="user != null"><a ng-click="logout()"><i class="fa-solid fa-power-off"></i> Đăng xuất</a></li>
                        
                        
@@ -80,10 +85,10 @@
                             <li class="lvl1"><a href="#news">Tin Tức <i class="anm anm-angle-down-l"></i></a></li>
                         <li class="lvl1 parent dropdown"><a href="#">Về Chúng Tôi <i class="anm anm-angle-down-l"></i></a>
                           <ul class="dropdown">
-							<li><a href="checkout.html" class="site-nav">Giới Thiệu</a></li>
-                            <li><a href="about-us.html" class="site-nav">Chính sách đổi trả </a></li>
-                            <li><a href="contact-us.html" class="site-nav">Contact Us</a></li>
-                            <li><a href="faqs.html" class="site-nav">FAQs</a></li>
+                            <li><a href="#/info" class="site-nav">Giới Thiệu</a></li>
+                            <li><a href="#/faq" class="site-nav">Chính sách đổi hàng </a></li>
+                            <li><a href="#/contact" class="site-nav">Liên hệ chúng tôi</a></li>
+                            <li><a href="#/q&a" class="site-nav">Câu hỏi thường gặp</a></li>
                           </ul>
                         </li>
                     
@@ -101,14 +106,14 @@
                     </div>
                 </div>
                 <!--Mobile Logo-->
-                <div class="col-4 col-sm-3 col-md-3 col-lg-2">
-                    <div class="site-cart">
-                    	<a href="javascript:void(0)" class="site-header__cart" title="Cart">
+                <div class="col-4 col-sm-3 col-md-3 col-lg-2" ng-if="user != null">
+                    <div class="site-cart" ng-click="toggleCart()">
+                    	<a class="site-header__cart" title="Cart">
                         	<i class="icon anm anm-bag-l"></i>
                             <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">{{listCartIndex.length}}</span>
                         </a>
                         <!--Minicart Popup-->
-                        <div id="header-cart" class="block block-cart">
+                        <div id="header-cart" class="block block-cart" ng-show="isCartOpen">
                         	<ul class="mini-products-list">
                                 <li class="item" ng-repeat="c in listCartIndex" ng-if="listCartIndex.length > 0">
                                 	<a class="product-image" href="#">
@@ -156,13 +161,9 @@
                                     <p>Không có sản phẩm nào trong giỏ</p>
                                     </div>
                                 </li>
-                                <li ng-if="user == null" >
-                                    <div style="text-align: center;">
-                                    <p>Vui lòng đăng nhập</p>
-                                    </div>
-                                </li>
+                            
                             </ul> 
-                            <div class="total" ng-if="user != null">
+                            <div class="total">
                             	<div class="total-in">
                                 	<span class="label">Tổng tiền :</span><span class="product-price"><span class="money">{{tongTienIndex | currency:'':0}} VNĐ</span></span>
                                 </div>
@@ -179,7 +180,90 @@
             
                   
                     <div class="site-header__search">
-                    	<button type="button" class="search-trigger"><i class="icon anm anm-search-l"></i></button>
+                    	<!-- <button type="button" class="search-trigger"><i class="icon anm anm-search-l"></i></button> -->
+                    </div>
+                </div>
+
+                <div class="col-4 col-sm-3 col-md-3 col-lg-2" ng-if="user == null">
+                    <div class="site-cart">
+                    	<a href="javascript:void(0)" class="site-header__cart" title="Cart">
+                        	<i class="icon anm anm-bag-l"></i>
+                            <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">{{listCartIndex1.length}}</span>
+                        </a>
+                        <!--Minicart Popup-->
+                        <div id="header-cart" class="block block-cart">
+                        	<ul class="mini-products-list">
+                               
+                                <li class="item" ng-repeat="c in listCartIndex1" ng-if="listCartIndex1.length > 0">
+                                	<span ng-repeat="s in listIndex1" >
+                                      <span ng-if="s.id == c.idProductDetail.id">
+                                        <a class="product-image" href="#">
+                                            <span ng-repeat="img in s.product.productImages">
+                                                <span ng-if="img.mainImage == true">
+                                                   
+                                                    <img height="85px" class="cart__image" src="{{img.url}}">
+                                                </span>
+                                            </span>
+                                        </a>
+                                        <div class="product-details">
+                                            
+                                            <a class="pName">{{s.product.name | uppercase }}
+                                                <br> SKU : {{s.product.code}}
+                                            </a>
+                                           
+                                            <div class="variant-cart"> <span ng-repeat="color in listColorIndex1">
+                                                <span ng-if="color.id == c.idColor">
+                                                    {{color.name}}
+                                                </span>
+                                            </span> /  <span ng-repeat="size in listSizeIndex1">
+                                                <span ng-if="size.id == c.idSize">
+                                                    {{size.name}}
+                                                </span>
+                                            </span></div>
+                                            <div class="wrapQtyBtn" ng-if="editQuantityIndex == false">
+                                                <div class="qtyField">
+                                                    <span class="label">Qty:</span>
+                                                    <a class="qtyBtn minus" ng-click="giamIndex1(c.idProductDetail.id,c.idColor,c.idSize)"><i class="fa anm anm-minus-r" aria-hidden="true"></i></a>
+                                                    <input type="text" ng-keyup="EnterQuantityIndex1(c.idProductDetail.id,c.idColor,c.idSize)" id="qtyIndex1{{c.idProductDetail.id}}color{{c.idColor}}size{{c.idSize}}" name="quantity" value="{{c.quantity}}" class="product-form__input qty">
+                                                    <a class="qtyBtn plus" ng-click="tangIndex1(c.idProductDetail.id,c.idColor,c.idSize)"><i class="fa anm anm-plus-r" aria-hidden="true"></i></a>
+                                                    <button ng-click="deleteByCartIndex1(c.idProductDetail.id,c.idColor,c.idSize)" style="border: none;font-size: 13px;"><i class="fa-solid fa-trash-can"></i></button>
+                                                </div>
+                                               
+                                            </div>
+                                               <div class="priceRow">
+                                                <div class="product-price">
+                                                    <span class="money">{{c.unitPrice * c.quantity | currency:'':0}} VNĐ</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      </span>
+                                    </span>
+                                </li>
+                                <li ng-if="listCartIndex1.length == 0">
+                                    <div style="text-align: center;"><img style="width: 50px;height: 50px;" src="./assets/images/empty-cart.png">
+                                    <p>Không có sản phẩm nào trong giỏ</p>
+                                    </div>
+                                </li>
+                            
+                            </ul> 
+                            <div class="total">
+                            	<div class="total-in">
+                                	<span class="label">Tổng tiền :</span><span class="product-price"><span class="money">{{tongTienIndex1 | currency:'':0}} VNĐ</span></span>
+                                </div>
+                                 <div class="buttonSet text-center">
+                                    <a href="#cart" class="btn btn-secondary btn--small">Xem Giỏ Hàng</a>
+                                    <a href="#checkout" class="btn btn-secondary btn--small">Thanh Toán</a>
+                                    <!-- <a href="#checkout" class="btn btn-secondary btn--small">Thanh Toán</a> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!--EndMinicart Popup-->
+                    </div>
+
+            
+                  
+                    <div class="site-header__search">
+                    	<!-- <button type="button" class="search-trigger"><i class="icon anm anm-search-l"></i></button> -->
                     </div>
                 </div>
 
@@ -199,13 +283,15 @@
             <li class="lvl1"><a href="#news">Tin Tức <i class="anm anm-angle-down-l"></i></a></li>
             <li class="lvl1 parent dropdown"><a href="#">Về Chúng Tôi <i class="anm anm-angle-down-l"></i></a>
               <ul class="dropdown">
-  <li><a href="checkout.html" class="site-nav">Giới Thiệu</a></li>
-                <li><a href="about-us.html" class="site-nav">Chính sách đổi trả </a></li>
-                <li><a href="contact-us.html" class="site-nav">Contact Us</a></li>
-                <li><a href="faqs.html" class="site-nav">FAQs</a></li>
+  <li><a href="#/info" class="site-nav">Giới Thiệu</a></li>
+                <li><a href="#/faq" class="site-nav">Chính sách đổi hàng </a></li>
+                <li><a href="#/contact" class="site-nav">Liên hệ chúng tôi</a></li>
+                <li><a href="#/q&a" class="site-nav">Câu hỏi thường gặp</a></li>
               </ul>
             </li>
       </ul>
 	</div>
 	<!--End Mobile Menu-->
 </div>
+
+

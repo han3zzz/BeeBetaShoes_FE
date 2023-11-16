@@ -212,11 +212,11 @@
             <span id="maGiamGiaKH" style="display: none;"><input ng-click="magiamgia()" type="radio"  id="magiamgiaCheck" name="magiam"><label for="magiamgiaCheck">Phiếu giảm giá</label></span>
           </div>
          
-          <div id="magiamgia">
+          <div id="magiamgia" style="display: none;">
             <input class="input-group-text" style="width: 250px;" type="text" id="code-coupon" placeholder="Mã giảm giá nếu có...">
           <button ng-click="apCoupon()" style="padding: 5px;" class="btn btn-dark">Áp dụng</button>
           </div>
-          <div id="chuongtrinhkhuyenmai" style="display: none;">
+          <div id="chuongtrinhkhuyenmai" style="display: block;">
             <select class="input-group-text" style="width: 230px;height: 40px; float: left;" id="ctkm" >
               <option ng-repeat="km in listVoucher" value="{{km.code}}">{{km.code}} - {{km.name}} | Áp dụng cho {{km.isVoucher == true ? 'Sản phẩm' : 'Hóa đơn'}}  </option>
             </select>

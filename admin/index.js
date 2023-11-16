@@ -233,6 +233,10 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "account/change.html",
            
         })
+        .when("/statistical",{
+            templateUrl: "thongke/index.html",
+            controller : ThongKeController
+        })
 
 
         
@@ -246,7 +250,8 @@ app.factory('AuthInterceptor', function ($location,AuthService) {
     return {
         request: function (config) {
             var token = AuthService.getToken();
-            if (token === null && $location.path() !== '/login' ||token === null && $location.path() !== '/forget') {
+            console.log($location.path());
+            if (token === null && $location.path() !== '/login' && $location.path() !== '/forget') {
                 $location.path('/login');
             }
             if (token !== null && $location.path() === '/login' || token !== null && $location.path() === '/forget') {

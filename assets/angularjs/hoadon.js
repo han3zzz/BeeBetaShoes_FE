@@ -1,4 +1,4 @@
-window.HoaDonController = function($scope, $http, $location,$routeParams,$rootScope){
+window.HoaDonController = function($scope, $http, $location,$routeParams,$rootScope,$timeout){
     $scope.list = [];
     $http.get("http://localhost:8080/api/bill/getall").then(function(rest){
         $scope.list = rest.data;
@@ -123,22 +123,25 @@ $http.get(urlsize).then(function (response) {
                   $scope.redirect = function(code){
                     location.href = "#/bill/view/" +code;
                   }
+                
                   let code = $routeParams.code ;
+                  $scope.address = {};
+                  $http.get("http://localhost:8080/api/address/getBill/"+code).then(function(resp){
+                    $scope.address = resp.data;
+                  })
+                  $scope.listItem = [];
+                  $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+                    $scope.listItem = resp.data;
+                  })
                   $scope.getBill = function(){
-                    
-                    $scope.listItem = [];
+                    let code = $routeParams.code ;
+                   
                   $scope.bill = {};
                  
                   $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(resp){
                     $scope.bill = resp.data;
                      })
-                     $scope.address = {};
-                     $http.get("http://localhost:8080/api/address/getBill/"+code).then(function(resp){
-                       $scope.address = resp.data;
-                     })
-                     $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
-                       $scope.listItem = resp.data;
-                     })
+                  
                      $scope.billhistory = [];
                      $http.get("http://localhost:8080/api/billhistory/"+code).then(function(resp){
                       $scope.billhistory = resp.data;
@@ -175,12 +178,14 @@ $http.get(urlsize).then(function (response) {
                           method : 'PUT',
                           url : 'http://localhost:8080/api/bill/updatestatus',
                           params : params
-                      });
-                       
+                      }).then(function(resp){
                         Swal.fire("Xác nhận thành công !","","success");
-                        setTimeout(() => {
-                          location.reload();
-                        }, 2000);
+                        $timeout(function () {
+                          $scope.getBill();
+                      });
+                      })
+                       
+                       
                           
                         
                      
@@ -210,12 +215,14 @@ $http.get(urlsize).then(function (response) {
                           method : 'PUT',
                           url : 'http://localhost:8080/api/bill/updatestatus',
                           params : params
-                      });
-                       
+                      }).then(function(resp){
                         Swal.fire("Xác nhận thành công !","","success");
-                        setTimeout(() => {
-                          location.reload();
-                        }, 2000);
+                        $timeout(function () {
+                          $scope.getBill();
+                      });
+                      })
+                       
+                        
                           
                      
                     }
@@ -237,18 +244,23 @@ $http.get(urlsize).then(function (response) {
                             status : 3,
                             idBill : id
                           });
-                          $http.put('http://localhost:8080/api/bill/updateStatus/'+ code,{
-                            payStatus : 1,
-                            paymentDate : new Date(),
-                            delyveryDate : new Date(),
+                          let params = {
+                            code : code,
                             status : 3
-                          
-                          });
+                          }
+                          $http({
+                            method : 'PUT',
+                            url : 'http://localhost:8080/api/bill/updatestatus',
+                            params : params
+                        }).then(function(resp){
+                          Swal.fire("Xác nhận thành công !","","success");
+                          $timeout(function () {
+                            $scope.getBill();
+                        });
+                        })
+                         
                        
-                        Swal.fire("Xác nhận thành công !","","success");
-                        setTimeout(() => {
-                          location.reload();
-                        }, 2000);
+                       
                           
                      
                     }
@@ -348,7 +360,7 @@ $http.get(urlsize).then(function (response) {
                         $http.post('http://localhost:8080/api/billhistory',{
                           createBy : $rootScope.user.username,
                           note : result.value,
-                          status : 5,
+                          status : 4,
                           idBill : id
                         });
                       let params = {
@@ -743,6 +755,39 @@ $http.get(urlsize).then(function (response) {
                              
                           }
                       })
+                    }
+
+                    $scope.XacNhanTT = function(){
+                      let code = $routeParams.code;
+                      $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(resp){
+                      
+                        let amout = resp.data.totalPrice + resp.data.shipPrice - resp.data.totalPriceLast;
+                        Swal.fire({
+                          title: 'Xác nhận đã thanh toán '+ amout.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }),
+                          showCancelButton: true,
+                          confirmButtonText: 'Xác nhận',
+                      }).then((result) => {
+                          /* Read more about isConfirmed, isDenied below */
+                          if (result.isConfirmed) {
+                          
+                            $http.put('http://localhost:8080/api/bill/updateStatus/'+ code,{
+                              payStatus : 1,
+                              paymentDate : new Date(),
+                              delyveryDate : new Date(),
+                              status : resp.data.status
+                            
+                            }).then(function(resp){
+                              Swal.fire("Xác nhận thanh toán thành công !","","success");
+                              $timeout(function () {
+                                $scope.getBill();
+                            });
+                            })
+  
+                          }
+                        })
+                         })
+                   
+                   
                     }
   
 }

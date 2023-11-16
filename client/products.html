@@ -10,7 +10,11 @@
                 	<div class="sidebar_tags">
                         <div class="widget-title"><h2><i class="fa-solid fa-filter"></i> Lọc</h2></div>
                     	<!--Danh mục-->
+                        <div>
+                            <input ng-keyup="filter()" id="tentimkiem" class="form-select-sm" placeholder="Nhập tên cần tìm kiếm...">
+                        </div>
                         <div class="sidebar_widget filterBox filter-widget">
+    
                             <div class="widget-title"><h2>Danh Mục</h2></div>
                             <select id="danhmuc" class="form-select-sm" ng-click="filter()">
                                 <option value="">Tất cả danh mục</option>
@@ -189,7 +193,7 @@
                         <!--End Toolbar-->
                         <div class="grid-products grid--view-items">
                             <div class="row">
-                                <div ng-repeat="sp in pager.items" class="col-6 col-sm-6 col-md-3 col-lg-3 item grid-view-item style2">
+                                <div ng-if="list.length > 0" ng-repeat="sp in pager.items" class="col-6 col-sm-6 col-md-3 col-lg-3 item grid-view-item style2">
                                     <div class="grid-view_image">
                                         <!-- start product image -->
                                         <a href="#/detail/{{sp.id}}" class="grid-view-item__link">
@@ -270,13 +274,13 @@
                                                 </span>
                                                 
                                             </div>
-                                            <div class="product-review">
+                                            <!-- <div class="product-review">
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star-o"></i>
                                                 <i class="font-13 fa fa-star-o"></i>
-                                            </div>
+                                            </div> -->
                                             <!-- End product price -->
                                         <!-- Variant -->
                                         <!-- <ul class="swatches text-center" ng-repeat="img in sp.product.productImages">
@@ -288,9 +292,16 @@
                                         
                                     </div>
                         </div>
+                       
                     </div>
+                    <div ng-if="list.length == 0">
+                        <center>
+                         <img src="./assets/images/inbox.png">
+                         <h3>Không có sản phẩm nào !</h3>
+                        </center>
+                     </div>
                 </div>
-                <div class="text-center">
+                <div class="text-center" ng-if="list.length > 0">
                     <div class="btn-group" role="group" aria-label="Basic outlined example">
                       <button ng-click="pager.first()" type="button"
                               class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>

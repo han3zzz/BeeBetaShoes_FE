@@ -12,8 +12,8 @@ window.BanHangController = function($scope, $http, $location,$routeParams,$rootS
            .then(function (bill) {
             Swal.fire("Tạo hóa đơn " + bill.data.code + " thành công !" ,"","success");
             $http.post('http://localhost:8080/api/billhistory',{
-              createBy : null,
-              note : null,
+              createBy : $rootScope.user.username,
+              note : 'Tạo hóa đơn tại quầy',
               status : 0,
               idBill : bill.data.id
             });
@@ -92,6 +92,8 @@ window.BanHangController = function($scope, $http, $location,$routeParams,$rootS
         document.getElementById("diachichon").checked = true;
         document.getElementById("diachi").style.display = 'none';
         document.getElementById("diachichon1").style.display = 'none';
+        document.getElementById('chuongtrinhkhuyenmai').style.display = 'block';
+        document.getElementById('magiamgia').style.display = 'none';
         
 
         idBill =id;
@@ -881,7 +883,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                    
                     if(document.getElementById("hinhThuc1").checked === true){
                       document.getElementById('maGiamGiaKH').style.display = 'block';
-                  document.getElementById('magiamgia').style.display = 'block';
+             
                       $scope.phiShip = 0;
                     }
                     else{
@@ -1753,14 +1755,20 @@ $scope.removeCoupon = function(){
     $scope.checkCoupon = false;
     $scope.giamGia = $scope.voucherGiamGia - $scope.giamGia;
     $scope.tienThanhToan = $scope.tongTien + $scope.phiShip - $scope.voucherGiamGia +  $scope.couponGiamGia;
-
+  
 }
+
+
            //check trạng thái thanh toán online khi trả về
+
    if ($location.search().vnp_TransactionStatus === "00") {
+
     $http.put('http://localhost:8080/api/bill/updateStatus1/'+ $location.search().vnp_OrderInfo,{
       payStatus : 1,
     
     }).then(function (response) {
+    
+    
       Swal.fire('Thanh toán thành công' ,'','success');
       let urlcolor = "http://localhost:8080/api/color";
       let urlsize = "http://localhost:8080/api/size";
@@ -1774,21 +1782,44 @@ $scope.removeCoupon = function(){
              $http.get(urlsize).then(function (response) {
                $scope.listSize = response.data;
              });
-    $scope.isLoading = false;
+  
     $scope.billexport = {};
     $scope.addressexport = {};
     $scope.listItemExport = [];
     $http.get('http://localhost:8080/api/bill/getbycode/'+$location.search().vnp_OrderInfo).then(function(billexport){
       $scope.billexport = billexport.data;
+    
+    
       $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
         $scope.addressexport = add.data;
+
+        
       })
      
     })
     $http.get("http://localhost:8080/api/bill/getallbybill/"+$location.search().vnp_OrderInfo).then(function(resp){
       $scope.listItemExport = resp.data;
   })
-  console.log($scope.listItemExport);
+  $scope.isLoading = false;
+  console.log(response.data.typeStatus)
+  if(response.data.typeStatus == 1){
+    $http.post('http://localhost:8080/api/billhistory',{
+      createBy : $rootScope.user.username,
+      note : 'Đã giao hàng tại quầy',
+      status : 3,
+      idBill : response.data.id
+    });
+   }
+    
+
+  else if(response.data.typeStatus == 0){
+    $http.post('http://localhost:8080/api/billhistory',{
+      createBy : $rootScope.user.username,
+      note : 'Đã xác nhận tại quầy',
+      status : 1,
+      idBill : response.data.id
+    });
+  }
       setTimeout(() => {
      
       
@@ -1818,6 +1849,7 @@ $scope.removeCoupon = function(){
     }, 2000);
       
     })
+
   }
   if ($location.search().vnp_TransactionStatus === "02") {
     
@@ -1947,6 +1979,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
             if(document.getElementById("hinhThuc1").checked === true){
               //khách lẻ
               if(document.getElementById('khachhang').value === '0'){
+                
                 $http.put('http://localhost:8080/api/bill/updateBillTaiQuay/'+ codeBill,{
                     totalPrice : $scope.tongTien,
                     shipPrice : 0,
@@ -1960,9 +1993,15 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     idCustomer : idCustomer,
                     paymentDate : new Date(),
                     delyveryDate : new Date(),
-                    status : 3
+                    status : 3,
+                    typeStatus : 1
                   }).then(function(resp){
-
+                    $http.post('http://localhost:8080/api/billhistory',{
+                  createBy : $rootScope.user.username,
+                  note : 'Đã giao hàng tại quầy',
+                  status : 3,
+                  idBill : resp.data.id
+                });
                     $scope.exportBill();
                     return;
                   })
@@ -1984,9 +2023,15 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     idCustomer : idCustomer,
                     paymentDate : new Date(),
                     delyveryDate : new Date(),
-                    status : 3
+                    status : 3,
+                    typeStatus : 1
                   }).then(function(resp){
-
+                    $http.post('http://localhost:8080/api/billhistory',{
+                      createBy : $rootScope.user.username,
+                      note : 'Đã giao hàng tại quầy',
+                      status : 3,
+                      idBill : resp.data.id
+                    });
                     $scope.exportBill();
                     return;
                   })
@@ -2019,8 +2064,15 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                       idAddress : adds.data.id,
                       idVoucher : idVoucher == null ? 0 : idVoucher,
                       idCoupon : idCoupon,
-                      status : 1
+                      status : 1,
+                      typeStatus : 0
                     }).then(function(resp){
+                      $http.post('http://localhost:8080/api/billhistory',{
+                        createBy : $rootScope.user.username,
+                        note : 'Đã xác nhận tại quầy',
+                        status : 1,
+                        idBill : resp.data.id
+                      });
                       $scope.exportBill();
                       return;
                     })
@@ -2057,8 +2109,15 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                           idAddress : adds.data.id,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
-                          status : 1
+                          status : 1,
+                          typeStatus : 0
                         }).then(function(resp){
+                          $http.post('http://localhost:8080/api/billhistory',{
+                            createBy : $rootScope.user.username,
+                            note : 'Đã xác nhận tại quầy',
+                            status : 1,
+                            idBill : resp.data.id
+                          });
                           $scope.exportBill();
                           return;
                         })
@@ -2083,8 +2142,15 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                           idAddress : idAddressCoSan,
                           idVoucher : idVoucher == null ? 0 : idVoucher,
                           idCoupon : idCoupon,
-                          status : 1
+                          status : 1,
+                          typeStatus : 0
                         }).then(function(resp){
+                          $http.post('http://localhost:8080/api/billhistory',{
+                            createBy : $rootScope.user.username,
+                            note : 'Đã xác nhận tại quầy',
+                            status : 1,
+                            idBill : resp.data.id
+                          });
                           $scope.exportBill();
                           return;
                         })
@@ -2119,7 +2185,8 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     idCustomer : idCustomer,
                     paymentDate : new Date(),
                     delyveryDate : new Date(),
-                    status : 3
+                    status : 3,
+                    typeStatus : 1
                   });
                   
 
@@ -2141,7 +2208,8 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     idCustomer : idCustomer,
                     paymentDate : new Date(),
                     delyveryDate : new Date(),
-                    status : 3
+                    status : 3,
+                    typeStatus : 1
                   });
                 }
                 let params = {
@@ -2187,7 +2255,8 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                         idAddress : adds.data.id,
                         idVoucher : idVoucher == null ? 0 : idVoucher,
                         idCoupon : idCoupon,
-                        status : 1
+                        status : 1,
+                        typeStatus : 0
                       })
                    
                         
@@ -2222,7 +2291,8 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             idAddress : adds.data.id,
                             idVoucher : idVoucher == null ? 0 : idVoucher,
                             idCoupon : idCoupon,
-                            status : 1
+                            status : 1,
+                            typeStatus : 0
                           })
                        
                             
@@ -2245,7 +2315,8 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             idAddress : idAddressCoSan,
                             idVoucher : idVoucher == null ? 0 : idVoucher,
                             idCoupon : idCoupon,
-                            status : 1
+                            status : 1,
+                            typeStatus : 0
                           });
             
     

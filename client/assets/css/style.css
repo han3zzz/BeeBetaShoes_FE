@@ -1748,7 +1748,23 @@ body.home15-funiture-template { font-size:14px; }
   font-weight: bold;
   color: black;
 }
+ /* Ẩn radio button mặc định */
+ .danhgia input[type="radio"] {
+  display: none;
+}
 
+/* CSS cho ngôi sao chưa chọn */
+.danhgia label {
+  font-size: 24px; /* Kích thước ngôi sao */
+  color: #ccc; /* Màu sắc ngôi sao chưa chọn */
+  cursor: pointer; /* Con trỏ là bàn tay để biểu thị có thể click */
+  margin-right: 5px; /* Khoảng cách giữa các ngôi sao */
+}
+
+/* CSS cho ngôi sao đã chọn */
+.danhgia input[type="radio"]:checked + label {
+  color: #f39c12; /* Màu sắc ngôi sao đã chọn */
+}
 .radio-buttonhan1 input[type="radio"]:checked + label {
   background-color: #000000;
   color: #fff;
@@ -1897,6 +1913,8 @@ body.home15-funiture-template { font-size:14px; }
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
+  max-height: 80%; /* Giả sử chiều cao tối đa của modal là 80% của cửa sổ */
+  overflow: auto; /* Tạo thanh cuộn tự động khi cần */
 }
 
 .popup-content {
@@ -1913,4 +1931,60 @@ body.home15-funiture-template { font-size:14px; }
 /* Hiển thị popup khi có class 'show' */
 .popup.show {
   display: block;
+}
+.gallery {
+  display: flex;
+}
+
+.thumbnail {
+  width: 100px;
+  height: 100px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 800px;
+  max-height: 80vh;
+  overflow: auto;
+  text-align: center; /* Căn giữa ảnh */
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.close-modal {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 24px;
+  cursor: pointer;
+}
+#header-cart {
+  /* ... */
+  display: none !important; /* Bắt đầu ẩn popup */
+  transition: none !important;
+  animation: none !important;
+}
+
+#header-cart.show {
+  display: block !important;
 }

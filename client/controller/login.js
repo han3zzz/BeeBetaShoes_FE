@@ -23,6 +23,7 @@ window.LoginController = function ($http, $scope, $rootScope,AuthService) {
            
             $http.get('http://localhost:8080/api/customer/getByUsername/'+username.data.username).then(function(user){
                 $rootScope.user = user.data;
+                AuthService.saveCustomer(user.data.id)
                 let urlcolor = "http://localhost:8080/api/color";
                 let urlsize = "http://localhost:8080/api/size";
                  // load color

@@ -37,36 +37,44 @@ $http.get(urlsize).then(function (response) {
     $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
       $scope.listItem = resp.data;
     })
-    $scope.pager1 = {
-      page: 0,
-      size: 3,
-      get items() {
-        var start = this.page * this.size;
-        return $scope.listItem.slice(start, start + this.size);
-      },
-      get count() {
-        return Math.ceil((1.0 * $scope.listItem.length) / this.size);
-      },
+    $scope.isChiTiet = false;
+    $scope.chitiet = function(code){
+     $scope.isChiTiet = !$scope.isChiTiet;
+     $scope.listbillhistory = [];
+     $http.get("http://localhost:8080/api/billhistory/"+code).then(function(resp){
+      $scope.listbillhistory = resp.data;
+    })
+    }
+    // $scope.pager1 = {
+    //   page: 0,
+    //   size: 3,
+    //   get items() {
+    //     var start = this.page * this.size;
+    //     return $scope.listItem.slice(start, start + this.size);
+    //   },
+    //   get count() {
+    //     return Math.ceil((1.0 * $scope.listItem.length) / this.size);
+    //   },
 
-      first() {
-        this.page = 0;
-      },
-      prev() {
-        this.page--;
-        if (this.page < 0) {
-          this.last();
-        }
-      },
-      next() {
-        this.page++;
-        if (this.page >= this.count) {
-          this.first();
-        }
-      },
-      last() {
-        this.page = this.count - 1;
-      },
-    };
+    //   first() {
+    //     this.page = 0;
+    //   },
+    //   prev() {
+    //     this.page--;
+    //     if (this.page < 0) {
+    //       this.last();
+    //     }
+    //   },
+    //   next() {
+    //     this.page++;
+    //     if (this.page >= this.count) {
+    //       this.first();
+    //     }
+    //   },
+    //   last() {
+    //     this.page = this.count - 1;
+    //   },
+    // };
         
    
 
@@ -229,6 +237,17 @@ $http.get(urlsize).then(function (response) {
                 /* Read more about isConfirmed, isDenied below */
                 if (result.isConfirmed) {
                   $http.get("http://localhost:8080/api/bill/huy/"+code).then(function(response){
+
+                  $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(billl){
+
+                  $http.post('http://localhost:8080/api/billhistory',{
+                    createBy : null,
+                    note : 'Hủy đơn',
+                    status : 4,
+                    idBill : billl.data.id
+                  });
+                })
+                  
                     $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
                       for(let i = 0 ; i < resp.data.length ; i++){
                         for(let j = 0 ; j < resp.data[i].productDetail.productDetail_size_colors.length ; j++){
@@ -259,7 +278,7 @@ $http.get(urlsize).then(function (response) {
                     })
                     
                     Swal.fire("Hủy đơn hàng thành công !","Bạn đã hủy thành công đơn hàng " +code,"success")
-                    $scope.getStatus(0);
+                    $scope.getStatus(null);
                     $scope.countTT();
                   })
                 }

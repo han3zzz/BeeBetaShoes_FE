@@ -185,7 +185,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
         });
     
         $scope.filter = function () {
-          
+          let name = document.getElementById("tentimkiem").value;
           let idCategory = document.getElementById("danhmuc").value;
           let idMaterial = document.getElementById("chatlieu").value;
           let idColor = document.getElementById("mausac").value;
@@ -210,9 +210,10 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
           let idshoe = idShoelace != "" ? idShoelace : null;
           let idheel = idHeelcushion != "" ? idHeelcushion : null;
           let iddesign = idDesign != "" ? idDesign : null;
+          let nameF = name != "" ? name : null;
     
           var params = {
-            name : '',
+            name : nameF,
             idcategory: idcate,
             idmaterial: idmate,
             idcolor: idcolor,

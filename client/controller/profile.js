@@ -1,560 +1,98 @@
-window.CartController = function ($http, $scope,$rootScope,AuthService,CartService) {
+window.ProfileController = function ($http, $scope, $rootScope,AuthService) {
+   $scope.profile = function(){
+    let IdCustomer = AuthService.getCustomer();
 
+    $scope.profile = {
+        fullname : '',
+        phone : '',
+        email : '',
+        iamge : ''
+    };
+    $http.get("http://localhost:8080/api/customer/"+IdCustomer).then(function(resp){
+        $scope.profile = resp.data;
+        $scope.anh = resp.data.image;
+        if(resp.data.gender == true ){
+            document.getElementById("gtNam").checked = true ;
+        }else{
+            document.getElementById("gtNu").checked = true ;
 
-    $scope.loadCart = function () {
-      let IdCustomer = AuthService.getCustomer();
+        }
+    })
+
+    $scope.update = function(){
+
+        var gender = true ;
+        if(document.getElementById("gtNu").checked == true){
+            gender = false ; 
+
+        }
+        
+          // update image
+          var MainImage = document.getElementById("fileUpload").files;
+          if (MainImage.length > 0) {
+              var img = new FormData();
+              img.append("files", MainImage[0]);
+              $http.post("http://localhost:8080/api/upload", img, {
+                  transformRequest: angular.identity,
+                  headers: {
+                      'Content-Type': undefined
+                  }
+              }).then(function (image) {
+                $http.put("http://localhost:8080/api/customer/updateprofile/" + IdCustomer, {
+                    fullname: $scope.profile.fullname,
+                    image: image.data[0],
+                    gender: gender,
+                    phone: $scope.profile.phone,
+                    email: $scope.profile.email
+                }).then(function (resp) {
+                    if (resp.status === 200) {
+                        Swal.fire('Cập nhật thành công !', '', 'success')
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    }
+                }).catch(function (err) {
+                    if (err.status === 400) {
+                        $scope.validationErrors = err.data;
+                    }
+        
+                })
+              })
+          }
+          else{
+            $http.put("http://localhost:8080/api/customer/updateprofile/" + IdCustomer, {
+                fullname: $scope.profile.fullname,
+                image: $scope.profile.image,
+                gender: gender,
+                phone: $scope.profile.phone,
+                email: $scope.profile.email
+            }).then(function (resp) {
+                if (resp.status === 200) {
+                    Swal.fire('Cập nhật thành công !', '', 'success')
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            }).catch(function (err) {
+                if (err.status === 400) {
+                    $scope.validationErrors = err.data;
+                }
+    
+            })
+          }
      
-      let urlcolor = "http://localhost:8080/api/color";
-      let urlsize = "http://localhost:8080/api/size";
-       // load color
-  $scope.listColor = [];
-  $http.get(urlcolor).then(function (response) {
-    $scope.listColor = response.data;
-  });
-  // load size
-  $scope.listSize = [];
-  $http.get(urlsize).then(function (response) {
-    $scope.listSize = response.data;
-  });
-
- if(IdCustomer != null){
-
-    //load cart by user
-    $scope.listCart = [];
-  $http.get("http://localhost:8080/api/cart/"+IdCustomer).then(function (cart) {
-    $scope.listCart = cart.data;
-    $scope.tongTien = 0;
-    for (let i = 0; i < $scope.listCart.length; i++) {
-      $scope.tongTien +=
-        $scope.listCart[i].unitPrice * $scope.listCart[i].quantity;
     }
-  });
-  $http.get("http://localhost:8080/api/cart/getCartByCustomer/"+ IdCustomer).then(function(idd){
-    let idCart = idd.data.id;
+    
+
+   }
+
+
+   $scope.profile();
+
    
 
-   //delete product from cart
-   $scope.deleteByCart = function (id) {
-     Swal.fire({
-       title: "Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng ?",
-       showCancelButton: true,
-       confirmButtonText: "Xóa",
-     }).then((result) => {
-       /* Read more about isConfirmed, isDenied below */
-       if (result.isConfirmed) {
-         $http.delete("http://localhost:8080/api/cart/" + id);
-      
-         Swal.fire("Đã xóa khỏi giỏ hàng !", "", "success");
-         setTimeout(() => {
-          $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
-            $rootScope.listCartIndex = cartL.data;
-            $rootScope.tongTienIndex = 0;
-            for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
-              $rootScope.tongTienIndex +=
-                $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
-            }
-        })
-           location.href = "#cart";
-         }, 500);
-       }
-     });
-   };
 
-   //giảm số lượng trong cart
-   $scope.giam = function (idCartDetail, idProductDetail, idColor, idSize) {
-     var getQuanity = parseInt(
-       document.getElementById("qty" + idCartDetail).value
-     );
-     getQuanity = getQuanity - 1;
-     //nếu product về số lượng là 0 thì check có thể xóa
-     if (getQuanity <= 0) {
-       $scope.deleteByCart(idCartDetail);
-       getQuanity = 1;
-       return;
-     }
-     //get đơn giá ở thời điểm hiện tại
-     $http
-       .get("http://localhost:8080/api/product/" + idProductDetail)
-       .then(function (response) {
-         var unitPrice = 0;
-         if (response.data.discount > 0) {
-           unitPrice =
-             response.data.price -
-             response.data.price * (response.data.discount * 0.01);
-         } else {
-           unitPrice = response.data.price;
-         }
-
-         // nếu thỏa mãn thì giảm số lượng trong giỏ hàng
-         $http
-           .put("http://localhost:8080/api/cart/updateCart/" + idCartDetail, {
-             idCart: idCart,
-             idProductDetail: idProductDetail,
-             idColor: idColor,
-             idSize: idSize,
-             quantity: getQuanity,
-             unitPrice: unitPrice,
-           })
-           .then(function (cart) {
-             if (cart.status === 200) {
-              $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
-                $rootScope.listCartIndex = cartL.data;
-                $rootScope.tongTienIndex = 0;
-                for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
-                  $rootScope.tongTienIndex +=
-                    $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
-                }
-            })
-               //load lại sau khi giảm thành công !
-               $scope.loadCart();
-             }
-           });
-       });
-   };
-   // tăng số lượng trong giỏ
-   $scope.tang = function (idCartDetail, idProductDetail, idColor, idSize) {
-     // check số lượng của sản phẩm đang còn
-     var params = {
-       IdProduct: idProductDetail,
-       IdColor: idColor,
-       IdSize: idSize,
-     };
-     $http({
-       method: "GET",
-       url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-       params: params,
-     }).then(function (resp) {
-       $scope.quantity = resp.data;
-
-       if (
-         document.getElementById("qty" + idCartDetail).value >= $scope.quantity
-       ) {
-         Swal.fire(
-           "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
-           "",
-           "error"
-         );
-         return;
-       }
-       document.getElementById("qty" + idCartDetail).value =
-         parseInt(document.getElementById("qty" + idCartDetail).value) + 1;
-
-       //get đơn giá ở thời điểm hiện tại
-       $http
-         .get("http://localhost:8080/api/product/" + idProductDetail)
-         .then(function (response) {
-           var unitPrice = 0;
-           if (response.data.discount > 0) {
-             unitPrice =
-               response.data.price -
-               response.data.price * (response.data.discount * 0.01);
-           } else {
-             unitPrice = response.data.price;
-           }
-
-           // nếu thỏa mãn thì tăng số lượng trong giỏ hàng
-           $http
-             .put(
-               "http://localhost:8080/api/cart/updateCart/" + idCartDetail,
-               {
-                 idCart: idCart,
-                 idProductDetail: idProductDetail,
-                 idColor: idColor,
-                 idSize: idSize,
-                 quantity: parseInt(
-                   document.getElementById("qty" + idCartDetail).value
-                 ),
-                 unitPrice: unitPrice,
-               }
-             )
-             .then(function (cart) {
-               if (cart.status === 200) {
-                $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
-                  $rootScope.listCartIndex = cartL.data;
-                  $rootScope.tongTienIndex = 0;
-                  for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
-                    $rootScope.tongTienIndex +=
-                      $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
-                  }
-              })
-                 //load lại sau khi tăng thành công !
-                 $scope.loadCart();
-               }
-             });
-         });
-     });
-   };
-
-   $scope.EnterQuantity = function (
-     idCartDetail,
-     idProductDetail,
-     idColor,
-     idSize
-   ) {
-     var numberRegex = /^[0-9]+$/;
-     if (
-       !numberRegex.test(document.getElementById("qty" + idCartDetail).value)
-     ) {
-       Swal.fire("Số lượng phải là số nguyên dương !!", "", "error");
-       $http
-         .get(
-           "http://localhost:8080/api/cart/getQuantityByCartDetail/" +
-             idCartDetail
-         )
-         .then(function (resp) {
-           document.getElementById("qty" + idCartDetail).value = resp.data;
-         });
-       return;
-     }
-     var params = {
-       IdProduct: idProductDetail,
-       IdColor: idColor,
-       IdSize: idSize,
-     };
-     $http({
-       method: "GET",
-       url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-       params: params,
-     }).then(function (resp) {
-       $scope.quantity = resp.data;
-
-       if (
-         document.getElementById("qty" + idCartDetail).value > $scope.quantity
-       ) {
-         Swal.fire(
-           "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
-           "",
-           "error"
-         );
-         $http
-           .get(
-             "http://localhost:8080/api/cart/getQuantityByCartDetail/" +
-               idCartDetail
-           )
-           .then(function (resp) {
-             document.getElementById("qty" + idCartDetail).value = resp.data;
-           });
-       } else {
-         //get đơn giá ở thời điểm hiện tại
-         $http
-           .get("http://localhost:8080/api/product/" + idProductDetail)
-           .then(function (response) {
-             var unitPrice = 0;
-             if (response.data.discount > 0) {
-               unitPrice =
-                 response.data.price -
-                 response.data.price * (response.data.discount * 0.01);
-             } else {
-               unitPrice = response.data.price;
-             }
-
-             // nếu thỏa mãn thì tăng số lượng trong giỏ hàng
-             $http
-               .put(
-                 "http://localhost:8080/api/cart/updateCart/" + idCartDetail,
-                 {
-                   idCart: idCart,
-                   idProductDetail: idProductDetail,
-                   idColor: idColor,
-                   idSize: idSize,
-                   quantity: parseInt(
-                     document.getElementById("qty" + idCartDetail).value
-                   ),
-                   unitPrice: unitPrice,
-                 }
-               )
-               .then(function (cart) {
-                 if (cart.status === 200) {
-                  $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
-                    $rootScope.listCartIndex = cartL.data;
-                    $rootScope.tongTienIndex = 0;
-                    for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
-                      $rootScope.tongTienIndex +=
-                        $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
-                    }
-                })
-                   //load lại sau khi tăng thành công !
-                   $scope.loadCart();
-                 }
-               });
-           });
-       }
-     });
-   };
- 
-
-})
- }
- else{
-  
-  let url = "http://localhost:8080/api/product";
-  $http.get(url).then(function (response){
-    $scope.list1 = response.data;
-  
-  })
-  $scope.listCart1 = CartService.getCartItems();
-  $scope.tongTien1 = 0;
-  for (let i = 0; i < $scope.listCart1.length; i++) {
-    $scope.tongTien1 +=
-      $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-  }
-
-  
-  $scope.deleteByCart1 = function (id,idColor,idSize) {
-    Swal.fire({
-        title: "Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng ?",
-        showCancelButton: true,
-        confirmButtonText: "Xóa",
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var index = CartService.findItemIndexById(id,idColor,idSize);
-            CartService.removeFromCart(index);
-
-            // Reload data from the server
-            $http.get(url).then(function (response){
-              $scope.list1 = response.data;
-            
-            })
-
-          
-
-            // Recalculate total price
-            $scope.tongTien1 = 0;
-            for (let i = 0; i < $scope.listCart1.length; i++) {
-              $scope.tongTien1 +=
-                $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-            }
-            $rootScope.tongTienIndex1 = 0;
-            for (let i = 0; i < $rootScope.listCartIndex1.length; i++) {
-              $rootScope.tongTienIndex1 +=
-                $rootScope.listCartIndex1[i].unitPrice * $rootScope.listCartIndex1[i].quantity;
-            }
-
-            Swal.fire("Đã xóa khỏi giỏ hàng !", "", "success");
-        }
-    });
-};
-
- //giảm số lượng trong cart
- $scope.giam1 = function (idProductDetail, idColor, idSize) {
-  var getQuanity = parseInt(
-    document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value
-  );
-
-
-  
- 
-  getQuanity = getQuanity - 1;
- 
-  //nếu product về số lượng là 0 thì check có thể xóa
-  if (getQuanity <= 0) {
-    $scope.deleteByCart1(idProductDetail, idColor, idSize);
-    getQuanity = 1;
-    return;
-  }
-  //get đơn giá ở thời điểm hiện tại
-  $http
-    .get("http://localhost:8080/api/product/" + idProductDetail)
-    .then(function (response) {
-      var unitPrice = 0;
-      if (response.data.discount > 0) {
-        unitPrice =
-          response.data.price -
-          response.data.price * (response.data.discount * 0.01);
-      } else {
-        unitPrice = response.data.price;
-      }
-
-      var index = CartService.findItemIndexById(idProductDetail,idColor,idSize);
-      var cartUpdate = {
-        idProductDetail : response.data,
-        idColor : idColor,
-        idSize : idSize,
-        quantity: parseInt(CartService.getCartItemAtIndex(index).quantity) - 1,
-        unitPrice: unitPrice
-      }
-      CartService.updateCartItem(index, cartUpdate);
-       // Recalculate total price
-       $scope.tongTien1 = 0;
-       for (let i = 0; i < $scope.listCart1.length; i++) {
-         $scope.tongTien1 +=
-           $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-       }
-       $rootScope.tongTienIndex1 = 0;
-       for (let i = 0; i < $rootScope.listCartIndex1.length; i++) {
-         $rootScope.tongTienIndex1 +=
-           $rootScope.listCartIndex1[i].unitPrice * $rootScope.listCartIndex1[i].quantity;
-       }
-
-    });
-};
-
-// tăng số lượng trong giỏ
-$scope.tang1 = function (idProductDetail, idColor, idSize) {
-  // check số lượng của sản phẩm đang còn
-  
-  var params = {
-    IdProduct: idProductDetail,
-    IdColor: idColor,
-    IdSize: idSize,
-  };
-  $http({
-    method: "GET",
-    url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-    params: params,
-  }).then(function (resp) {
-    $scope.quantity = resp.data;
-
-    if (
-      document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value >= $scope.quantity
-    ) {
-      Swal.fire(
-        "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
-        "",
-        "error"
-      );
-      return;
-    }
-    document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value =
-      parseInt(document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value) + 1;
-
-    //get đơn giá ở thời điểm hiện tại
-    $http
-      .get("http://localhost:8080/api/product/" + idProductDetail)
-      .then(function (response) {
-        var unitPrice = 0;
-        if (response.data.discount > 0) {
-          unitPrice =
-            response.data.price -
-            response.data.price * (response.data.discount * 0.01);
-        } else {
-          unitPrice = response.data.price;
-        }
-
-        var index = CartService.findItemIndexById(idProductDetail,idColor,idSize);
-        var cartUpdate = {
-          idProductDetail : response.data,
-          idColor : idColor,
-          idSize : idSize,
-          quantity: parseInt(CartService.getCartItemAtIndex(index).quantity) + 1,
-          unitPrice: unitPrice
-        }
-        CartService.updateCartItem(index, cartUpdate);
-         // Recalculate total price
-         $scope.tongTien1 = 0;
-            for (let i = 0; i < $scope.listCart1.length; i++) {
-              $scope.tongTien1 +=
-                $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-            }
-            $rootScope.tongTienIndex1 = 0;
-            for (let i = 0; i < $rootScope.listCartIndex1.length; i++) {
-              $rootScope.tongTienIndex1 +=
-                $rootScope.listCartIndex1[i].unitPrice * $rootScope.listCartIndex1[i].quantity;
-            }
-        
-      });
-  });
-};
-$scope.EnterQuantity1 = function (
-  idProductDetail,
-  idColor,
-  idSize
-) {
-  var numberRegex = /^[0-9]+$/;
-  if (
-    !numberRegex.test(document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value)
-  ) {
-    Swal.fire("Số lượng phải là số nguyên dương !!", "", "error");
-    document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value = 1;
-    return;
-  }
-  var params = {
-    IdProduct: idProductDetail,
-    IdColor: idColor,
-    IdSize: idSize,
-  };
-  $http({
-    method: "GET",
-    url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-    params: params,
-  }).then(function (resp) {
-    $scope.quantity = resp.data;
-
-    if (
-      document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value > $scope.quantity
-    ) {
-      Swal.fire(
-        "Số lượng đã đến mức tối đa số lượng sản phẩm hiện có !",
-        "",
-        "error"
-      );
-    } else {
-      //get đơn giá ở thời điểm hiện tại
-      $http
-        .get("http://localhost:8080/api/product/" + idProductDetail)
-        .then(function (response) {
-          var unitPrice = 0;
-          if (response.data.discount > 0) {
-            unitPrice =
-              response.data.price -
-              response.data.price * (response.data.discount * 0.01);
-          } else {
-            unitPrice = response.data.price;
-          }
-
-          var index = CartService.findItemIndexById(idProductDetail,idColor,idSize);
-          var cartUpdate = {
-            idProductDetail : response.data,
-            idColor : idColor,
-            idSize : idSize,
-            quantity: parseInt( document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value),
-            unitPrice: unitPrice
-          }
-          CartService.updateCartItem(index, cartUpdate);
-           // Recalculate total price
-           $scope.tongTien1 = 0;
-           for (let i = 0; i < $scope.listCart1.length; i++) {
-             $scope.tongTien1 +=
-               $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-           }
-           $rootScope.tongTienIndex1 = 0;
-           for (let i = 0; i < $rootScope.listCartIndex1.length; i++) {
-             $rootScope.tongTienIndex1 +=
-               $rootScope.listCartIndex1[i].unitPrice * $rootScope.listCartIndex1[i].quantity;
-           }
-          
-         
-        });
-    }
-  });
-};
-
-  
-  
- }
-$scope.checkCheckOut = function(){
-  location.href = "#/checkout";
-    //load cart by user
-// $scope.listCartCheck = [];
-// $http.get("http://localhost:8080/api/cart/"+IdCustomer).then(function (cart) {
-// $scope.listCartCheck = cart.data;
-// if($scope.listCartCheck.length === 0){
-//  Swal.fire('Giỏ hàng của bạn đang rỗng !','','error');
-//  location.href = "#/cart";
-
-// }
-// else{
-//  location.href = "#/checkout";
-// }
-
-// });
- }
-       
-      };
-      $scope.loadCart();
-
-
-          /*********************************************************************************
+  /*********************************************************************************
 
 	Template Name: Belle - Multipurpose eCommerce Bootstrap4 HTML Template
 	Description: A perfect template to build beautiful and unique Glasses websites. It comes with nice and clean design.
@@ -608,7 +146,7 @@ $scope.checkCheckOut = function(){
   33. Infinite Scroll js
 *************************************************/
 
-  (function ($) {
+(function ($) {
     // Start of use strict
     "use strict";
 
@@ -1644,6 +1182,5 @@ $scope.checkCheckOut = function(){
 	  End Infinite Scroll js
 	  -------------------------------------*/
   })(jQuery);
-
-
+   
 }

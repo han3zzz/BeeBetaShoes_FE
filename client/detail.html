@@ -28,9 +28,18 @@
                                     <h1 class="product-single__title">{{sp.product.name}}</h1>
                                     
                                     <div class="prInfoRow">
-                                        <div class="product-stock">Tình trạng : <span ng-if="quantity > 0"><span class="instock ">Còn hàng</span></span>  <span ng-if="quantity ==0"><span style="color: red;" class="outstock">Tạm hết hàng</span></span></div>
+                                        <div class="product-stock">Tình trạng : <span ng-if="quantityHT > 0"><span class="instock ">Còn hàng</span></span>  <span ng-if="quantityHT ==0"><span style="color: red;" class="outstock">Tạm hết hàng</span></span></div>
                                         <div class="product-sku">Code: <span class="variant-sku">{{sp.product.code}}</span></div>
-                                        <div class="product-review"><a class="reviewLink" href="#tab2"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><span class="spr-badge-caption">6 reviews</span></a></div>
+                                        <div class="product-review"><a class="reviewLink" href="#tab2"> 
+                                         
+                                            <span ng-repeat="star in [].constructor(stars) track by $index">
+                                                <i class="fa fa-star"></i>
+                                              </span>
+                                              <span ng-if="stars1 == 1"><i class="fa fa-star-half"></i>
+                                            
+                                            </span>
+
+                                          <span class="spr-badge-caption">{{sp.ratings.length}} đánh giá</span></a></div>
                                     </div>
                                     <p class="product-single__price product-single__price-product-template">
                                         <span class="visually-hidden">Regular price</span>
@@ -214,83 +223,139 @@
                                     <div class="spr-container">
                                         <div class="spr-header clearfix">
                                             <div class="spr-summary">
-                                                <span class="product-review"><a class="reviewLink"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i> </a><span class="spr-summary-actions-togglereviews">Based on 6 reviews456</span></span>
-                                                <span class="spr-summary-actions">
-                                                    <a href="#" class="spr-summary-actions-newreview btn">Viết Đánh Giá</a>
-                                                </span>
+                                                <span class="product-review"><a class="reviewLink">    <span ng-repeat="star in [].constructor(stars) track by $index">
+                                                    <i class="fa fa-star"></i>
+                                                  </span>
+                                                  <span ng-if="stars1 == 1"><i class="fa fa-star-half"></i>
+                                                
+                                                </span> </a><span class="spr-summary-actions-togglereviews">Sản phẩm này có {{sp.ratings.length}} đánh giá</span></span>
+                                            
                                             </div>
                                         </div>
                                         <div class="spr-content">
-                                            <div class="spr-form clearfix">
-                                                <form method="post" action="#" id="new-review-form" class="new-review-form">
+                                            <div class="spr-form clearfix" ng-if="user != null">
+                                              
+                                                  <div ng-if="dkdanhgia == true">
+
                                                     <h3 class="spr-form-title">Viết Đánh Giá</h3>
-                                                    <fieldset class="spr-form-contact">
-                                                        <div class="spr-form-contact-name">
-                                                          <label class="spr-form-label" for="review_author_10508262282">Tên của bạn</label>
-                                                          <input class="spr-form-input spr-form-input-text " id="review_author_10508262282" type="text" name="review[author]" value="" placeholder="Enter your name">
-                                                        </div>
-                                                        <div class="spr-form-contact-email">
-                                                          <label class="spr-form-label" for="review_email_10508262282">Email</label>
-                                                          <input class="spr-form-input spr-form-input-email " id="review_email_10508262282" type="email" name="review[email]" value="" placeholder="john.smith@example.com">
-                                                        </div>
-                                                    </fieldset>
+                                                 
                                                     <fieldset class="spr-form-review">
                                                       <div class="spr-form-review-rating">
                                                         <label class="spr-form-label">Đánh giá</label>
                                                         <div class="spr-form-input spr-starrating">
-                                                          <div class="product-review"><a class="reviewLink" href="#"><i class="fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i></a></div>
-                                                        </div>
+                                                            <div class="danhgia">
+                                                               <div>
+                                                                <input type="radio" id="star5" name="rating">
+                                                                <label for="star5" title="5 stars">
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                </label>
+                                                               </div>
+                                                            
+                                                                <div>
+                                                                    <input type="radio" id="star4" name="rating" >
+                                                                <label for="star4" title="4 stars">
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                </label>
+                                                                </div>
+                                                            
+                                                               <div>
+                                                                <input type="radio" id="star3" name="rating">
+                                                                <label for="star3" title="3 stars">
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                </label>
+                                                               </div>
+                                                            
+                                                               <div>
+                                                                <input type="radio" id="star2" name="rating" >
+                                                                <label for="star2" title="2 stars">
+                                                                    <i class="fa fa-star"></i>
+                                                                    <i class="fa fa-star"></i>
+                                                                </label>
+                                                               </div>
+                                                            
+                                                                <div>
+                                                                    <input type="radio" id="star1" name="rating" >
+                                                                <label for="star1" title="1 star">
+                                                                    <i class="fa fa-star"></i>
+                                                                </label>
+                                                                </div>
+                                                            </div>
                                                       </div>
                                                 
                                                      
                                                       <div class="spr-form-review-body">
-                                                        <label class="spr-form-label" for="review_body_10508262282">Nội dung đánh giá <span class="spr-form-review-body-charactersremaining">(1500)</span></label>
+                                                        <label class="spr-form-label" for="review_body_10508262282">Nội dung đánh giá <span class="spr-form-review-body-charactersremaining"></span></label>
+                                                        <div style="padding: 10px;">
+                                                            <input id="fileList" type="file" accept="image/*" multiple style="display: none;">
+                                                        <button ng-click="openImage()" style="border-radius: 10px; margin-top: 5px; background-color: rgb(23, 146, 82); color: white; border: none; padding: 5px;" id="uploadButton">Tải ảnh lên</button>
+                                                        <div id="imagePreviewContainer" ng-repeat="image in images">
+                                                          <div class="image-wrapper">
+                                                          <img style="width: 100px;height: 100px;" class="image" ng-src="{{image}}" />
+                                                          <button class="delete-button" ng-click="deleteImage($index)"><i class="fa-solid fa-trash-can"></i></button>
+                                                          </div>
+                                                        </div>
+                                                        </div>
                                                         <div class="spr-form-input">
-                                                          <textarea class="spr-form-input spr-form-input-textarea " id="review_body_10508262282" data-product-id="10508262282" name="review[body]" rows="10" placeholder="Write your comments here"></textarea>
+                                                          <textarea class="spr-form-input spr-form-input-textarea " id="review" data-product-id="10508262282" name="review[body]" rows="10" placeholder="Viết nội dung đánh giá..."></textarea>
                                                         </div>
                                                       </div>
                                                     </fieldset>
                                                     <fieldset class="spr-form-actions">
-                                                        <input type="submit" class="spr-button spr-button-primary button button-primary btn btn-primary" value="Đánh Giá">
+                                                       <button ng-click="danhgia()" class="spr-button spr-button-primary button button-primary btn btn-primary">Đánh Giá</button>
                                                     </fieldset>
-                                                </form>
+                                                  </div>
+                                                  <div ng-if="dkdanhgia == false">
+                                                    Bạn phải mua sản phẩm này mới được đánh giá !
+                                                  </div>
+                                                
                                             </div>
+                                            <div class="spr-form clearfix" ng-if="user == null">
+                                             <h4>Nếu bạn đã mua sản phẩm này ? Hãy <a href="#/login">đăng nhập</a> để đánh giá</h4>
+                                            
+                                        </div>
                                             <div class="spr-reviews">
-                                                <div class="spr-review">
+                                                <div class="spr-review" ng-repeat="rate in pagerRating.items | orderBy:'createDate':true">
                                                     <div class="spr-review-header">
-                                                        <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><i class="fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i></span></span>
-                                                        <h3 class="spr-review-header-title">Lorem ipsum dolor sit amet</h3>
-                                                        <span class="spr-review-header-byline"><strong>dsacc</strong> on <strong>Apr 09, 2019</strong></span>
+                                            
+                
+                                                        <span class="spr-review-header-byline"><strong>{{rate.customer.username}}</strong> đã đánh giá  <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><span ng-repeat="star in [].constructor(rate.score) track by $index">
+                                                            <i class="fa fa-star"></i>
+                                                          </span></span></span> vào ngày <strong>{{rate.createDate | date:'dd-MM-yyyy'}}</strong></span>
                                                     </div>
                                                     <div class="spr-review-content">
-                                                        <p class="spr-review-content-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                                                        <p style="padding-left: 5px;" class="spr-review-content-body">{{rate.note}}</p>
+                                                        <span ng-repeat="img in rate.ratingImages">
+                                                            <img style="width: 50px;height: 50px;padding: 5px;" src="{{img.url}}" ng-click="openModal(img.url)">
+                                                        </span>
                                                     </div>
                                                 </div>
-                                                <div class="spr-review">
-                                                  <div class="spr-review-header">
-                                                    <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><i class="fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i></span></span>
-                                                    <h3 class="spr-review-header-title">Lorem Ipsum is simply dummy text of the printing</h3>
-                                                    <span class="spr-review-header-byline"><strong>larrydude</strong> on <strong>Dec 30, 2018</strong></span>
-                                                  </div>
-                                            
-                                                  <div class="spr-review-content">
-                                                    <p class="spr-review-content-body">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-                                                    </p>
-                                                  </div>
-                                                </div>
-                                                <div class="spr-review">
-                                                  <div class="spr-review-header">
-                                                    <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><i class="fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i></span></span>
-                                                    <h3 class="spr-review-header-title">Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</h3>
-                                                    <span class="spr-review-header-byline"><strong>quoctri1905</strong> on <strong>Dec 30, 2018</strong></span>
-                                                  </div>
-                                            
-                                                  <div class="spr-review-content">
-                                                    <p class="spr-review-content-body">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled.<br>
-                                                    <br>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
-                                                  </div>
-                                                </div>
+                                               
+                                              
                                             </div>
+                                            <div class="text-center" ng-if="sp.ratings.length > 0">
+                                                <div class="btn-group" role="group" aria-label="Basic outlined example">
+                                                  <button ng-click="pagerRating.first()" type="button"
+                                                          class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>
+                                                  <button ng-click="pagerRating.prev()" type="button"
+                                                          class="btn btn-outline-secondary"><i class="fa-solid fa-angle-left"></i></button>
+                                                  <button type="button" class="btn btn-outline-secondary">{{pagerRating.page+1}}
+                                                    of
+                                                    {{pagerRating.count}}</button>
+                                                  <button ng-click="pagerRating.next()" type="button"
+                                                          class="btn btn-outline-secondary"><i class="fa-solid fa-angle-right"></i></button>
+                                                  <button ng-click="pagerRating.last()" type="button"
+                                                          class="btn btn-outline-secondary"><i class="fa-solid fa-angles-right"></i></button>
+                                                </div>
+                                              </div>
                                         </div>
                                         </div>
                                     </div>
@@ -369,13 +434,13 @@
                                                 <!-- <span class="old-price">$500.00</span> -->
                                                 <span class="price">{{sp.price | currency}}</span>
                                             </div>
-                                            <div class="product-review">
+                                            <!-- <div class="product-review">
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star"></i>
                                                 <i class="font-13 fa fa-star-o"></i>
                                                 <i class="font-13 fa fa-star-o"></i>
-                                            </div>
+                                            </div> -->
                                             <!-- End product price -->
                                         <!-- Variant -->
                                         <!-- <ul class="swatches text-center" ng-repeat="img in sp.product.productImages">
@@ -399,3 +464,8 @@
             <!--MainContent-->
         </div>
     	<!--End Body Content-->
+          <!-- Modal -->
+  <div id="myModal" class="modal">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img style="width: 500px;height: 350px;" class="modal-content" id="modalImg">
+  </div>
