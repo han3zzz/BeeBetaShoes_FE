@@ -311,7 +311,7 @@
             </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="cart in pager1.items" ng-click="themvaogio(cart.id)">
+          <tr ng-if="listQuantity.length > 0" ng-repeat="cart in pager1.items" ng-click="themvaogio(cart.id)">
             <td class="cart__image-wrapper cart-flex-item">
                 <span ng-repeat="pro in listPro">
                     <span ng-if="pro.id == cart.idProductDetail">
@@ -363,6 +363,9 @@
                 {{cart.quantity > 0 ? cart.quantity : 'Tạm hết'}}
             </td>
         </tr>
+        <tr ng-if="listQuantity.length == 0">
+          <td colspan="8">Không có sản phẩm nào</td>
+        </tr>
            
            
           
@@ -370,7 +373,7 @@
         </tbody>
        
 </table>
-<div class="text-center">
+<div class="text-center" ng-if="listQuantity.length > 0">
     <div class="btn-group" role="group" aria-label="Basic outlined example">
       <button ng-click="pager1.first()" type="button"
               class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>
@@ -404,7 +407,7 @@
           </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="cart in pager1.items" ng-click="themvaogio(cart.id)">
+        <tr ng-if="listProduct.length > 0" ng-repeat="cart in pager1.items" ng-click="themvaogio(cart.id)">
           <td class="cart__image-wrapper cart-flex-item">
               <span ng-repeat="pro in listPro">
                   <span ng-if="pro.id == cart.idProductDetail">
@@ -456,6 +459,9 @@
               {{cart.quantity > 0 ? cart.quantity : 'Tạm hết'}}
           </td>
       </tr>
+      <tr ng-if="listProduct.length == 0">
+        <td colspan="8">Không có sản phẩm nào</td>
+      </tr>
          
          
         
@@ -463,7 +469,7 @@
       </tbody>
      
 </table>
-<div class="text-center">
+<div class="text-center" ng-if="listProduct.length > 0">
     <div class="btn-group" role="group" aria-label="Basic outlined example">
       <button ng-click="pager1.first()" type="button"
               class="btn btn-outline-secondary"><i class="fa-solid fa-angles-left"></i></button>

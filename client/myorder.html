@@ -185,7 +185,7 @@
         <tr>
             <td>Trạng thái</td>
             <td>Ngày cập nhật</td>
-            <td>Ghi chú</td>
+            <td style="max-width: 200px; overflow-wrap: break-word;">Ghi chú</td>
             <td>Người cập nhật</td>
         </tr>
         <tr ng-repeat="bi in listbillhistory">
@@ -195,9 +195,13 @@
                 <span class="button-bill" ng-if="bi.status == 3"><i class="fa-solid fa-circle-check"></i> Hoàn thành</span>
                 <span class="button-bill" ng-if="bi.status == 4"><i class="fa-solid fa-ban"></i> Đã hủy</span>
                 <span class="button-bill" ng-if="bi.status == 5"><i class="fa-solid fa-right-left"></i> Đổi trả</span>
+                <span class="button-bill5" ng-if="bi.status == 10"><i class="fa-solid fa-file-invoice-dollar"></i> Xác nhận thanh toán</span>
+                <span class="button-bill4" ng-if="bi.status == 11"><i class="fa-solid fa-map-location"></i> Cập nhật địa chỉ</span>
+                <span class="button-bill2" ng-if="bi.status == 12"><i class="fa-solid fa-trash-can"></i> Xóa sản phẩm</span>
+                <span class="button-bill1" ng-if="bi.status == 13"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</span>
                 </td>
             <td>{{bi.createDate | date:'HH:mm  dd/MM/yyyy' }}</td>
-            <td>{{bi.note}}</td>
+            <td style="max-width: 200px; overflow-wrap: break-word;">{{bi.note}}</td>
             <td>{{bi.createBy}}</td>
         </tr>
     </table>

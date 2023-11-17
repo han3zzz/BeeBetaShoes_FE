@@ -1,23 +1,27 @@
 <!--Body Content-->
 <div id="page-content">
 	<!--Home slider-->
-	<div class="slideshow slideshow-wrapper pb-section sliderFull">
-		<div class="home-slideshow">
-			<div class="slide">
-				<div class="blur-up lazyload bg-size">
-					<img class="blur-up lazyload bg-img" data-src="./banner.jpg" src="./banner.jpg" alt="Shop Our New Collection" title="Shop Our New Collection" />
-					<div class="slideshow__text-wrap slideshow__overlay classic bottom">
-						<div class="slideshow__text-content bottom">
-							<div class="wrap-caption center">
-									<h2 class="h1 mega-title slideshow__title">BeeBetaShoes New Collection</h2>
-									
-									
-								</div>
+	<div id="slideshowhan">
+				<div class="slideshow slide-wrapperhan  pb-section sliderFull ">
+					
+				  <div class="slidehan blur-up lazyload bg-size " ng-repeat="img in listBanner">
+					
+					<img class="blur-up lazyload bg-img" src="{{img.url}}">
+					<div class="image-text bottom">
+								<div class="wrap-caption center">
+									<h2 class="h1 mega-title slideshow__title">{{img.content}}</h2>	
 						</div>
-					</div>
+					  </div>
+				
 				</div>
-			</div>
-			<div class="slide">
+					
+					
+					
+				</div>
+			  </div>
+	<!-- <div class="slideshow slideshow-wrapper pb-section sliderFull">
+		<div class="home-slideshow"> -->
+			<!-- <div class="slide">
 				<div class="blur-up lazyload bg-size">
 					<img class="blur-up lazyload bg-img" data-src="assets/images/slideshow-banners/belle-banner2.jpg" src="assets/images/slideshow-banners/belle-banner2.jpg" alt="Summer Bikini Collection" title="Summer Bikini Collection" />
 					<div class="slideshow__text-wrap slideshow__overlay classic bottom">
@@ -30,9 +34,30 @@
 						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-	</div>
+			</div> -->
+			<!-- <div id="banner">
+				
+			</div> -->
+			
+			
+			<!-- <div class="slide" ng-repeat="img in listBanner" ng-if="listBanner.length > 0">
+				<div class="blur-up lazyload bg-size">
+					<img class="blur-up lazyload bg-img" data-src="{{img.url}}" src="{{img.url}}" alt="{{img.content}}" title="{{img.content}}" />
+					<div class="slideshow__text-wrap slideshow__overlay classic bottom">
+						<div class="slideshow__text-content bottom">
+							<div class="wrap-caption center">
+								<h2 class="h1 mega-title slideshow__title">{{img.content}}</h2>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div> -->
+			
+	
+		 
+			
+		<!-- </div>
+	</div> -->
 	<!--End Home slider-->
 	
 	<!-- Collection Box slider-->

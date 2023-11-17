@@ -180,14 +180,14 @@
             <span class="hide-menu">Quản Lý Hóa Đơn</span>
           </a>
         </li>
-        <li class="sidebar-item">
+        <!-- <li class="sidebar-item">
           <a class="sidebar-link" href="/admin/index.html#/return-ex" aria-expanded="false">
                 <span>
                   <i class="fa-solid fa-right-left"></i>
                 </span>
             <span class="hide-menu">Quản Lý Đổi Trả</span>
           </a>
-        </li>
+        </li> -->
         <div ng-if="user.role.id === 1">
         <li class="nav-small-cap">
           <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
@@ -199,6 +199,20 @@
                   <i class="fa-solid fa-gift"></i>
                 </span>
             <span class="hide-menu">Quản Lý Khuyến Mãi</span>
+          </a>
+        </li>
+      </div>
+      <div ng-if="user.role.id === 1">
+        <li class="nav-small-cap">
+          <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+          <span class="hide-menu">Hệ Thống</span>
+        </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="#/banner" aria-expanded="false">
+                <span>
+                  <i class="fa-solid fa-bars-progress"></i>
+                </span>
+            <span class="hide-menu">Quản Lý Banner</span>
           </a>
         </li>
       </div>

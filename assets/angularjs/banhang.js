@@ -1,4 +1,4 @@
-window.BanHangController = function($scope, $http, $location,$routeParams,$rootScope){
+window.BanHangController = function($scope, $http, $location,$routeParams,$rootScope,AuthService){
 
     //tạo hóa đơn
     $scope.addbill = function(){
@@ -6,7 +6,7 @@ window.BanHangController = function($scope, $http, $location,$routeParams,$rootS
            $http
            .post("http://localhost:8080/api/bill/billTaiQuay", {
              status: 10,
-             idEmployee : $rootScope.user.id ,
+             idEmployee : AuthService.getId() ,
              typeStatus : 1
            })
            .then(function (bill) {
@@ -1047,7 +1047,7 @@ $http.get("http://localhost:8080/api/bill/getallbybill/"+codeBill).then(function
                     // pagation
             $scope.pager1 = {
               page: 0,
-              size: 3,
+              size: 8,
               get items() {
                 var start = this.page * this.size;
                 return $scope.listQuantity.slice(start, start + this.size);
@@ -1762,12 +1762,12 @@ $scope.removeCoupon = function(){
            //check trạng thái thanh toán online khi trả về
 
    if ($location.search().vnp_TransactionStatus === "00") {
-
+  
     $http.put('http://localhost:8080/api/bill/updateStatus1/'+ $location.search().vnp_OrderInfo,{
       payStatus : 1,
     
     }).then(function (response) {
-    
+     
     
       Swal.fire('Thanh toán thành công' ,'','success');
       let urlcolor = "http://localhost:8080/api/color";
@@ -1800,26 +1800,7 @@ $scope.removeCoupon = function(){
     $http.get("http://localhost:8080/api/bill/getallbybill/"+$location.search().vnp_OrderInfo).then(function(resp){
       $scope.listItemExport = resp.data;
   })
-  $scope.isLoading = false;
-  console.log(response.data.typeStatus)
-  if(response.data.typeStatus == 1){
-    $http.post('http://localhost:8080/api/billhistory',{
-      createBy : $rootScope.user.username,
-      note : 'Đã giao hàng tại quầy',
-      status : 3,
-      idBill : response.data.id
-    });
-   }
-    
-
-  else if(response.data.typeStatus == 0){
-    $http.post('http://localhost:8080/api/billhistory',{
-      createBy : $rootScope.user.username,
-      note : 'Đã xác nhận tại quầy',
-      status : 1,
-      idBill : response.data.id
-    });
-  }
+  
       setTimeout(() => {
      
       
@@ -1852,7 +1833,7 @@ $scope.removeCoupon = function(){
 
   }
   if ($location.search().vnp_TransactionStatus === "02") {
-    
+    $http.delete("http://localhost:8080/api/billhistory/deletebillhistory/"+$location.search().vnp_OrderInfo);
     $http.put('http://localhost:8080/api/bill/updateStatus/'+ $location.search().vnp_OrderInfo,{
       payStatus : 0,
       paymentDate : null,
@@ -1864,6 +1845,7 @@ $scope.removeCoupon = function(){
     setTimeout(() => {
         location.href = '#/sell/view';
     }, 2000);
+    
 
   }
 
@@ -2187,7 +2169,39 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     delyveryDate : new Date(),
                     status : 3,
                     typeStatus : 1
-                  });
+                  }).then(function(resp){
+                    let requestParams = {
+                      createBy: '',
+                      idBill: resp.data.id
+                  };
+          
+                  if (resp.data.typeStatus == 1) {
+                      requestParams.note = 'Đã giao hàng tại quầy';
+                      requestParams.status = 3;
+                  } else {
+                      requestParams.note = 'Đã xác nhận tại quầy';
+                      requestParams.status = 1;
+                  }
+          
+                  // Make a single POST request with the consolidated parameters
+                  $http.post('http://localhost:8080/api/billhistory', requestParams).then(function(re){
+                    let params = {
+                      totalPrice:
+                        $scope.tienThanhToan,
+                      code: codeBill,
+                    };
+                    $http({
+                      method: "GET",
+                      url: "http://localhost:8080/api/vnpaytaiquay",
+                      params: params,
+                      transformResponse: [
+                        function (data) {
+                          location.href = data;
+                        },
+                      ],
+                    });
+                  })
+                  })
                   
 
       
@@ -2210,23 +2224,42 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                     delyveryDate : new Date(),
                     status : 3,
                     typeStatus : 1
-                  });
+                  }).then(function(resp){
+                    let requestParams = {
+                      createBy: '',
+                      idBill: resp.data.id
+                  };
+          
+                  if (resp.data.typeStatus == 1) {
+                      requestParams.note = 'Đã giao hàng tại quầy';
+                      requestParams.status = 3;
+                  } else {
+                      requestParams.note = 'Đã xác nhận tại quầy';
+                      requestParams.status = 1;
+                  }
+          
+                  // Make a single POST request with the consolidated parameters
+                  $http.post('http://localhost:8080/api/billhistory', requestParams).then(function(re){
+                    let params = {
+                      totalPrice:
+                        $scope.tienThanhToan,
+                      code: codeBill,
+                    };
+                    $http({
+                      method: "GET",
+                      url: "http://localhost:8080/api/vnpaytaiquay",
+                      params: params,
+                      transformResponse: [
+                        function (data) {
+                          location.href = data;
+                        },
+                      ],
+                    });
+                  })
+                  })
                 }
-                let params = {
-                  totalPrice:
-                    $scope.tienThanhToan,
-                  code: codeBill,
-                };
-                $http({
-                  method: "GET",
-                  url: "http://localhost:8080/api/vnpaytaiquay",
-                  params: params,
-                  transformResponse: [
-                    function (data) {
-                      location.href = data;
-                    },
-                  ],
-                });
+               
+               
 
               }
               //mua online thanh toán online
@@ -2257,6 +2290,38 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                         idCoupon : idCoupon,
                         status : 1,
                         typeStatus : 0
+                      }).then(function(resp){
+                        let requestParams = {
+                          createBy: '',
+                          idBill: resp.data.id
+                      };
+              
+                      if (resp.data.typeStatus == 1) {
+                          requestParams.note = 'Đã giao hàng tại quầy';
+                          requestParams.status = 3;
+                      } else {
+                          requestParams.note = 'Đã xác nhận tại quầy';
+                          requestParams.status = 1;
+                      }
+              
+                      // Make a single POST request with the consolidated parameters
+                      $http.post('http://localhost:8080/api/billhistory', requestParams).then(function(re){
+                        let params = {
+                          totalPrice:
+                            $scope.tienThanhToan,
+                          code: codeBill,
+                        };
+                        $http({
+                          method: "GET",
+                          url: "http://localhost:8080/api/vnpaytaiquay",
+                          params: params,
+                          transformResponse: [
+                            function (data) {
+                              location.href = data;
+                            },
+                          ],
+                        });
+                      })
                       })
                    
                         
@@ -2293,6 +2358,38 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             idCoupon : idCoupon,
                             status : 1,
                             typeStatus : 0
+                          }).then(function(resp){
+                            let requestParams = {
+                              createBy: '',
+                              idBill: resp.data.id
+                          };
+                  
+                          if (resp.data.typeStatus == 1) {
+                              requestParams.note = 'Đã giao hàng tại quầy';
+                              requestParams.status = 3;
+                          } else {
+                              requestParams.note = 'Đã xác nhận tại quầy';
+                              requestParams.status = 1;
+                          }
+                  
+                          // Make a single POST request with the consolidated parameters
+                          $http.post('http://localhost:8080/api/billhistory', requestParams).then(function(re){
+                            let params = {
+                              totalPrice:
+                                $scope.tienThanhToan,
+                              code: codeBill,
+                            };
+                            $http({
+                              method: "GET",
+                              url: "http://localhost:8080/api/vnpaytaiquay",
+                              params: params,
+                              transformResponse: [
+                                function (data) {
+                                  location.href = data;
+                                },
+                              ],
+                            });
+                          })
                           })
                        
                             
@@ -2317,7 +2414,39 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                             idCoupon : idCoupon,
                             status : 1,
                             typeStatus : 0
-                          });
+                          }).then(function(resp){
+                            let requestParams = {
+                              createBy: '',
+                              idBill: resp.data.id
+                          };
+                  
+                          if (resp.data.typeStatus == 1) {
+                              requestParams.note = 'Đã giao hàng tại quầy';
+                              requestParams.status = 3;
+                          } else {
+                              requestParams.note = 'Đã xác nhận tại quầy';
+                              requestParams.status = 1;
+                          }
+                  
+                          // Make a single POST request with the consolidated parameters
+                          $http.post('http://localhost:8080/api/billhistory', requestParams).then(function(re){
+                            let params = {
+                              totalPrice:
+                                $scope.tienThanhToan,
+                              code: codeBill,
+                            };
+                            $http({
+                              method: "GET",
+                              url: "http://localhost:8080/api/vnpaytaiquay",
+                              params: params,
+                              transformResponse: [
+                                function (data) {
+                                  location.href = data;
+                                },
+                              ],
+                            });
+                          })
+                          })
             
     
                     }
@@ -2325,21 +2454,7 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
                 
   
               }
-              let params = {
-                totalPrice:
-                  $scope.tienThanhToan,
-                code: codeBill,
-              };
-              $http({
-                method: "GET",
-                url: "http://localhost:8080/api/vnpaytaiquay",
-                params: params,
-                transformResponse: [
-                  function (data) {
-                    location.href = data;
-                  },
-                ],
-              });
+            
          
            
          

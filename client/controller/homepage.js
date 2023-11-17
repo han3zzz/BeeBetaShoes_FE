@@ -67,6 +67,72 @@ window.HomeController = function ($http, $scope, $routeParams, $location,$rootSc
     $http.get(urldesign).then(function (response) {
       $scope.listDesign = response.data;
     });
+    $scope.listBanner = [];
+    $http.get("http://localhost:8080/api/banner").then(function(resp){
+        $scope.listBanner = resp.data;
+
+
+        let numberOfSlides = resp.data.length;
+        let keyframes = '';
+        
+        // Tính toán keyframes dựa vào số lượng slide
+        keyframes += `15% { transform: translateX(0); } `;
+        for (let i = 1; i < numberOfSlides; i++) {
+          let percentage = 15 + (70 / (numberOfSlides - 1)) * i;
+          keyframes += `${percentage}% { transform: translateX(-${i * 100}%); } `;
+      }
+        keyframes += `85% { transform: translateX(-${(numberOfSlides - 1) * 100}%); } `;
+        
+        // Thêm keyframes vào stylesheet
+        let style = document.styleSheets[0];
+        style.insertRule(`@keyframes slidehan { ${keyframes} }`, style.cssRules.length);
+
+        // Gán keyframes cho phần tử có class là slide-wrapperhan
+document.getElementById("slide-wrapperhan").style.animation = `slidehan ${numberOfSlides * 5}s ease infinite`;
+        
+        
+        
+
+      
+        
+   
+   // Get the slides container
+   
+  //  let banner = document.getElementById("banner");
+
+  //  // Loop through the listBanner array and create slides dynamically
+  //  $scope.listBanner.forEach(function(img) {
+  //      // Create slide element
+  //      var slide = document.createElement('div');
+  //      slide.classList.add('slide');
+   
+  //      // Create slide content
+  //      var slideContent = `
+  //          <div class="blur-up lazyload bg-size">
+  //              <img class="blur-up lazyload bg-img" data-src="${img.url}" src="${img.url}" alt="${img.content}" title="${img.content}" />
+  //              <div class="slideshow__text-wrap slideshow__overlay classic bottom">
+  //                  <div class="slideshow__text-content bottom">
+  //                      <div class="wrap-caption center">
+  //                          <h2 class="h1 mega-title slideshow__title">${img.content}</h2>
+  //                      </div>
+  //                  </div>
+  //              </div>
+  //          </div>
+  //      `;
+   
+  //      // Set the HTML content of the slide
+  //      slide.innerHTML = slideContent;
+   
+  //      // Append the slide to the banner
+  //      banner.appendChild(slide);
+     
+       
+  //  });
+
+  
+    })
+    
+  
       //load cart by user
       // $scope.listCart = [];
       // $http.get("http://localhost:8080/api/cart/1").then(function (cart) {
@@ -193,7 +259,10 @@ window.HomeController = function ($http, $scope, $routeParams, $location,$rootSc
       },
       last() {
         this.page = this.count - 1;
-      },
+      }
+      
+
+      
       
     };
   

@@ -16,3 +16,4 @@ let loadFile = function(event) {
     var modal = document.getElementById("myModal");
     modal.style.display = "none";
   }
+  

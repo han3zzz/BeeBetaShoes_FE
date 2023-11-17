@@ -1988,3 +1988,49 @@ body.home15-funiture-template { font-size:14px; }
 #header-cart.show {
   display: block !important;
 }
+.image-text {
+  position: absolute;
+  top: 80%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+}
+
+
+
+#slideshowhan {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+}
+
+#slideshowhan img {
+  width: 1900px;
+  height: 800px;
+  display: block;
+  max-width: 100%; /* Thay đổi giá trị max-width */
+}
+
+.slide-wrapperhan {
+  width: 100%;
+  display: flex;
+  -webkit-animation: slidehan 20s ease infinite;
+}
+
+.slidehan {
+  flex: 0 0 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* @-webkit-keyframes slidehan {
+  20% {transform: translateX(0);}
+  30% {transform: translateX(-100%);}
+  50% {transform: translateX(-200%);}
+  80% {transform: translateX(-300%);}
+} */
+

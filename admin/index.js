@@ -231,12 +231,23 @@ app.config(function ($routeProvider, $locationProvider) {
         })
         .when("/change", {
             templateUrl: "account/change.html",
+            controller : ChangeController
+           
+        })
+        .when("/profile", {
+            templateUrl: "account/profile.html",
+            controller : ProfileController
            
         })
         .when("/statistical",{
             templateUrl: "thongke/index.html",
             controller : ThongKeController
         })
+        .when("/banner",{
+            templateUrl: "banner/index.html",
+           controller : BannerController
+        })
+
 
 
         
@@ -250,7 +261,7 @@ app.factory('AuthInterceptor', function ($location,AuthService) {
     return {
         request: function (config) {
             var token = AuthService.getToken();
-            console.log($location.path());
+            
             if (token === null && $location.path() !== '/login' && $location.path() !== '/forget') {
                 $location.path('/login');
             }
@@ -285,6 +296,17 @@ app.factory('AuthService', function() {
     authService.clearToken = function() {
         localStorage.removeItem('token');
     };
+    authService.saveId = function(id) {
+        localStorage.setItem('id', id);
+    };
+
+    authService.getId = function() {
+        return localStorage.getItem('id');
+    };
+
+    authService.clearId = function() {
+        localStorage.removeItem('id');
+    };
 
     
 
@@ -292,7 +314,7 @@ app.factory('AuthService', function() {
 });
 
 app.run(function ($rootScope, $http,AuthService) {
-  
+   
     if(AuthService.getToken() != null){
         var token = AuthService.getToken();
 
@@ -304,6 +326,7 @@ app.run(function ($rootScope, $http,AuthService) {
            
             $http.get('http://localhost:8080/api/employee/getByUsername/'+username.data.username).then(function(user){
                 $rootScope.user = user.data;
+                AuthService.saveId(user.data.id);
             })
 
           })
@@ -322,6 +345,7 @@ app.run(function ($rootScope, $http,AuthService) {
             /* Read more about isConfirmed, isDenied below */
             if (result.isConfirmed) {
                 AuthService.clearToken();
+                AuthService.clearId();
                 $rootScope.user = null;
                 Swal.fire('Đăng xuất thành công !','',"success");
                 location.href = "#/login"
