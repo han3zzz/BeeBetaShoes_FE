@@ -893,6 +893,83 @@ $http.get(urlsize).then(function (response) {
 
                     
                   }
+                  
+        //export exel
+        $scope.exportToExcel = function () {
+          Swal.fire({
+              title: 'Bạn có chắc muốn xuất Exel ?',
+              showCancelButton: true,
+              confirmButtonText: 'Xuất',
+          }).then((result) => {
+              if (result.isConfirmed){
+                  // Chuyển dữ liệu thành một mảng các đối tượng JSON
+                  var dataArray = $scope.list.map(function (item) {
+                      return {
+                          HoaDon: item.code,
+                          NgayMua: item.purchaseDate,
+                          TongTien : item.totalPrice + item.shipPrice - item.totalPriceLast,
+                          HinhThucThanhToan : item.payType == 1 ? 'Đã thanh toán' :'Chưa thanh toán',
+                          TrangThaiThanhToan : item.payStatus == 0 ? 'Chưa thanh toán' : 'Đã thanh toán',
+                          TrangThaiDonHang : item.status == 0 ? 'Chờ xác nhận' : item.status == 1 ? 'Chờ giao hàng' : item.status == 2 ? 'Đang giao hàng' : item.status == 3 ? 'Đã giao hàng' : item.status == 4 ? 'Đã hủy' : item.status == 5 ? 'Đổi hàng' : '',
+                          HinhThucMuaHang : item.typeStatus == 1 ? 'Mua tại quầy' : 'Mua online'
+                        
+                      };
+                  });
+
+                  // Tạo một workbook mới
+                  var workbook = XLSX.utils.book_new();
+
+                  // Tạo một worksheet từ dữ liệu
+                  var worksheet = XLSX.utils.json_to_sheet(dataArray);
+
+                  // Thêm worksheet vào workbook
+                  XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Sheet');
+
+                  // Xuất tệp Excel
+                  XLSX.writeFile(workbook, 'data'+ new Date()+'.xlsx');
+                  Swal.fire("Xuất file exel thành công !","","success");
+              }
+          })
+
+      }
+                  $scope.$watch('selectedDate', function(newValue, oldValue) {
+                    // Thực hiện các công việc cần thiết khi ngày thay đổi
+                    $scope.filter();
+                  });
+                  $scope.filter = function (){
+                    
+                    let idHttt = document.getElementById("httt").value;
+                    let idTTTT = document.getElementById("tttt").value;
+                    let idTTDH = document.getElementById("ttdh").value;
+                    let idHTMH = document.getElementById("htmh").value;
+                    let tungay = document.getElementById('tungay').value;
+                    let denngay = document.getElementById('denngay').value;
+                    let httt = (idHttt != '') ? idHttt : null;
+                    let tttt = (idTTTT != '') ? idTTTT : null;
+                    let ttdh = (idTTDH != '') ? idTTDH : null;
+                    let htmh = (idHTMH != '') ? idHTMH : null;
+                    let tn = (tungay != '') ? tungay : null;
+                    let dn = (denngay != '') ? denngay : null;
+
+                   
+                    var params = {
+                        status : ttdh,
+                        payType : httt,
+                        payStatus : tttt,
+                        typeStatus : htmh,
+                        tungay : tn,
+                        denngay : dn
+                    }
+                    $http({
+                        method : 'GET',
+                        url : 'http://localhost:8080/api/bill/billAllFilter',
+                        params : params
+                    }).then(function (resp){
+                        $scope.list = resp.data;
+                        $scope.pager.first();
+                        // Swal.fire("Lọc thành công !","","success");
+                    });
+                }
 
                   $scope.isPopupVisible1 = false;
 

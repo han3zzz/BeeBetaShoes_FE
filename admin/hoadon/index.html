@@ -16,7 +16,55 @@
   <input type="radio" id="radioButton7" name="radioGroup" ng-click="loc(5)">
   <label for="radioButton7">Đổi trả ({{doitra}})</label>
 </div>
-<div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo mã.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div>
+<!-- <div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo mã.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div> -->
+<div class="row">
+ <div class="col-md-5">
+  <label>Hình thức thanh toán</label>
+  <select class="haninput" id="httt" ng-click="filter()">
+    <option value="">Tất cả</option>
+    <option value="0" >Thanh toán khi nhận hàng</option>
+    <option value="1">Thanh toán online qua VNPay</option>
+  </select>
+ </div>
+ <div class="col-md-5">
+  <label>Trạng thái thanh toán</label>
+  <select class="haninput" id="tttt" ng-click="filter()">
+    <option value="">Tất cả</option>
+    <option value="1">Đã thanh toán</option>
+    <option value="0">Chưa thanh toán</option>
+  </select>
+ </div>
+ <div class="col-md-2"></div>
+ <div class="col-md-5">
+  <label>Trạng thái đơn hàng</label>
+  <select class="haninput" id="ttdh" ng-click="filter()">
+    <option value="">Tất cả</option>
+    <option value="0">Chờ xác nhận</option>
+    <option value="1">Chờ giao hàng</option>
+    <option value="2">Đang giao hàng</option>
+    <option value="3">Đã giao hàng</option>
+    <option value="4">Đã hủy</option>
+    <option value="5">Đổi hàng</option>
+  </select>
+ </div>
+ <div class="col-md-5">
+  <label>Hình thức mua hàng</label>
+  <select class="haninput" id="htmh" ng-click="filter()">
+    <option value="">Tất cả</option>
+    <option value="0">Mua online</option>
+    <option value="1">Mua tại quầy</option>
+  </select>
+ </div>
+ <div class="col-md-2"></div>
+ <div class="col-md-5">
+  <label>Từ ngày</label>
+  <input ng-model="selectedDate" type="date" class="haninput" id="tungay">
+ </div>
+ <div class="col-md-5">
+  <label>Đến ngày</label>
+  <input ng-model="selectedDate" type="date" class="haninput" id="denngay">
+ </div>
+</div>
 <!--        <button class="btn btn-outline-dark" ng-click="loadAll()"> <i class="fa-solid fa-rotate-right"></i></button>-->
 <div style="float: right">
   <button class="btn btn-info" ng-click="exportToExcel()"><svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0,0,256,256">
@@ -54,7 +102,7 @@
               <span class="button-bill4" ng-if="bill.status == 2">Đang giao hàng</span>
               <span class="button-bill" ng-if="bill.status == 3">Đã giao hàng</span>
               <span class="button-bill2" ng-if="bill.status == 4">Đã hủy</span>
-              <span class="button-bill6" ng-if="bill.status == 5">Đổi trả</span>
+              <span class="button-bill6" ng-if="bill.status == 5">Đổi hàng</span>
             </td>
             <td>
               <span class="button-bill" ng-if="bill.typeStatus == 1">Tại quầy</span>
