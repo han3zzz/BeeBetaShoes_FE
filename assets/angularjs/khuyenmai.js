@@ -1,7 +1,8 @@
 window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
     let url = "http://localhost:8080/api/voucher";
+    $scope.selectedVoucherType = 'percentage';
     $scope.loadAll = function () {
-
+        
         // load material
         $scope.list = [];
         $http.get(url).then(function (response) {
@@ -57,25 +58,29 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
     $scope.form = {
         code: '',
         name: '',
-        typevoucher:'',
-        isvoucher:'',
+        typeVoucher:'',
+        isVoucher:'',
         discount:'',
         cash:'',
         startdate:'',
         enddate:'',
+        minimum:'',
     }
 
     //add
     $scope.add = function(){
+        console.log($scope.form.isVoucher)
+        
         $http.post(url,{
             code : $scope.form.code,
             name : $scope.form.name,
-            typeVoucher : $scope.form.typevoucher ,
-            isVoucher : $scope.form.isvoucher ,
+            typeVoucher : $scope.form.typeVoucher ,
+            isVoucher : $scope.form.isVoucher ,
             discount : $scope.form.discount, 
             cash : $scope.form.cash,
             startDate : $scope.form.startdate,
             endDate : $scope.form.enddate,
+            minimum : $scope.form.minimum,
             
         }).then(function(resp){
             if(resp.status === 200){
@@ -86,6 +91,7 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
             }
         }).catch(function (err){
             if (err.status === 400){
+                console.log(err.data)
                 $scope.validationErrors = err.data;
             }
             
@@ -96,16 +102,23 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
     $scope.update = function(){
         var startDate  = document.getElementById("ngaybatdau").value;
         var endDate  = document.getElementById("ngayhethan").value;
-        let id = $routeParams.id ;
+        let id = $routeParams.id;
+        if( $scope.form.typeVoucher==true){
+            $scope.form.cash = null;
+        }else{
+            $scope.form.discount = null;
+        }
+        
         $http.put("http://localhost:8080/api/voucher/update/"+id,{
             code : $scope.form.code,
             name : $scope.form.name,
-            typeVoucher : $scope.form.typevoucher,
-            isVoucher : $scope.form.isvoucher,
+            typeVoucher : $scope.form.typeVoucher,
+            isVoucher : $scope.form.isVoucher,
             discount : $scope.form.discount,
             cash : $scope.form.cash,
             startDate : startDate,
             endDate : endDate,
+            minimum : $scope.form.minimum,
         }).then(function(resp){
             if(resp.status === 200){
                 Swal.fire('Sửa thành công !', '', 'success')
@@ -148,23 +161,27 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         let id = $routeParams.id;
         $http.get("http://localhost:8080/api/voucher/" + id).then(function (resp) {
             $scope.form = resp.data;
-            if(resp.data.isVoucher == true){
-                document.getElementById("giamphantram").checked = true
+            console.log(  $scope.form);
+            if(resp.data.typeVoucher == true){
+                
+                // document.getElementById("giamphantram").checked = true;
+                // document.getElementById("giamtienmat").checked = false;
                 document.getElementById("km").style.display = "block";
                 document.getElementById("km1").style.display = "none";
             }else{
-                document.getElementById("giamtienmat").checked = true
+                // document.getElementById("giamtienmat").checked = true
+                // document.getElementById("giamphantram").checked = false;
                 document.getElementById("km").style.display = "none";
                 document.getElementById("km1").style.display = "block";
             }
-            if(resp.data.typeVoucher == true){
-                document.getElementById("giamtheobill").checked = true 
-            }else{
-                document.getElementById("giamsanpham").checked = true
-            }
+            // if(resp.data.typeVoucher == true){
+            //     document.getElementById("giamtheobill").checked = true 
+            // }else{
+            //     document.getElementById("giamsanpham").checked = true
+            // }
 
 
-
+          
             let dateInput = document.getElementById('ngaybatdau');
     
             // Original datetime string in 'yyyy-MM-dd hh:mm:ss.sss' format
@@ -211,7 +228,11 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         })
 
     }
-
+    
+    //appear box
+    $scope.appear = function () {
+        var boxabc = document.getElementById("123").style.display = "block";
+    }
      //export exel
      $scope.exportToExcel = function () {
         Swal.fire({
@@ -226,10 +247,10 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
                         Id: item.id,
                         Code: item.code,
                         Name: item.name,
-                        TypeVoucher: item.typeVoucher,
-                        // TypeVoucher: item.typevoucher,
-                        IsVoucher: item.isVoucher,
-                        // IsVoucher: item.isvoucher,
+                        typeVoucher: item.typeVoucher,
+                        // typeVoucher: item.typeVoucher,
+                        isVoucher: item.isVoucher,
+                        // isVoucher: item.isVoucher,
                         Discount: item.discount,
                         Cash: item.cash,
                         StartDate: item.startDate,
@@ -270,3 +291,4 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         }
     }
 }
+
