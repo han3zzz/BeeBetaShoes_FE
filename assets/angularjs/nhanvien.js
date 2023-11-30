@@ -246,11 +246,16 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
         }
 
     }
-    $scope.filter = function(){
+     //filter
+     $scope.filter = function (){
         let idRole = document.getElementById("vaitro").value;
+  
+        
         let idrole = (idRole != '') ? idRole : null;
+       
         var params = {
-            idrole : idrole,
+            idRole : idrole ,
+     
         }
         $http({
             method : 'GET',
@@ -261,6 +266,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
             $scope.pager.first();
             // Swal.fire("Lọc thành công !","","success");
         });
+
     }
-  
+
 }
