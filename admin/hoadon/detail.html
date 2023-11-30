@@ -11,7 +11,7 @@
           <div class="timeline-icon" ng-if="billhis.status == 0" >  <i class="fa-regular fa-file-lines"></i></div>
           <div class="timeline-icon" ng-if="billhis.status == 1">   <i class="fa-regular fa-calendar-check"></i></div>
           <div class="timeline-icon" ng-if="billhis.status == 2" >  <i class="fa-solid fa-truck-fast"></i></div>
-          <div class="timeline-icon" ng-if="billhis.status == 3">   <i class="fa-solid fa-circle-check"></i></div>
+          <div class="timeline-icon" ng-if="billhis.status == 3">   <i class="fa-solid fa-hand-holding"></i></div>
           <div class="timeline-icon1" ng-if="billhis.status == 4">   <i class="fa-solid fa-ban"></i></div>
           <div class="timeline-icon2" ng-if="billhis.status == 5">     <i class="fa-solid fa-right-left"></i></div>
         
@@ -25,13 +25,26 @@
         <h2 ng-if="billhis.status == 0">Tạo đơn hàng</h2>
         <h2 ng-if="billhis.status == 1">Đã xác nhận</h2>
         <h2 ng-if="billhis.status == 2">Đang giao hàng</h2>
-        <h2 ng-if="billhis.status == 3">Hoàn thành</h2>
+        <h2 ng-if="billhis.status == 3">Đã giao hàng</h2>
         <h2 ng-if="billhis.status == 4">Đã hủy</h2>
         <h2 ng-if="billhis.status == 5">Đổi hàng</h2>
         <p>{{billhis.createDate | date:'HH:mm  dd/MM/yyyy' }}</p>
       </div>
     </div>
+    <div class="timeline-item" ng-if="billhis.status != 10 && billhis.status != 11 && billhis.status != 12 && billhis.status != 13 && bill.status == 3 && bill.payStatus == 1">
+      <div class="timeline-content">
+        <center><div>
+          <div class="timeline-icon" > <i class="fa-solid fa-circle-check"></i></div>
+                <!-- <span ng-if="billhis.status == 5">Đã hủy</span> -->
+          </div></center>
+        <h2 ng-if="bill.status == 3 && bill.payStatus == 1" >Hoàn thành</h2>
+        <p style="height: 20px;"></p>
+      </div>
+    </div>
 </div>
+
+  
+
 
   <div style="margin-top: 10px;">
     <button class="btn btn-dark" ng-click="check(bill.code,bill.id)" ng-if="bill.status == 0 || bill.status == 1 || bill.status == 2"><i class="fa-solid fa-check"></i> {{bill.status == 0 ? 'Xác nhận đơn hàng' : bill.status == 1 ? 'Xác nhận đang giao hàng' : bill.status == 2 ? 'Xác nhận đã giao hàng' : ''}}</button>
@@ -51,6 +64,7 @@
         <span class="button-bill2" ng-if="bill.status == 4">Đã hủy</span>
         <span class="button-bill6" ng-if="bill.status == 5">Đổi hàng</span></h6>
     <h6>Hình thức mua hàng : <span class="button-bill">{{bill.typeStatus == 1 ? 'Tại quầy' : 'Mua online'}}</span></h6>
+    <h6>Người mua hàng : {{cus == null ? 'Khách lẻ' : cus.fullname}} - {{cus == null ? '' : cus.phone}}</h6>
     <!-- <h6 ng-if="bill.paymentDate != null">Ngày thanh toán : {{bill.paymentDate | date:'dd-MM-yyyy' }}</h6> -->
     <h6 ng-if="bill.typeStatus != 1">Thông tin giao hàng : {{address.fullname}} - {{address.phone}} 
         ( {{address.address}}, {{address.wardName}}, {{address.districtName}}, {{address.cityName}} )   
@@ -80,7 +94,7 @@
         <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span>
         
       </td>
-      <td ng-if="bill.payStatus == 0"><button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="(bill.payStatus == 0 && bill.status == 0) || (bill.payStatus == 0 && bill.status == 1) || (bill.payStatus == 0 && bill.status == 2)">Xác nhận thanh toán</button></td>
+      <td ng-if="bill.payStatus == 0"><button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="(bill.payStatus == 0 && bill.status == 0) || (bill.payStatus == 0 && bill.status == 1) || (bill.payStatus == 0 && bill.status == 2) || (bill.payStatus == 0 && bill.status == 3)">Xác nhận thanh toán</button></td>
       <td ng-if="bill.payStatus == 1">{{nhanhVienTT}}</td>
     </tr>
     </table>
@@ -165,11 +179,17 @@
             <td style="max-width: 200px; overflow-wrap: break-word;">Ghi chú</td>
             <td>Người cập nhật</td>
         </tr>
+        <tr ng-if="bill.status == 3 && bill.payStatus == 1">
+          <td><span class="button-bill"><i class="fa-solid fa-circle-check"></i> Hoàn thành</span></td>
+            <td></td>
+            <td style="max-width: 200px; overflow-wrap: break-word;">Đơn hàng hoàn tất</td>
+            <td></td>
+        </tr>
         <tr ng-repeat="bi in listbillhistory">
             <td> <span class="button-bill" ng-if="bi.status == 0"><i class="fa-regular fa-file-lines"></i> Tạo đơn hàng</span>
                 <span class="button-bill" ng-if="bi.status == 1"><i class="fa-regular fa-calendar-check"></i> Đã xác nhận</span>
                 <span class="button-bill" ng-if="bi.status == 2"><i class="fa-solid fa-truck-fast"></i> Đang giao hàng</span>
-                <span class="button-bill" ng-if="bi.status == 3"><i class="fa-solid fa-circle-check"></i> Hoàn thành</span>
+                <span class="button-bill" ng-if="bi.status == 3"><i class="fa-solid fa-hand-holding"></i> Đã giao hàng</span>
                 <span class="button-bill2" ng-if="bi.status == 4"><i class="fa-solid fa-ban"></i> Đã hủy</span>
                 <span class="button-bill6" ng-if="bi.status == 5"><i class="fa-solid fa-right-left"></i> Đổi trả</span>
                 <span class="button-bill5" ng-if="bi.status == 10"><i class="fa-solid fa-file-invoice-dollar"></i> Xác nhận thanh toán</span>

@@ -142,6 +142,12 @@ $http.get(urlsize).then(function (response) {
                  
                   $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(resp){
                     $scope.bill = resp.data;
+                    $scope.cus = {};
+                    if($scope.bill.idCustomer != ""){
+                      $http.get("http://localhost:8080/api/customer/"+$scope.bill.idCustomer).then(function(cus){
+                        $scope.cus = cus.data;
+                      })
+                    }
                     $http.get("http://localhost:8080/api/billhistory/"+code).then(function(resp1){
                       $scope.billhistory = resp1.data;
                       for(let i = 0 ; i < $scope.billhistory.length ; i++){
@@ -164,6 +170,7 @@ $http.get(urlsize).then(function (response) {
                         $scope.address = resp.data;
                       })
                     })
+                  
                      })
 
                   }
@@ -303,10 +310,6 @@ $http.get(urlsize).then(function (response) {
                       }
                    
                      if($scope.bill.status === 2){
-                      if($scope.bill.payStatus === 0){
-                        Swal.fire("Vui lòng xác nhận thanh toán trước khi xác nhận đơn hoàn thành !","","error");
-                        return;
-                      }
                         Swal.fire({
                           title: "Xác nhận đơn hàng " +code +" đã hoàn thành",
                           inputLabel : 'Ghi chú',
@@ -342,7 +345,7 @@ $http.get(urlsize).then(function (response) {
                      $scope.chitiet = function(code){
                       $scope.isChiTiet = !$scope.isChiTiet;
                       $scope.listbillhistory = [];
-                      $http.get("http://localhost:8080/api/billhistory/"+code).then(function(resp){
+                      $http.get("http://localhost:8080/api/billhistory/get/"+code).then(function(resp){
                        $scope.listbillhistory = resp.data;
                      })
                      }
