@@ -849,3 +849,42 @@ body {
   color: #009688;
   margin-top: 10px;
 }
+.slideshow-container {
+  max-width: 800px;
+  position: relative;
+  overflow: hidden;
+  margin: auto;
+}
+
+.slide-wrapper {
+  display: flex;
+  animation: slideAnimation 12s infinite;
+}
+
+.slide1 {
+  width: 100%;
+  height: auto;
+}
+
+@keyframes slideAnimation {
+  0% {
+      transform: translateX(0%);
+  }
+  25% {
+      transform: translateX(-100%);
+  }
+  50% {
+      transform: translateX(-200%);
+  }
+  75% {
+      transform: translateX(-300%);
+  }
+  100% {
+      transform: translateX(0%);
+  }
+}
+#owl-demo .item img{
+  display: block;
+  width: 100px;
+  height: 100px;
+}

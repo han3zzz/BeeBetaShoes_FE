@@ -37,6 +37,13 @@
         <div style="padding-top: 10px;">
             <button ng-click="thongKe()" class="btn btn-dark">Thống kê</button>
         </div>
+        <div style="display: none;padding: 5px; font-weight: bold;" id="tkhd">
+            Tổng số lượng chờ xác nhận : {{hdstatus[0].numberOfBillsStatus0}} <br>
+            Tổng số lượng chờ chờ giao : {{hdstatus[0].numberOfBillsStatus1}}<br>
+            Tổng số lượng chờ đang giao : {{hdstatus[0].numberOfBillsStatus2}}<br>
+            Tổng số lượng chờ đã giao : {{hdstatus[0].numberOfBillsStatus3}}<br>
+            Tổng số lượng chờ đã hủy : {{hdstatus[0].numberOfBillsStatus4}}
+        </div>
         <div style="display: none;padding: 5px; font-weight: bold;" id="tksp">
             Tổng số lượng đã bán : {{tongSL}}<br>
             Tổng doanh thu : {{tongDT | currency:'':0}} VNĐ

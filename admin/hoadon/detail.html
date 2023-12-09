@@ -64,11 +64,11 @@
         <span class="button-bill2" ng-if="bill.status == 4">Đã hủy</span>
         <span class="button-bill6" ng-if="bill.status == 5">Đổi hàng</span></h6>
     <h6>Hình thức mua hàng : <span class="button-bill">{{bill.typeStatus == 1 ? 'Tại quầy' : 'Mua online'}}</span></h6>
-    <h6>Người mua hàng : {{cus == null ? 'Khách lẻ' : cus.fullname}} - {{cus == null ? '' : cus.phone}}</h6>
+    <h6>Người mua hàng : {{cus == null ? 'Khách lẻ' : cus.fullname}} <span ng-if="cus != null">-</span>  {{cus == null ? '' : cus.phone}}</h6>
     <!-- <h6 ng-if="bill.paymentDate != null">Ngày thanh toán : {{bill.paymentDate | date:'dd-MM-yyyy' }}</h6> -->
     <h6 ng-if="bill.typeStatus != 1">Thông tin giao hàng : {{address.fullname}} - {{address.phone}} 
         ( {{address.address}}, {{address.wardName}}, {{address.districtName}}, {{address.cityName}} )   
-       
+       <h6>Ghi chú : {{bill.note === '' ? 'Không có' : bill.note}}</h6>
     <!-- <h6>Hình thức thanh toán : <span class="button-bill">{{bill.payType == 0 ? 'Tiền mặt' : 'VNPAY'}}</span></h6>
     <h6>Trạng thái thanh toán :  <span class="button-bill" ng-if="bill.payStatus == 1">Đã thanh toán</span>
         <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span></h6> -->
@@ -96,6 +96,7 @@
       </td>
       <td ng-if="bill.payStatus == 0"><button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="(bill.payStatus == 0 && bill.status == 0) || (bill.payStatus == 0 && bill.status == 1) || (bill.payStatus == 0 && bill.status == 2) || (bill.payStatus == 0 && bill.status == 3)">Xác nhận thanh toán</button></td>
       <td ng-if="bill.payStatus == 1">{{nhanhVienTT}}</td>
+  
     </tr>
     </table>
     <div>

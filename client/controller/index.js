@@ -85,6 +85,18 @@ app.config(function ($routeProvider, $locationProvider,$httpProvider) {
           
            
         })
+        .when("/news/:key", {
+          templateUrl: "news.html",
+          controller : HomeController
+         
+      })
+      .when("/news", {
+        templateUrl: "new.html",
+        controller : HomeController
+       
+      
+       
+    })
       
 
         .otherwise({
@@ -92,6 +104,7 @@ app.config(function ($routeProvider, $locationProvider,$httpProvider) {
         });
 
 });
+
 
 app.factory('AuthInterceptor', function ($location,AuthService,$rootScope) {
     return {
@@ -164,7 +177,7 @@ app.factory('CartService', function() {
 
       addToCart: function(item) {
           cartItems.push(item);
-          saveToLocalStorage();
+          saveToLocalStorage();fv
       },
 
       removeFromCart: function(index) {

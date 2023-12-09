@@ -1014,112 +1014,100 @@
                                             })
                                         })
                                     }
-                                    var ListImage = $scope.imagesList;
-                                    if (ListImage.length > 0) {
+                                    var listImage = $scope.imagesList;
 
-                                        $http.delete("http://localhost:8080/api/image/1/" + product.data.id);
-                                        var img1 = new FormData();
-                                        for (let i = 0; i < ListImage.length; i++) {
-                                           
-                                                img1.append("files", ListImage[i]);
-                                            $http.post("http://localhost:8080/api/upload", img1, {
-                                                transformRequest: angular.identity,
-                                                headers: {
-                                                    'Content-Type': undefined
-                                                }
-                                            }).then(function (imagelist) {
-                                                $http.post("http://localhost:8080/api/image", {
-                                                    url: imagelist.data[i],
-                                                    mainImage: false,
-                                                    idProduct: product.data.id
-                                                }).then(function(imgg){
-                                                    for(let i = 0; i <$scope.images.length; i++) {
-                                                        if($scope.images[i].startsWith('http')){
-                                                            if($scope.imageDelete.length > 0){
-                                                                for(let j = 0; j < $scope.imageDelete.length; j++) {
-                                                                    if($scope.imageDelete[j] !== $scope.images[i]){
-                                                                        $http.post("http://localhost:8080/api/image", {
-                                                                            url: $scope.images[i],
-                                                                            mainImage: false,
-                                                                            idProduct: product.data.id
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                            else{
-                                                                $http.post("http://localhost:8080/api/image", {
-                                                                    url: $scope.images[i],
-                                                                    mainImage: false,
-                                                                    idProduct: product.data.id
-                                                                });
-                                                            }
-                                                           
-                                                        }
-                                                    }
-                                                })
-                                            })
-
-                                            
-                                        }
-                                        
-                                      
-
-                                    }
-                                   if(ListImage.length == 0){
-                                     if($scope.imageDelete.length > 0){
-                                               // update image
-                                    var ListImage = $scope.imagesList;
-
-                                        $http.delete("http://localhost:8080/api/image/1/" + product.data.id);
-                                        var img1 = new FormData();
-                                        for (let i = 0; i < ListImage.length; i++) {
-                                           
-                                                img1.append("files", ListImage[i]);
-                                            $http.post("http://localhost:8080/api/upload", img1, {
-                                                transformRequest: angular.identity,
-                                                headers: {
-                                                    'Content-Type': undefined
-                                                }
-                                            }).then(function (imagelist) {
-                                                $http.post("http://localhost:8080/api/image", {
-                                                    url: imagelist.data[i],
-                                                    mainImage: false,
-                                                    idProduct: product.data.id
-                                                }).then(function(imgg){
-                                                    for(let i = 0; i <$scope.images.length; i++) {
-                                                        if($scope.images[i].startsWith('http')){
-                                                            if($scope.imageDelete.length > 0){
-                                                                for(let j = 0; j < $scope.imageDelete.length; j++) {
-                                                                    if($scope.imageDelete[j] !== $scope.images[i]){
-                                                                        $http.post("http://localhost:8080/api/image", {
-                                                                            url: $scope.images[i],
-                                                                            mainImage: false,
-                                                                            idProduct: product.data.id
-                                                                        });
-                                                                    }
-                                                                }
-                                                            }
-                                                            else{
-                                                                $http.post("http://localhost:8080/api/image", {
-                                                                            url: $scope.images[i],
-                                                                            mainImage: false,
-                                                                            idProduct: product.data.id
-                                                                        });
-                                                            }
-                                                           
-                                                        }
-                                                    }
-            
-                                                })
-                                            })
-
-                                            
-                                        }
-                                        
-                                      
+                                    if (listImage.length > 0) {
+                                        var checkImg = true;
                                     
+                                        $http.delete("http://localhost:8080/api/image/1/" + product.data.id).then(function () {
+                                            var img1 = new FormData();
+                                    
+                                            for (var i = 0; i < listImage.length; i++) {
+                                                img1.append("files", listImage[i]);
+                                            }
+                                    
+                                            $http.post("http://localhost:8080/api/upload", img1, {
+                                                transformRequest: angular.identity,
+                                                headers: {
+                                                    'Content-Type': undefined
+                                                }
+                                            }).then(function (imageList) {
+                                                var promises = [];
+                                    
+                                                for (var i = 0; i < imageList.data.length; i++) {
+                                                    promises.push(
+                                                        $http.post("http://localhost:8080/api/image", {
+                                                            url: imageList.data[i],
+                                                            mainImage: false,
+                                                            idProduct: product.data.id
+                                                        })
+                                                    );
+                                                }
+                                    
+                                                Promise.all(promises).then(function () {
+                                                    for (var i = 0; i < $scope.images.length; i++) {
+                                                        if ($scope.images[i].startsWith('https')) {
+                                                            if ($scope.imageDelete.length > 0) {
+                                                                var deletePromises = [];
+                                    
+                                                                for (var j = 0; j < $scope.imageDelete.length; j++) {
+                                                                    if ($scope.imageDelete[j] !== $scope.images[i]) {
+                                                                        deletePromises.push(
+                                                                            $http.post("http://localhost:8080/api/image", {
+                                                                                url: $scope.images[i],
+                                                                                mainImage: false,
+                                                                                idProduct: product.data.id
+                                                                            })
+                                                                        );
+                                                                    }
+                                                                }
+                                    
+                                                                Promise.all(deletePromises).then(function () {
+                                                                    // Các hành động khác sau khi xử lý xóa ảnh
+                                                                });
+                                                            } else {
+                                                                if (checkImg) {
+                                                                    checkImg = false;
+                                                                    $http.post("http://localhost:8080/api/image", {
+                                                                        url: $scope.images[i],
+                                                                        mainImage: false,
+                                                                        idProduct: product.data.id
+                                                                    }).then(function () {
+                                                                        // Các hành động khác sau khi thêm ảnh mới
+                                                                    });
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            });
+                                        });
                                     }
-                                   }
+                                    
+                                    if (listImage.length == 0) {
+                                        if ($scope.imageDelete.length > 0) {
+                                            $http.delete("http://localhost:8080/api/image/1/" + product.data.id).then(function () {
+                                                var promises = [];
+                                    
+                                                for (var i = 0; i < $scope.images.length; i++) {
+                                                    if ($scope.images[i].startsWith('http')) {
+                                                        promises.push(
+                                                            $http.post("http://localhost:8080/api/image", {
+                                                                url: $scope.images[i],
+                                                                mainImage: false,
+                                                                idProduct: product.data.id
+                                                            })
+                                                        );
+                                                    }
+                                                }
+                                    
+                                                Promise.all(promises).then(function () {
+                                                    // Các hành động khác sau khi xử lý thêm ảnh khi không có ảnh mới
+                                                });
+                                            });
+                                        }
+                                    }
+                                    
                                 })
                                 //update material
                                 let listMaterial = $scope.listMaterial;
@@ -1536,7 +1524,6 @@ $scope.openImage = function() {
 
 $scope.change = function(){
     document.getElementById('fileList').addEventListener('change', function() {
-        console.log($scope.imagesList.length);
         var files = this.files;
         if(files.length > 3) {
           Swal.fire("Danh sách tối đa 3 ảnh !","","error");

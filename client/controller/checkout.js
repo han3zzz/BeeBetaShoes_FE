@@ -1,9 +1,16 @@
 window.CheckOutController = function ($http, $scope,$rootScope, $routeParams, $location,AuthService,CartService) {
   //trang thanh toán
+  
 
   $scope.checkOut = function () {
     
     let IdCustomer = AuthService.getCustomer();
+    $(document).ready(function() {
+      // Đặt thuộc tính checked cho radio button với ID là 'pay1'
+      $("#pay1").prop("checked", true);
+      // Hoặc có thể sử dụng
+      // $("#pay1").attr("checked", "checked");
+  });
     let urlcolor = "http://localhost:8080/api/color";
     let urlsize = "http://localhost:8080/api/size";
     // load color
@@ -131,6 +138,7 @@ window.CheckOutController = function ($http, $scope,$rootScope, $routeParams, $l
 
            // dat hang
            $scope.buy = function () {
+       
              Swal.fire({
                title: "Xác nhận đặt hàng ?",
                showCancelButton: true,
@@ -141,362 +149,446 @@ window.CheckOutController = function ($http, $scope,$rootScope, $routeParams, $l
                 //  var typePay = document.getElementById("typePay").value;
                  //nếu chọn thanh toán tại nhà
                  if (document.getElementById("pay1").checked === true) {
+                            // Biến để kiểm tra xem có sản phẩm nào số lượng không đủ không
+                             let quantityNotEnough = false;
                    //check số lượng còn hàng trước khi cho đặt hàng
                    $http
                      .get("http://localhost:8080/api/cart/"+IdCustomer)
                      .then(function (CheckCart) {
-                       for (let i = 0; i < CheckCart.data.length; i++) {
-                         //get số lượng sản phẩm đang có
-                         var getPram = {
-                           IdProduct: CheckCart.data[i].productDetail.id,
-                           IdColor: CheckCart.data[i].idColor,
-                           IdSize: CheckCart.data[i].idSize,
-                         };
+                  // Dùng Promise.all để chờ tất cả các request hoàn thành
+                  let promises = CheckCart.data.map((cartItem) => {
+                    // Lấy số lượng sản phẩm đang có
+                    var getPram = {
+                        IdProduct: cartItem.productDetail.id,
+                        IdColor: cartItem.idColor,
+                        IdSize: cartItem.idSize,
+                    };
+  
 
-                         $http({
-                           method: "GET",
-                           url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                           params: getPram,
-                         }).then(function (resp) {
-                           if (CheckCart.data[i].quantity > resp.data) {
-                             Swal.fire(
-                               "Số lượng sản phẩm " +
-                                 CheckCart.data[i].productDetail.product
-                                   .name +
-                                 " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
-                               "",
-                               "error"
-                             );
-                             // cập lại số lượng hiện có vào giỏ hàng
-                             $http
-                               .put(
-                                 "http://localhost:8080/api/cart/updateCart/" +
-                                   CheckCart.data[i].id,
-                                 {
-                                   idCart: idCart,
-                                   idProductDetail:
-                                     CheckCart.data[i].productDetail.id,
-                                   idColor: CheckCart.data[i].idColor,
-                                   idSize: CheckCart.data[i].idSize,
-                                   quantity: resp.data,
-                                   unitPrice: CheckCart.data[i].unitPrice,
-                                 }
-                               )
-                               .then(function (cart) {
-                                 if (cart.status === 200) {
-                                   //load lại sau khi tăng thành công !
-                                   $scope.loadCart();
-                                 }
-                               });
-                             return;
-                           }
-                           // nếu số lượng hết thì xóa khỏi giỏ hàng
-                           if (resp.data === 0) {
-                             Swal.fire(
-                               "Số lượng sản phẩm " +
-                                 CheckCart.data[i].productDetail.product
-                                   .name +
-                                 " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
-                               "",
-                               "success"
-                             );
-                             $http.delete(
-                               "http://localhost:8080/api/cart/" +
-                                 CheckCart.data[i].id
-                             );
-                             $scope.loadCart();
-                             return;
-                           }
+              // Trả về promise của request
+              return $http({
+                  method: "GET",
+                  url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                  params: getPram,
+              }).then(function (resp) {
+                  if (parseInt(resp.data) == 0) {
+                      // Nếu số lượng hết, cập nhật biến kiểm tra
+                      quantityNotEnough = true;
+                        Swal.fire(
+                          "Số lượng sản phẩm " +
+                          cartItem.productDetail.product.name +
+                            " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                          "",
+                          "warning",
+                        );
+                        $http.delete(
+                          "http://localhost:8080/api/cart/" +
+                          cartItem.id
+                        );
 
-                          
+                  } 
+                  else if(resp.data === ''){
+                    quantityNotEnough = true;
+                    $http.delete(
+                      "http://localhost:8080/api/cart/" +
+                      cartItem.id
+                    );
+                    Swal.fire(
+                        "Sản phẩm " +
+                        cartItem.productDetail.product.name +
+                        " không khả dụng ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                        "",
+                        "warning"
+                    );
+                  }
+                  else if (cartItem.quantity > parseInt(resp.data)) {
+                      // Nếu số lượng không đủ, cập nhật biến kiểm tra
+                      quantityNotEnough = true;
+                      Swal.fire(
+                          "Số lượng sản phẩm " +
+                          cartItem.productDetail.product.name +
+                          " không đủ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có!",
+                          "",
+                          "warning"
+                      );
+                      // Cập nhật số lượng hiện có vào giỏ hàng
+                      return $http
+                        .put(
+                          "http://localhost:8080/api/cart/updateCart/" +
+                          cartItem.id,
+                          {
+                            idCart: idCart,
+                            idProductDetail:
+                            cartItem.productDetail.id,
+                            idColor: cartItem.idColor,
+                            idSize: cartItem.idSize,
+                            quantity: resp.data,
+                            unitPrice: cartItem.unitPrice,
+                          }
+                        );
+
+                  }
+
+              });
+
+            });
+
+          // Sau khi tất cả các request hoàn thành
+          Promise.all(promises)
+          .then(() => {
+              // Nếu có sản phẩm nào số lượng không đủ, không thực hiện các bước tiếp theo
+              if (quantityNotEnough) {
+                $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
+                          $rootScope.listCartIndex = cartL.data;
+                          $rootScope.tongTienIndex = 0;
+                          for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                            $rootScope.tongTienIndex +=
+                              $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                          }
+                      })
+                location.href="#/cart"
+                  return;
+              }
+               // add bill
+               $http
+               .post("http://localhost:8080/api/bill", {
+                 totalPrice: TotalPrice,
+                 shipPrice: ship.data.data.total,
+                 totalPriceLast:
+                  $scope.giamGia,
+                 note: document.getElementById("note").value,
+                 payType: 0,
+                 payStatus: 0,
+                 idCoupon: 0,
+                 idAddress: idAddress,
+                 idCustomer: IdCustomer,
+                 status: 0,
+                 typeStatus : 0
+               })
+               .then(function (bill) {
+                 $http.post('http://localhost:8080/api/billhistory',{
+                   createBy : null,
+                   note : null,
+                   status : 0,
+                   idBill : bill.data.id
+                 });
+                 var isMailSent = false;
+                 $http
+                   .get("http://localhost:8080/api/cart/"+IdCustomer)
+                   .then(function (CartToBill) {
+                     for (
+                       let i = 0;
+                       i < CartToBill.data.length;
+                       i++
+                     ) {
+                       $http
+                         .post(
+                           "http://localhost:8080/api/bill/addBillDetail",
+                           {
+                             // add bill detail
+                             idBill: bill.data.id,
+                             idProductDetail:
+                               CartToBill.data[i].productDetail
+                                 .id,
+                             idColor:
+                               CartToBill.data[i].idColor,
+                             idSize: CartToBill.data[i].idSize,
+                             quantity:
+                               CartToBill.data[i].quantity,
+                             unitPrice:
+                               CartToBill.data[i].unitPrice,
+                           }
+                         )
+                         .then(function (billdetail) {
+                           //xóa giỏ hàng by user
+                           $http.delete(
+                             "http://localhost:8080/api/cart/deleteAllCart/"+IdCustomer
+                           );
+
+                           //get số lượng sản phẩm đang có
+                           var getPram = {
+                             IdProduct:
+                               CartToBill.data[i].productDetail
+                                 .id,
+                             IdColor:
+                               CartToBill.data[i].idColor,
+                             IdSize: CartToBill.data[i].idSize,
+                           };
+                           $http({
+                             method: "GET",
+                             url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                             params: getPram,
+                           }).then(function (resp) {
+                             var param2 = {
+                               IdProduct:
+                                 CartToBill.data[i]
+                                   .productDetail.id,
+                               IdColor:
+                                 CartToBill.data[i].idColor,
+                               IdSize:
+                                 CartToBill.data[i].idSize,
+                               Quantity:
+                                 parseInt(resp.data) -
+                                 parseInt(
+                                   CartToBill.data[i].quantity
+                                 ),
+                             };
+                             $http({
+                               method: "PUT",
+                               url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                               params: param2,
+                             }).then(function (resp) {
+
+                               // Kiểm tra biến kiểm soát trước khi gọi hàm
+                               if (!isMailSent) {
+                                 $scope.sendBillToMail(bill.data.code);
+                                 isMailSent = true; // Đánh dấu là đã gửi email
+                               }
+                              
+                             
+                              
+                             });
+                           });
                          });
-                       }
-                        // add bill
-                        $http
-                        .post("http://localhost:8080/api/bill", {
-                          totalPrice: TotalPrice,
-                          shipPrice: ship.data.data.total,
-                          totalPriceLast:
-                           $scope.giamGia,
-                          note: document.getElementById("note").value,
-                          payType: 0,
-                          payStatus: 0,
-                          idCoupon: 0,
-                          idAddress: idAddress,
-                          idCustomer: IdCustomer,
-                          status: 0,
-                          typeStatus : 0
-                        })
-                        .then(function (bill) {
-                          $http.post('http://localhost:8080/api/billhistory',{
-                            createBy : null,
-                            note : null,
-                            status : 0,
-                            idBill : bill.data.id
-                          });
-                          var isMailSent = false;
-                          $http
-                            .get("http://localhost:8080/api/cart/"+IdCustomer)
-                            .then(function (CartToBill) {
-                              for (
-                                let i = 0;
-                                i < CartToBill.data.length;
-                                i++
-                              ) {
-                                $http
-                                  .post(
-                                    "http://localhost:8080/api/bill/addBillDetail",
-                                    {
-                                      // add bill detail
-                                      idBill: bill.data.id,
-                                      idProductDetail:
-                                        CartToBill.data[i].productDetail
-                                          .id,
-                                      idColor:
-                                        CartToBill.data[i].idColor,
-                                      idSize: CartToBill.data[i].idSize,
-                                      quantity:
-                                        CartToBill.data[i].quantity,
-                                      unitPrice:
-                                        CartToBill.data[i].unitPrice,
-                                    }
-                                  )
-                                  .then(function (billdetail) {
-                                    //xóa giỏ hàng by user
-                                    $http.delete(
-                                      "http://localhost:8080/api/cart/deleteAllCart/"+IdCustomer
-                                    );
+                     }
+                   });
+                   
+               });
 
-                                    //get số lượng sản phẩm đang có
-                                    var getPram = {
-                                      IdProduct:
-                                        CartToBill.data[i].productDetail
-                                          .id,
-                                      IdColor:
-                                        CartToBill.data[i].idColor,
-                                      IdSize: CartToBill.data[i].idSize,
-                                    };
-                                    $http({
-                                      method: "GET",
-                                      url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                                      params: getPram,
-                                    }).then(function (resp) {
-                                      var param2 = {
-                                        IdProduct:
-                                          CartToBill.data[i]
-                                            .productDetail.id,
-                                        IdColor:
-                                          CartToBill.data[i].idColor,
-                                        IdSize:
-                                          CartToBill.data[i].idSize,
-                                        Quantity:
-                                          parseInt(resp.data) -
-                                          parseInt(
-                                            CartToBill.data[i].quantity
-                                          ),
-                                      };
-                                      $http({
-                                        method: "PUT",
-                                        url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
-                                        params: param2,
-                                      }).then(function (resp) {
+              
+              })
 
-                                        // Kiểm tra biến kiểm soát trước khi gọi hàm
-                                        if (!isMailSent) {
-                                          $scope.sendBillToMail(bill.data.code);
-                                          isMailSent = true; // Đánh dấu là đã gửi email
-                                        }
-                                       
-                                      
-                                       
-                                      });
-                                    });
-                                  });
-                              }
-                            });
-                            
-                        });
+
+                  
+                       
                      });
                  } else if (document.getElementById("pay2").checked === true) {
                    //thanh toán qua vnpay
+                     // Biến để kiểm tra xem có sản phẩm nào số lượng không đủ không
+                     let quantityNotEnough = false;
                    //check số lượng còn hàng trước khi cho đặt hàng
                    $http
                      .get("http://localhost:8080/api/cart/"+IdCustomer)
                      .then(function (CheckCart) {
-                       for (let i = 0; i < CheckCart.data.length; i++) {
-                         //get số lượng sản phẩm đang có
-                         var getPram = {
-                           IdProduct: CheckCart.data[i].productDetail.id,
-                           IdColor: CheckCart.data[i].idColor,
-                           IdSize: CheckCart.data[i].idSize,
-                         };
+                  // Dùng Promise.all để chờ tất cả các request hoàn thành
+                  let promises = CheckCart.data.map((cartItem) => {
+                    // Lấy số lượng sản phẩm đang có
+                    var getPram = {
+                        IdProduct: cartItem.productDetail.id,
+                        IdColor: cartItem.idColor,
+                        IdSize: cartItem.idSize,
+                    };
+  
 
-                         $http({
-                           method: "GET",
-                           url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                           params: getPram,
-                         }).then(function (resp) {
-                           if (CheckCart.data[i].quantity > resp.data) {
-                             Swal.fire(
-                               "Số lượng sản phẩm " +
-                                 CheckCart.data[i].productDetail.product
-                                   .name +
-                                 " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
-                               "",
-                               "error"
-                             );
-                             // cập lại số lượng hiện có vào giỏ hàng
-                             $http
-                               .put(
-                                 "http://localhost:8080/api/cart/updateCart/" +
-                                   CheckCart.data[i].id,
-                                 {
-                                   idCart: idCart,
-                                   idProductDetail:
-                                     CheckCart.data[i].productDetail.id,
-                                   idColor: CheckCart.data[i].idColor,
-                                   idSize: CheckCart.data[i].idSize,
-                                   quantity: resp.data,
-                                   unitPrice: CheckCart.data[i].unitPrice,
-                                 }
-                               )
-                               .then(function (cart) {
-                                 if (cart.status === 200) {
-                                   //load lại sau khi tăng thành công !
-                                   $scope.loadCart();
-                                 }
-                               });
-                             return;
-                           }
-                           // nếu số lượng hết thì xóa khỏi giỏ hàng
-                           if (resp.data === 0) {
-                             Swal.fire(
-                               "Số lượng sản phẩm " +
-                                 CheckCart.data[i].productDetail.product
-                                   .name +
-                                 " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
-                               "",
-                               "success"
-                             );
-                             $http.delete(
-                               "http://localhost:8080/api/cart/" +
-                                 CheckCart.data[i].id
-                             );
-                             $scope.loadCart();
-                             return;
-                           }
+              // Trả về promise của request
+              return $http({
+                  method: "GET",
+                  url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                  params: getPram,
+              }).then(function (resp) {
+                  if (parseInt(resp.data) == 0) {
+                      // Nếu số lượng hết, cập nhật biến kiểm tra
+                      quantityNotEnough = true;
+                        Swal.fire(
+                          "Số lượng sản phẩm " +
+                          cartItem.productDetail.product.name +
+                            " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                          "",
+                          "warning",
+                        );
+                        $http.delete(
+                          "http://localhost:8080/api/cart/" +
+                          cartItem.id
+                        );
 
-                         });
-                       }
+                  } 
+                  else if(resp.data === ''){
+                    quantityNotEnough = true;
+                    $http.delete(
+                      "http://localhost:8080/api/cart/" +
+                      cartItem.id
+                    );
+                    Swal.fire(
+                        "Sản phẩm " +
+                        cartItem.productDetail.product.name +
+                        " không khả dụng ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                        "",
+                        "warning"
+                    );
+                  }
+                  else if (cartItem.quantity > parseInt(resp.data)) {
+                      // Nếu số lượng không đủ, cập nhật biến kiểm tra
+                      quantityNotEnough = true;
+                      Swal.fire(
+                          "Số lượng sản phẩm " +
+                          cartItem.productDetail.product.name +
+                          " không đủ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có!",
+                          "",
+                          "warning"
+                      );
+                      // Cập nhật số lượng hiện có vào giỏ hàng
+                      return $http
+                        .put(
+                          "http://localhost:8080/api/cart/updateCart/" +
+                          cartItem.id,
+                          {
+                            idCart: idCart,
+                            idProductDetail:
+                            cartItem.productDetail.id,
+                            idColor: cartItem.idColor,
+                            idSize: cartItem.idSize,
+                            quantity: resp.data,
+                            unitPrice: cartItem.unitPrice,
+                          }
+                        );
+
+                  }
+
+              });
+
+            });
+             // Sau khi tất cả các request hoàn thành
+          Promise.all(promises)
+          .then(() => {
+              // Nếu có sản phẩm nào số lượng không đủ, không thực hiện các bước tiếp theo
+              if (quantityNotEnough) {
+                $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cartL) {
+                          $rootScope.listCartIndex = cartL.data;
+                          $rootScope.tongTienIndex = 0;
+                          for (let i = 0; i < $rootScope.listCartIndex.length; i++) {
+                            $rootScope.tongTienIndex +=
+                              $rootScope.listCartIndex[i].unitPrice * $rootScope.listCartIndex[i].quantity;
+                          }
+                      })
+                location.href="#/cart"
+                  return;
+              }
+              $scope.checkTienTT = $scope.tienThanhToan - $scope.giamGia;
+              if($scope.checkTienTT > 20000000){
+                Swal.fire(
+                  "Vượt quá hạn mức thanh toán qua VNPay",
+                  "Tổng giá trị thanh toán đơn hàng của bạn qua VNPay đang vượt quá 20,000,000 VNĐ. Vui lòng giảm bớt số lượng sản phảm trong giỏ",
+                  "warning"
+              );
+              location.href="#/cart"
+              return;
+
+              }
+
+              // add bill
+              $http.post("http://localhost:8080/api/bill", {
+                totalPrice: TotalPrice,
+                shipPrice: ship.data.data.total,
+                totalPriceLast:
+                 $scope.giamGia,
+                note: document.getElementById("note").value,
+                payType: 1,
+                payStatus: 0,
+                idCoupon: 0,
+                idAddress: idAddress,
+                idCustomer: IdCustomer,
+                status: 0,
+                typeStatus : 0
+              })
+              .then(function (bill) {
+                $http.post('http://localhost:8080/api/billhistory',{
+                  createBy : null,
+                  note : null,
+                  status : 0,
+                  idBill : bill.data.id
+                });
+                $http
+                  .get("http://localhost:8080/api/cart/"+IdCustomer)
+                  .then(function (CartToBill) {
+                    for (
+                      let i = 0;
+                      i < CartToBill.data.length;
+                      i++
+                    ) {
+                      $http
+                        .post(
+                          "http://localhost:8080/api/bill/addBillDetail",
+                          {
+                            // add bill detail
+                            idBill: bill.data.id,
+                            idProductDetail:
+                              CartToBill.data[i].productDetail
+                                .id,
+                            idColor:
+                              CartToBill.data[i].idColor,
+                            idSize: CartToBill.data[i].idSize,
+                            quantity:
+                              CartToBill.data[i].quantity,
+                            unitPrice:
+                              CartToBill.data[i].unitPrice,
+                          }
+                        )
+                        .then(function (billdetail) {
+                          //xóa giỏ hàng by user
+                          $http.delete(
+                            "http://localhost:8080/api/cart/deleteAllCart/"+IdCustomer
+                          );
+
+                          //get số lượng sản phẩm đang có
+                          var getPram = {
+                            IdProduct:
+                              CartToBill.data[i].productDetail
+                                .id,
+                            IdColor:
+                              CartToBill.data[i].idColor,
+                            IdSize: CartToBill.data[i].idSize,
+                          };
+                          $http({
+                            method: "GET",
+                            url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                            params: getPram,
+                          }).then(function (resp) {
+                            var param2 = {
+                              IdProduct:
+                                CartToBill.data[i]
+                                  .productDetail.id,
+                              IdColor:
+                                CartToBill.data[i].idColor,
+                              IdSize:
+                                CartToBill.data[i].idSize,
+                              Quantity:
+                                parseInt(resp.data) -
+                                parseInt(
+                                  CartToBill.data[i].quantity
+                                ),
+                            };
+                            $http({
+                              method: "PUT",
+                              url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                              params: param2,
+                            }).then(function (resp) {
+                              let params = {
+                                totalPrice:
+                                  $scope.tienThanhToan - $scope.giamGia,
+                                code: bill.data.code,
+                              };
+                              $http({
+                                method: "GET",
+                                url: "http://localhost:8080/api/vnpay",
+                                params: params,
+                                transformResponse: [
+                                  function (data) {
+                                    location.href = data;
+                                  },
+                                ],
+                              });
+                            });
+                          });
+                        });
+                    }
+                  });
+              });
+
+              
+            })
+
                        
-                           // add bill
-                           $http.post("http://localhost:8080/api/bill", {
-                               totalPrice: TotalPrice,
-                               shipPrice: ship.data.data.total,
-                               totalPriceLast:
-                                $scope.giamGia,
-                               note: document.getElementById("note").value,
-                               payType: 1,
-                               payStatus: 0,
-                               idCoupon: 0,
-                               idAddress: idAddress,
-                               idCustomer: IdCustomer,
-                               status: 0,
-                               typeStatus : 0
-                             })
-                             .then(function (bill) {
-                               $http.post('http://localhost:8080/api/billhistory',{
-                                 createBy : null,
-                                 note : null,
-                                 status : 0,
-                                 idBill : bill.data.id
-                               });
-                               $http
-                                 .get("http://localhost:8080/api/cart/"+IdCustomer)
-                                 .then(function (CartToBill) {
-                                   for (
-                                     let i = 0;
-                                     i < CartToBill.data.length;
-                                     i++
-                                   ) {
-                                     $http
-                                       .post(
-                                         "http://localhost:8080/api/bill/addBillDetail",
-                                         {
-                                           // add bill detail
-                                           idBill: bill.data.id,
-                                           idProductDetail:
-                                             CartToBill.data[i].productDetail
-                                               .id,
-                                           idColor:
-                                             CartToBill.data[i].idColor,
-                                           idSize: CartToBill.data[i].idSize,
-                                           quantity:
-                                             CartToBill.data[i].quantity,
-                                           unitPrice:
-                                             CartToBill.data[i].unitPrice,
-                                         }
-                                       )
-                                       .then(function (billdetail) {
-                                         //xóa giỏ hàng by user
-                                         $http.delete(
-                                           "http://localhost:8080/api/cart/deleteAllCart/"+IdCustomer
-                                         );
-
-                                         //get số lượng sản phẩm đang có
-                                         var getPram = {
-                                           IdProduct:
-                                             CartToBill.data[i].productDetail
-                                               .id,
-                                           IdColor:
-                                             CartToBill.data[i].idColor,
-                                           IdSize: CartToBill.data[i].idSize,
-                                         };
-                                         $http({
-                                           method: "GET",
-                                           url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                                           params: getPram,
-                                         }).then(function (resp) {
-                                           var param2 = {
-                                             IdProduct:
-                                               CartToBill.data[i]
-                                                 .productDetail.id,
-                                             IdColor:
-                                               CartToBill.data[i].idColor,
-                                             IdSize:
-                                               CartToBill.data[i].idSize,
-                                             Quantity:
-                                               parseInt(resp.data) -
-                                               parseInt(
-                                                 CartToBill.data[i].quantity
-                                               ),
-                                           };
-                                           $http({
-                                             method: "PUT",
-                                             url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
-                                             params: param2,
-                                           }).then(function (resp) {
-                                             let params = {
-                                               totalPrice:
-                                                 $scope.tienThanhToan,
-                                               code: bill.data.code,
-                                             };
-                                             $http({
-                                               method: "GET",
-                                               url: "http://localhost:8080/api/vnpay",
-                                               params: params,
-                                               transformResponse: [
-                                                 function (data) {
-                                                   location.href = data;
-                                                 },
-                                               ],
-                                             });
-                                           });
-                                         });
-                                       });
-                                   }
-                                 });
-                             });
+                           
                      });
 
                  } else {
@@ -1385,26 +1477,10 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
             
             })
            
-            
-           
-           
           }
          
-          
-        
-        
            
           }
-         
-          
-          
-        
- 
-          
-          
-        
-       
-         
          
          
           
@@ -1413,8 +1489,6 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
         
       }
       
-    
-    
      
     })
     
@@ -1445,465 +1519,555 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
  
     
   }
-// đặt hàng
-  var params = {
-    service_type_id: 2,
-    insurance_value: parseInt($scope.tongTien1),
-    coupon: null,
-    from_district_id: 1482,
-    to_district_id: idHuyen,
-    to_ward_code: idXa,
-    height: 0,
-    length: 0,
-    weight: parseInt(TotalGam),
-    width: 0,
-  };
-  // get phí ship từ GHN
-  $http({
-    method: "GET",
-    url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
-    params: params,
-    headers: {
-      "Content-Type": undefined,
-      token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
-      shop_id: 4603004,
-    },
-  }).then(function (ship) {
-    $scope.phiShip = ship.data.data.total;
-    $scope.tienThanhToan = $scope.tongTien1 + ship.data.data.total;
 
-    // dat hang
-    $scope.buy1 = function () {
-      let tennguoimua = document.getElementById('tennguoimua1').value;
-      let sodienthoai = document.getElementById('sodienthoai1').value;
-      let diachicuthe = document.getElementById('diachicuthe1').value;
-      if(tennguoimua.trim().length  == 0){
-        Swal.fire("Tên người mua không được bỏ trống !","","error");
-        return;
-      }
-      if(sodienthoai.trim().length  == 0){
-        Swal.fire("Số điện thoại không được bỏ trống !","","error");
-        return;
-      }
-      if(diachicuthe.trim().length  == 0){
-        Swal.fire("Địa chỉ cụ thể không được bỏ trống !","","error");
-        return;
-      }
-      Swal.fire({
-        title: "Xác nhận đặt hàng ?",
-        showCancelButton: true,
-        confirmButtonText: "Đặt",
-      }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-         //  var typePay = document.getElementById("typePay").value;
-          //nếu chọn thanh toán tại nhà
-          if (document.getElementById("pay1").checked === true) {
-            //check số lượng còn hàng trước khi cho đặt hàng
-                for (let i = 0; i < $scope.listCart1.length; i++) {
+      // đặt hàng
+      var params = {
+        service_type_id: 2,
+        insurance_value: parseInt($scope.tongTien1),
+        coupon: null,
+        from_district_id: 1482,
+        to_district_id: idHuyen,
+        to_ward_code: idXa,
+        height: 0,
+        length: 0,
+        weight: parseInt(TotalGam),
+        width: 0,
+      };
+      // get phí ship từ GHN
+      $http({
+        method: "GET",
+        url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+        params: params,
+        headers: {
+          "Content-Type": undefined,
+          token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
+          shop_id: 4603004,
+        },
+      }).then(function (ship) {
+        $scope.phiShip = ship.data.data.total;
+        $scope.tienThanhToan = $scope.tongTien1 + ship.data.data.total;
+    
+        // dat hang
+        $scope.buy1 = function () {
+          const phoneNumberRegex = /^\d{10}$/;
+          let tennguoimua = document.getElementById('tennguoimua1').value;
+          let sodienthoai = document.getElementById('sodienthoai1').value;
+          let diachicuthe = document.getElementById('diachicuthe1').value;
+          if(tennguoimua.trim().length  == 0){
+            Swal.fire("Tên người nhận không được bỏ trống !","","error");
+            return;
+          }
+          if(tennguoimua.trim().length  > 50){
+            Swal.fire("Tên người nhận nhỏ hơn 50 kí tự !","","error");
+            return;
+          }
+          if(sodienthoai.trim().length  == 0){
+            Swal.fire("Số điện thoại không được bỏ trống !","","error");
+            return;
+          }
+          if (!phoneNumberRegex.test(sodienthoai.trim())) {
+            Swal.fire("Số điện thoại phải là số có 10 chữ số !","","error");
+            return;
+        }
+
+      
+          if(diachicuthe.trim().length  == 0){
+            Swal.fire("Địa chỉ cụ thể không được bỏ trống !","","error");
+            return;
+          }
+          if(diachicuthe.trim().length  > 100){
+            Swal.fire("Địa chỉ cụ thể nhỏ hơn 100 kí tự !","","error");
+            return;
+          }
+          Swal.fire({
+            title: "Xác nhận đặt hàng ?",
+            showCancelButton: true,
+            confirmButtonText: "Đặt",
+          }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+             //  var typePay = document.getElementById("typePay").value;
+              //nếu chọn thanh toán tại nhà
+              if (document.getElementById("pay1").checked === true) {
+                // Biến để kiểm tra xem có sản phẩm nào số lượng không đủ không
+    let quantityNotEnough = false;
+
+
+    // Dùng Promise.all để chờ tất cả các request hoàn thành
+    let promises = $scope.listCart1.map((cartItem) => {
+        // Lấy số lượng sản phẩm đang có
+        var getPram = {
+            IdProduct: cartItem.idProductDetail.id,
+            IdColor: cartItem.idColor,
+            IdSize: cartItem.idSize,
+        };
+        
+
+        // Trả về promise của request
+        return $http({
+            method: "GET",
+            url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+            params: getPram,
+        }).then(function (resp) {
+            if (parseInt(resp.data) == 0) {
+                // Nếu số lượng hết, cập nhật biến kiểm tra
+                quantityNotEnough = true;
+                var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+                CartService.removeFromCart(index);
+                Swal.fire(
+                    "Số lượng sản phẩm " +
+                    cartItem.idProductDetail.product.name +
+                    " đã hết! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                    "",
+                    "warning"
+                );
+
+            } 
+            else if(resp.data === ''){
+              quantityNotEnough = true;
+              var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+              CartService.removeFromCart(index);
+              Swal.fire(
+                  "Sản phẩm " +
+                  cartItem.idProductDetail.product.name +
+                  " không khả dụng ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                  "",
+                  "warning"
+              );
+            }
+            else if (cartItem.quantity > parseInt(resp.data)) {
+                // Nếu số lượng không đủ, cập nhật biến kiểm tra
+                quantityNotEnough = true;
+                Swal.fire(
+                    "Số lượng sản phẩm " +
+                    cartItem.idProductDetail.product.name +
+                    " không đủ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có!",
+                    "",
+                    "warning"
+                );
+                // Cập nhật số lượng hiện có vào giỏ hàng
+                return $http
+                    .get("http://localhost:8080/api/product/" + cartItem.idProductDetail.id)
+                    .then(function (response) {
+                        var unitPrice = 0;
+                        if (response.data.discount > 0) {
+                            unitPrice =
+                                response.data.price -
+                                response.data.price * (response.data.discount * 0.01);
+                        } else {
+                            unitPrice = response.data.price;
+                        }
+
+                        var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+                        var cartUpdate = {
+                            idProductDetail: cartItem.idProductDetail,
+                            idColor: cartItem.idColor,
+                            idSize: cartItem.idSize,
+                            quantity: parseInt(resp.data),
+                            unitPrice: unitPrice
+                        }
+                        CartService.updateCartItem(index, cartUpdate);
+                    });
+
+            }
+
+        });
+      
+    });
+
+    // Sau khi tất cả các request hoàn thành
+    Promise.all(promises)
+    .then(() => {
+        // Nếu có sản phẩm nào số lượng không đủ, không thực hiện các bước tiếp theo
+        if (quantityNotEnough) {
+          $scope.tongTien1 = 0;
+          for (let i = 0; i < $scope.listCart1.length; i++) {
+            $scope.tongTien1 +=
+              $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
+          }
+          $rootScope.tongTien1 = $scope.tongTien1;
+          $rootScope.tongTienIndex1 = $scope.tongTien1;
+          location.href="#/cart"
+            return;
+        }
+
+        let cityId = document.getElementById('tinh').value;
+        let districtId = document.getElementById('huyen').value;
+        let wardId = document.getElementById('xa').value;
+      // Get the select element by its id
+    const selectElement = document.getElementById('tinh');
+    
+    // Get the selected option's text content (ProvinceName)
+    const cityName = selectElement.options[selectElement.selectedIndex].textContent;
+      // Get the select element by its id
+      const selectElement1 = document.getElementById('huyen');
+    
+      // Get the selected option's text content (ProvinceName)
+      const districtName = selectElement1.options[selectElement1.selectedIndex].textContent;
+        // Get the select element by its id
+        const selectElement2 = document.getElementById('xa');
+    
+        // Get the selected option's text content (ProvinceName)
+        const wardName = selectElement2.options[selectElement2.selectedIndex].textContent;
+        $http.post('http://localhost:8080/api/address',{
+                      fullname : tennguoimua,
+                      phone : sodienthoai,
+                      address : diachicuthe,
+                      cityId : cityId,
+                      districtId : districtId,
+                      wardId : wardId,
+                      cityName : cityName,
+                      districtName : districtName,
+                      wardName : wardName,
+    
+    
+      }).then(function(resp){
+      // add bill
+      $http
+      .post("http://localhost:8080/api/bill", {
+        totalPrice: $scope.tongTien1,
+        shipPrice: ship.data.data.total,
+        totalPriceLast:
+         $scope.giamGia,
+        note: document.getElementById("note").value,
+        payType: 0,
+        payStatus: 0,
+        idCoupon: 0,
+        idAddress: resp.data.id,
+        idCustomer: -1,
+        status: 0,
+        typeStatus : 0
+      })
+      .then(function (bill) {
+        $http.post('http://localhost:8080/api/billhistory',{
+          createBy : null,
+          note : null,
+          status : 0,
+          idBill : bill.data.id
+        });
+            for (
+              let i = 0;
+              i < $scope.listCart1.length;
+              i++
+            ) {
+              $http
+                .post(
+                  "http://localhost:8080/api/bill/addBillDetail",
+                  {
+                    // add bill detail
+                    idBill: bill.data.id,
+                    idProductDetail:
+                    $scope.listCart1[i].idProductDetail
+                        .id,
+                    idColor:
+                    $scope.listCart1[i].idColor,
+                    idSize: $scope.listCart1[i].idSize,
+                    quantity:
+                    $scope.listCart1[i].quantity,
+                    unitPrice:
+                    $scope.listCart1[i].unitPrice,
+                  }
+                )
+                .then(function (billdetail) {
+                
+                
+
                   //get số lượng sản phẩm đang có
                   var getPram = {
-                    IdProduct: $scope.listCart1[i].idProductDetail.id,
-                    IdColor: $scope.listCart1[i].idColor,
+                    IdProduct:
+                    $scope.listCart1[i].idProductDetail
+                        .id,
+                    IdColor:
+                    $scope.listCart1[i].idColor,
                     IdSize: $scope.listCart1[i].idSize,
                   };
-
                   $http({
                     method: "GET",
                     url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
                     params: getPram,
                   }).then(function (resp) {
-                    if ($scope.listCart1[i].quantity > resp.data) {
-                      Swal.fire(
-                        "Số lượng sản phẩm " +
-                        $scope.listCart1[i].idProductDetail.product
-                            .name +
-                          " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
-                        "",
-                        "error"
-                      );
-                      // cập lại số lượng hiện có vào giỏ hàng
-                      $http
-                      .get("http://localhost:8080/api/product/" + $scope.listCart1[i].idProductDetail.id)
-                      .then(function (response) {
-                        var unitPrice = 0;
-                        if (response.data.discount > 0) {
-                          unitPrice =
-                            response.data.price -
-                            response.data.price * (response.data.discount * 0.01);
-                        } else {
-                          unitPrice = response.data.price;
-                        }
-                      var index = CartService.findItemIndexById($scope.listCart1[i].idProductDetail.id,$scope.listCart1[i].idColor,$scope.listCart1[i].idSize);
-      var cartUpdate = {
-        idProductDetail : $scope.listCart1[i].idProductDetail.id,
-        idColor : $scope.listCart1[i].idColor,
-        idSize : $scope.listCart1[i].idSize,
-        quantity: parseInt(resp.data),
-        unitPrice: unitPrice
-      }
-      CartService.updateCartItem(index, cartUpdate);
-       // Recalculate total price
-       $scope.tongTien1 = 0;
-       for (let i = 0; i < $scope.listCart1.length; i++) {
-         $scope.tongTien1 +=
-           $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-       }
-      })
-                      return;
-                    }
-                    // nếu số lượng hết thì xóa khỏi giỏ hàng
-                    if (resp.data === 0) {
-                      Swal.fire(
-                        "Số lượng sản phẩm " +
-                        $scope.listCart1[i].idProductDetail.product
-                            .name +
-                          " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
-                        "",
-                        "success"
-                      );
-                      var index = CartService.findItemIndexById($scope.listCart1[i].idProductDetail.id,$scope.listCart1[i].idColor,$scope.listCart1[i].idSize);
-                      CartService.removeFromCart(index);
-                      $scope.tongTien1 = 0;
-       for (let i = 0; i < $scope.listCart1.length; i++) {
-         $scope.tongTien1 +=
-           $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-       }
-                      return;
-                    }
-
-                   
+                    var param2 = {
+                      IdProduct:
+                      $scope.listCart1[i]
+                          .idProductDetail.id,
+                      IdColor:
+                      $scope.listCart1[i].idColor,
+                      IdSize:
+                      $scope.listCart1[i].idSize,
+                      Quantity:
+                        parseInt(resp.data) -
+                        parseInt(
+                          $scope.listCart1[i].quantity
+                        ),
+                    };
+                    $http({
+                      method: "PUT",
+                      url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                      params: param2,
+                    }).then(function (resp) {
+                  CartService.clearCart();
+                       Swal.fire(
+                         "Đặt hàng thành công !",
+                         "",
+                         "success"
+                       );
+                      $scope.listCartIndex1 = [];
+                       location.href = "#/cart";
+                    
+                     
+                    });
                   });
-                }
-              
-                let cityId = document.getElementById('tinh').value;
-                let districtId = document.getElementById('huyen').value;
-                let wardId = document.getElementById('xa').value;
-              // Get the select element by its id
-            const selectElement = document.getElementById('tinh');
-            
-            // Get the selected option's text content (ProvinceName)
-            const cityName = selectElement.options[selectElement.selectedIndex].textContent;
-              // Get the select element by its id
-              const selectElement1 = document.getElementById('huyen');
-            
-              // Get the selected option's text content (ProvinceName)
-              const districtName = selectElement1.options[selectElement1.selectedIndex].textContent;
-                // Get the select element by its id
-                const selectElement2 = document.getElementById('xa');
-            
-                // Get the selected option's text content (ProvinceName)
-                const wardName = selectElement2.options[selectElement2.selectedIndex].textContent;
-                $http.post('http://localhost:8080/api/address',{
-                              fullname : tennguoimua,
-                              phone : sodienthoai,
-                              address : diachicuthe,
-                              cityId : cityId,
-                              districtId : districtId,
-                              wardId : wardId,
-                              cityName : cityName,
-                              districtName : districtName,
-                              wardName : wardName,
-            
-            
-              }).then(function(resp){
-              // add bill
-              $http
-              .post("http://localhost:8080/api/bill", {
-                totalPrice: $scope.tongTien1,
-                shipPrice: ship.data.data.total,
-                totalPriceLast:
-                 $scope.giamGia,
-                note: document.getElementById("note").value,
-                payType: 0,
-                payStatus: 0,
-                idCoupon: 0,
-                idAddress: resp.data.id,
-                idCustomer: -1,
-                status: 0,
-                typeStatus : 0
-              })
-              .then(function (bill) {
-                $http.post('http://localhost:8080/api/billhistory',{
-                  createBy : null,
-                  note : null,
-                  status : 0,
-                  idBill : bill.data.id
                 });
-                    for (
-                      let i = 0;
-                      i < $scope.listCart1.length;
-                      i++
-                    ) {
-                      $http
-                        .post(
-                          "http://localhost:8080/api/bill/addBillDetail",
-                          {
-                            // add bill detail
-                            idBill: bill.data.id,
-                            idProductDetail:
-                            $scope.listCart1[i].idProductDetail
-                                .id,
-                            idColor:
-                            $scope.listCart1[i].idColor,
-                            idSize: $scope.listCart1[i].idSize,
-                            quantity:
-                            $scope.listCart1[i].quantity,
-                            unitPrice:
-                            $scope.listCart1[i].unitPrice,
-                          }
-                        )
-                        .then(function (billdetail) {
-                        
-                        
-
-                          //get số lượng sản phẩm đang có
-                          var getPram = {
-                            IdProduct:
-                            $scope.listCart1[i].idProductDetail
-                                .id,
-                            IdColor:
-                            $scope.listCart1[i].idColor,
-                            IdSize: $scope.listCart1[i].idSize,
-                          };
-                          $http({
-                            method: "GET",
-                            url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                            params: getPram,
-                          }).then(function (resp) {
-                            var param2 = {
-                              IdProduct:
-                              $scope.listCart1[i]
-                                  .idProductDetail.id,
-                              IdColor:
-                              $scope.listCart1[i].idColor,
-                              IdSize:
-                              $scope.listCart1[i].idSize,
-                              Quantity:
-                                parseInt(resp.data) -
-                                parseInt(
-                                  $scope.listCart1[i].quantity
-                                ),
-                            };
-                            $http({
-                              method: "PUT",
-                              url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
-                              params: param2,
-                            }).then(function (resp) {
-                          CartService.clearCart();
-                               Swal.fire(
-                                 "Đặt hàng thành công !",
-                                 "",
-                                 "success"
-                               );
-
-                               location.href = "#/cart";
-                            
-                             
-                            });
-                          });
-                        });
-                    }
-                  
-              });
-              })
-                 
-              
-          } else if (document.getElementById("pay2").checked === true) {
-            //thanh toán qua vnpay
-            //check số lượng còn hàng trước khi cho đặt hàng
-            for (let i = 0; i < $scope.listCart1.length; i++) {
-              //get số lượng sản phẩm đang có
-              var getPram = {
-                IdProduct: $scope.listCart1[i].idProductDetail.id,
-                IdColor: $scope.listCart1[i].idColor,
-                IdSize: $scope.listCart1[i].idSize,
-              };
-
-              $http({
-                method: "GET",
-                url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
-                params: getPram,
-              }).then(function (resp) {
-                if ($scope.listCart1[i].quantity > resp.data) {
-                  Swal.fire(
-                    "Số lượng sản phẩm " +
-                    $scope.listCart1[i].idProductDetail.product
-                        .name +
-                      " không đủ ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có !",
-                    "",
-                    "error"
-                  );
-                  // cập lại số lượng hiện có vào giỏ hàng
-                  $http
-                  .get("http://localhost:8080/api/product/" + $scope.listCart1[i].idProductDetail.id)
-                  .then(function (response) {
-                    var unitPrice = 0;
-                    if (response.data.discount > 0) {
-                      unitPrice =
-                        response.data.price -
-                        response.data.price * (response.data.discount * 0.01);
-                    } else {
-                      unitPrice = response.data.price;
-                    }
-                  var index = CartService.findItemIndexById($scope.listCart1[i].idProductDetail.id,$scope.listCart1[i].idColor,$scope.listCart1[i].idSize);
-  var cartUpdate = {
-    idProductDetail : $scope.listCart1[i].idProductDetail.id,
-    idColor : $scope.listCart1[i].idColor,
-    idSize : $scope.listCart1[i].idSize,
-    quantity: parseInt(resp.data),
-    unitPrice: unitPrice
-  }
-  CartService.updateCartItem(index, cartUpdate);
-   // Recalculate total price
-   $scope.tongTien1 = 0;
-   for (let i = 0; i < $scope.listCart1.length; i++) {
-     $scope.tongTien1 +=
-       $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-   }
-  })
-                  return;
-                }
-                // nếu số lượng hết thì xóa khỏi giỏ hàng
-                if (resp.data === 0) {
-                  Swal.fire(
-                    "Số lượng sản phẩm " +
-                    $scope.listCart1[i].idProductDetail.product
-                        .name +
-                      " đã hết ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
-                    "",
-                    "success"
-                  );
-                  var index = CartService.findItemIndexById($scope.listCart1[i].idProductDetail.id,$scope.listCart1[i].idColor,$scope.listCart1[i].idSize);
-                  CartService.removeFromCart(index);
-                  $scope.tongTien1 = 0;
-   for (let i = 0; i < $scope.listCart1.length; i++) {
-     $scope.tongTien1 +=
-       $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
-   }
-                  return;
-                }
-
-               
-              });
             }
-            let tennguoimua = document.getElementById('tennguoimua1').value;
-            let sodienthoai = document.getElementById('sodienthoai1').value;
-            let diachicuthe = document.getElementById('diachicuthe1').value;
-            let cityId = document.getElementById('tinh').value;
-            let districtId = document.getElementById('huyen').value;
-            let wardId = document.getElementById('xa').value;
-          // Get the select element by its id
-        const selectElement = document.getElementById('tinh');
-        
-        // Get the selected option's text content (ProvinceName)
-        const cityName = selectElement.options[selectElement.selectedIndex].textContent;
-          // Get the select element by its id
-          const selectElement1 = document.getElementById('huyen');
-        
-          // Get the selected option's text content (ProvinceName)
-          const districtName = selectElement1.options[selectElement1.selectedIndex].textContent;
-            // Get the select element by its id
-            const selectElement2 = document.getElementById('xa');
-        
-            // Get the selected option's text content (ProvinceName)
-            const wardName = selectElement2.options[selectElement2.selectedIndex].textContent;
-            $http.post('http://localhost:8080/api/address',{
-                          fullname : tennguoimua,
-                          phone : sodienthoai,
-                          address : diachicuthe,
-                          cityId : cityId,
-                          districtId : districtId,
-                          wardId : wardId,
-                          cityName : cityName,
-                          districtName : districtName,
-                          wardName : wardName,
-        
-        
-          }).then(function(resp){
- // add bill
- $http.post("http://localhost:8080/api/bill", {
-  totalPrice: $scope.tongTien1,
-  shipPrice: ship.data.data.total,
-  totalPriceLast:
-   $scope.giamGia,
-  note: document.getElementById("note").value,
-  payType: 1,
-  payStatus: 0,
-  idCoupon: 0,
-  idAddress: resp.data.id,
-  idCustomer: -1,
-  status: 0,
-  typeStatus : 0
-})
-.then(function (bill) {
-  $http.post('http://localhost:8080/api/billhistory',{
-    createBy : null,
-    note : null,
-    status : 0,
-    idBill : bill.data.id
-  });
-      for (
-        let i = 0;
-        i < $scope.listCart1.length;
-        i++
-      ) {
-        $http
-          .post(
-            "http://localhost:8080/api/bill/addBillDetail",
-            {
-              // add bill detail
-              idBill: bill.data.id,
-              idProductDetail:
-              $scope.listCart1[i].idProductDetail
-                  .id,
-              idColor:
-              $scope.listCart1[i].idColor,
-              idSize: $scope.listCart1[i].idSize,
-              quantity:
-              $scope.listCart1[i].quantity,
-              unitPrice:
-              $scope.listCart1[i].unitPrice,
-            }
-          )
-          .then(function (billdetail) {
           
-
-       
-                let params = {
-                  totalPrice:
-                    $scope.tienThanhToan,
-                  code: bill.data.code,
-                };
-                $http({
-                  method: "GET",
-                  url: "http://localhost:8080/api/vnpay",
-                  params: params,
-                  transformResponse: [
-                    function (data) {
-                      location.href = data;
-                    },
-                  ],
-               
-            });
-          });
-      }
-    
-});
-          })
-                
-                   
-              
-
-          } else {
-            Swal.fire("Có lỗi xảy ra !", "", "error");
-          }
-        }
       });
-    };
-  });
+      })
+
+      })
+            
+          
+                  
+                
+                     
+                  
+              } else if (document.getElementById("pay2").checked === true) {
+             
+                //thanh toán qua vnpay
+                let quantityNotEnough = false;
+
+
+                // Dùng Promise.all để chờ tất cả các request hoàn thành
+                let promises = $scope.listCart1.map((cartItem) => {
+                    // Lấy số lượng sản phẩm đang có
+                    var getPram = {
+                        IdProduct: cartItem.idProductDetail.id,
+                        IdColor: cartItem.idColor,
+                        IdSize: cartItem.idSize,
+                    };
+                    
+            
+                    // Trả về promise của request
+                    return $http({
+                        method: "GET",
+                        url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                        params: getPram,
+                    }).then(function (resp) {
+                        if (parseInt(resp.data) == 0) {
+                            // Nếu số lượng hết, cập nhật biến kiểm tra
+                            quantityNotEnough = true;
+                            var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+                            CartService.removeFromCart(index);
+                            Swal.fire(
+                                "Số lượng sản phẩm " +
+                                cartItem.idProductDetail.product.name +
+                                " đã hết! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                                "",
+                                "warning"
+                            );
+            
+                        } 
+                        else if(resp.data === ''){
+                          quantityNotEnough = true;
+                          var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+                          CartService.removeFromCart(index);
+                          Swal.fire(
+                              "Sản phẩm " +
+                              cartItem.idProductDetail.product.name +
+                              " không khả dụng ! Sản phẩm sẽ được xóa khỏi giỏ hàng",
+                              "",
+                              "warning"
+                          );
+                        }
+                        else if (cartItem.quantity > parseInt(resp.data)) {
+                            // Nếu số lượng không đủ, cập nhật biến kiểm tra
+                            quantityNotEnough = true;
+                            Swal.fire(
+                                "Số lượng sản phẩm " +
+                                cartItem.idProductDetail.product.name +
+                                " không đủ! Số lượng sản phẩm này trong giỏ hàng của bạn sẽ được cập nhật về số lượng hiện có!",
+                                "",
+                                "warning"
+                            );
+                            // Cập nhật số lượng hiện có vào giỏ hàng
+                            return $http
+                                .get("http://localhost:8080/api/product/" + cartItem.idProductDetail.id)
+                                .then(function (response) {
+                                    var unitPrice = 0;
+                                    if (response.data.discount > 0) {
+                                        unitPrice =
+                                            response.data.price -
+                                            response.data.price * (response.data.discount * 0.01);
+                                    } else {
+                                        unitPrice = response.data.price;
+                                    }
+            
+                                    var index = CartService.findItemIndexById(cartItem.idProductDetail.id, cartItem.idColor, cartItem.idSize);
+                                    var cartUpdate = {
+                                        idProductDetail: cartItem.idProductDetail,
+                                        idColor: cartItem.idColor,
+                                        idSize: cartItem.idSize,
+                                        quantity: parseInt(resp.data),
+                                        unitPrice: unitPrice
+                                    }
+                                    CartService.updateCartItem(index, cartUpdate);
+                                });
+            
+                        }
+            
+                    });
+                  
+                });
+            
+                // Sau khi tất cả các request hoàn thành
+                Promise.all(promises)
+                .then(() => {
+                    // Nếu có sản phẩm nào số lượng không đủ, không thực hiện các bước tiếp theo
+                    if (quantityNotEnough) {
+                      $scope.tongTien1 = 0;
+                      for (let i = 0; i < $scope.listCart1.length; i++) {
+                        $scope.tongTien1 +=
+                          $scope.listCart1[i].unitPrice * $scope.listCart1[i].quantity;
+                      }
+                      $rootScope.tongTien1 = $scope.tongTien1;
+                      $rootScope.tongTienIndex1 = $scope.tongTien1;
+                      location.href="#/cart"
+                        return;
+                    }
+                    $scope.checkTienTT = $scope.tienThanhToan - $scope.giamGia;
+                    if($scope.checkTienTT > 20000000){
+                      Swal.fire(
+                        "Vượt quá hạn mức thanh toán qua VNPay",
+                        "Tổng giá trị thanh toán đơn hàng của bạn qua VNPay đang vượt quá 20,000,000 VNĐ. Vui lòng giảm bớt số lượng sản phảm trong giỏ",
+                        "warning"
+                    );
+                    location.href="#/cart"
+                    return;
+      
+                    }
+
+                    let tennguoimua = document.getElementById('tennguoimua1').value;
+                    let sodienthoai = document.getElementById('sodienthoai1').value;
+                    let diachicuthe = document.getElementById('diachicuthe1').value;
+                    let cityId = document.getElementById('tinh').value;
+                    let districtId = document.getElementById('huyen').value;
+                    let wardId = document.getElementById('xa').value;
+                  // Get the select element by its id
+                const selectElement = document.getElementById('tinh');
+                
+                // Get the selected option's text content (ProvinceName)
+                const cityName = selectElement.options[selectElement.selectedIndex].textContent;
+                  // Get the select element by its id
+                  const selectElement1 = document.getElementById('huyen');
+                
+                  // Get the selected option's text content (ProvinceName)
+                  const districtName = selectElement1.options[selectElement1.selectedIndex].textContent;
+                    // Get the select element by its id
+                    const selectElement2 = document.getElementById('xa');
+                
+                    // Get the selected option's text content (ProvinceName)
+                    const wardName = selectElement2.options[selectElement2.selectedIndex].textContent;
+                    $http.post('http://localhost:8080/api/address',{
+                                  fullname : tennguoimua,
+                                  phone : sodienthoai,
+                                  address : diachicuthe,
+                                  cityId : cityId,
+                                  districtId : districtId,
+                                  wardId : wardId,
+                                  cityName : cityName,
+                                  districtName : districtName,
+                                  wardName : wardName,
+                
+                
+                  }).then(function(resp){
+         // add bill
+         $http.post("http://localhost:8080/api/bill", {
+          totalPrice: $scope.tongTien1,
+          shipPrice: ship.data.data.total,
+          totalPriceLast:
+           $scope.giamGia,
+          note: document.getElementById("note").value,
+          payType: 1,
+          payStatus: 0,
+          idCoupon: 0,
+          idAddress: resp.data.id,
+          idCustomer: -1,
+          status: 0,
+          typeStatus : 0
+        })
+        .then(function (bill) {
+          $http.post('http://localhost:8080/api/billhistory',{
+            createBy : null,
+            note : null,
+            status : 0,
+            idBill : bill.data.id
+          });
+              for (
+                let i = 0;
+                i < $scope.listCart1.length;
+                i++
+              ) {
+                $http
+                  .post(
+                    "http://localhost:8080/api/bill/addBillDetail",
+                    {
+                      // add bill detail
+                      idBill: bill.data.id,
+                      idProductDetail:
+                      $scope.listCart1[i].idProductDetail
+                          .id,
+                      idColor:
+                      $scope.listCart1[i].idColor,
+                      idSize: $scope.listCart1[i].idSize,
+                      quantity:
+                      $scope.listCart1[i].quantity,
+                      unitPrice:
+                      $scope.listCart1[i].unitPrice,
+                    }
+                  )
+                  .then(function (billdetail) {
+                  
+        
+               
+                        let params = {
+                          totalPrice:
+                            $scope.tienThanhToan,
+                          code: bill.data.code,
+                        };
+                        $http({
+                          method: "GET",
+                          url: "http://localhost:8080/api/vnpay",
+                          params: params,
+                          transformResponse: [
+                            function (data) {
+                              location.href = data;
+                            },
+                          ],
+                       
+                    });
+                  });
+              }
+            
+        });
+                  })
+                        
+                           
+                      
+
+
+                  })
+         
+    
+              } else {
+                Swal.fire("Có lỗi xảy ra !", "", "error");
+              }
+            }
+          });
+        };
+      });
 
     }
+
+
 
    
     $scope.sendBillToMail = function(code){
@@ -2104,7 +2268,7 @@ var year = currentDate.getFullYear();
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */

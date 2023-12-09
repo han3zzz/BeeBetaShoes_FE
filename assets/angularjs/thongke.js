@@ -40,8 +40,12 @@ $scope.ngay = {};
 
 
       if(document.getElementById('hoadon').checked == true){
+        document.getElementById("tkhd").style.display = "block";
+        document.getElementById("tksp").style.display = "none";
         $http.get("http://localhost:8080/api/bill/gettksoluonghd?tungay="+tungay+"&denngay="+denngay+"").then(function(resp){
             $scope.tkslhd = resp.data
+
+
                // Your date range
                document.getElementById('tksp').style.display = 'none';
    var startDate = new Date(tungay);
@@ -66,12 +70,116 @@ $scope.ngay = {};
    $scope.labels = dateArray.map(function (date) {
        return date.toLocaleDateString('en-GB'); // You can customize the date format
    });
-    $scope.data = [50, 80, 120, 40, 90,22,33,44,55,66,55,33,11,22,33];
     var columnData = $scope.tkslhd.map(function(item) {
-        return item["numberOfBills"];
+        return item["numberOfBillsStatus0"];
+    });
+    var columnData1 = $scope.tkslhd.map(function(item) {
+        return item["numberOfBillsStatus1"];
+    });
+    var columnData2 = $scope.tkslhd.map(function(item) {
+        return item["numberOfBillsStatus2"];
+    });
+    var columnDat3 = $scope.tkslhd.map(function(item) {
+        return item["numberOfBillsStatus3"];
+    });
+    var columnData4 = $scope.tkslhd.map(function(item) {
+        return item["numberOfBillsStatus4"];
     });
     destroyChart();
-    drawChart($scope.labels, columnData);
+       // Cấu hình dữ liệu cho biểu đồ Combo
+       var config = {
+        type: 'bar', // Loại biểu đồ cho số lượng đã bán
+        data: {
+            labels: $scope.labels,
+            datasets: [{
+                label: 'Số lượng chờ xác nhận',
+                data: columnData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: false
+                }
+            },
+            plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true,
+                        },
+                        pinch: {
+                            enabled: true
+                        },
+                        mode: 'xy',
+                    }
+                }
+            },
+            tooltips: {
+                callbacks: {
+                    label: function(context) {
+                        return 'Số lượng: ' + context.parsed.y;
+                    }
+                }
+            }
+        }
+    };
+
+    // Lấy thẻ canvas và vẽ biểu đồ số lượng đã bán
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myComboChart = new Chart(ctx, config);
+
+    // Thêm dữ liệu doanh thu vào biểu đồ Combo
+    config.type = 'line'; // Chuyển sang loại đồ thị đường
+    config.data.datasets.push({
+        label: 'Số lượng chờ giao hàng',
+        data: columnData1,
+        backgroundColor : 'rgba(159, 0, 207,1)',
+        borderColor: 'rgba(159, 0, 207, 1)',
+        borderWidth: 2,
+        fill: false 
+    });
+      // Thêm dữ liệu doanh thu vào biểu đồ Combo
+      config.type = 'line'; // Chuyển sang loại đồ thị đường
+      config.data.datasets.push({
+          label: 'Số lượng đang giao hàng',
+          data: columnData2,
+          backgroundColor : 'rgba(24, 138, 229, 1)',
+          borderColor: 'rgba(24, 138, 229, 1)',
+          borderWidth: 2,
+          fill: false // Không tô màu dưới đường doanh thu
+      });
+      // Thêm dữ liệu doanh thu vào biểu đồ Combo
+      config.type = 'line'; // Chuyển sang loại đồ thị đường
+      config.data.datasets.push({
+          label: 'Số lượng đã giao hàng',
+          data: columnDat3,
+          backgroundColor : 'rgba(206, 189, 20, 1)',
+          borderColor: 'rgba(206, 189, 20, 1)',
+          borderWidth: 2,
+          fill: false
+      });
+
+      // Thêm dữ liệu doanh thu vào biểu đồ Combo
+      config.type = 'line'; // Chuyển sang loại đồ thị đường
+      config.data.datasets.push({
+          label: 'Số lượng đã hủy',
+          data: columnData4,
+          backgroundColor : 'rgba(255, 0, 20, 1)',
+          borderColor: 'rgba(255, 0, 20, 1)',
+          borderWidth: 2,
+          fill: false
+      });
+    // Vẽ lại biểu đồ với dữ liệu mới
+    myComboChart.update();
+    // drawChart($scope.labels, columnData);
+    $http.get("http://localhost:8080/api/bill/gettksoluonghdstatus?tungay="+tungay+"&denngay="+denngay +"").then(function(tkhd){
+        $scope.hdstatus = tkhd.data;
+        console.log($scope.hdstatus);
+    })
 
 
         })
@@ -79,6 +187,7 @@ $scope.ngay = {};
         $http.get("http://localhost:8080/api/bill/gettksoluongsp?tungay="+tungay+"&denngay="+denngay+"").then(function(resp) {
             $scope.tkslhd1 = resp.data;
         document.getElementById('tksp').style.display = 'block';
+        document.getElementById('tkhd').style.display = 'none';
             // Your date range
             var startDate = new Date(tungay);
             var endDate = new Date(denngay);
@@ -237,6 +346,7 @@ function drawChart(labels, columnData) {
     });
    
 }
+// document.getElementById("tkhd").style.display = 'block';
 // Lấy ngày hôm nay
 var endDate = moment();
 
@@ -273,32 +383,42 @@ var dateArray = getDates(startDate, endDate);
 $scope.labels = dateArray.map(function (date) {
 return date.toLocaleDateString('en-GB'); // You can customize the date format
 });
-$scope.data = [50, 80, 120, 40, 90,22,33,44,55,66,55,33,11,22,33];
 var columnData = $scope.tkslhd.map(function(item) {
-return item["numberOfBills"];
+    return item["numberOfBillsStatus0"];
 });
-
- // Chart.js configuration
- var ctx = document.getElementById('myChart').getContext('2d');
- var myChart = new Chart(ctx, {
-     type: 'bar',
-     data: {
-         labels: $scope.labels,
-         datasets: [{
-             label: 'Số lượng hóa đơn',
-             data: columnData,
-             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-             borderColor: 'rgba(75, 192, 192, 1)',
-             borderWidth: 1
-         }]
-     },
-     options: {
-         scales: {
-             y: {
-                 beginAtZero: true
-             }
-         },
-         plugins: {
+var columnData1 = $scope.tkslhd.map(function(item) {
+    return item["numberOfBillsStatus1"];
+});
+var columnData2 = $scope.tkslhd.map(function(item) {
+    return item["numberOfBillsStatus2"];
+});
+var columnDat3 = $scope.tkslhd.map(function(item) {
+    return item["numberOfBillsStatus3"];
+});
+var columnData4 = $scope.tkslhd.map(function(item) {
+    return item["numberOfBillsStatus4"];
+});
+destroyChart();
+   // Cấu hình dữ liệu cho biểu đồ Combo
+   var config = {
+    type: 'bar', // Loại biểu đồ cho số lượng đã bán
+    data: {
+        labels: $scope.labels,
+        datasets: [{
+            label: 'Số lượng chờ xác nhận',
+            data: columnData,
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        },
+        plugins: {
             zoom: {
                 zoom: {
                     wheel: {
@@ -310,9 +430,68 @@ return item["numberOfBills"];
                     mode: 'xy',
                 }
             }
+        },
+        tooltips: {
+            callbacks: {
+                label: function(context) {
+                    return 'Số lượng: ' + context.parsed.y;
+                }
+            }
         }
-     }
- });
+    }
+};
+
+// Lấy thẻ canvas và vẽ biểu đồ số lượng đã bán
+var ctx = document.getElementById('myChart').getContext('2d');
+var myComboChart = new Chart(ctx, config);
+
+// Thêm dữ liệu doanh thu vào biểu đồ Combo
+config.type = 'line'; // Chuyển sang loại đồ thị đường
+config.data.datasets.push({
+    label: 'Số lượng chờ giao hàng',
+    data: columnData1,
+    backgroundColor : 'rgba(159, 0, 207,1)',
+    borderColor: 'rgba(159, 0, 207, 1)',
+    borderWidth: 2,
+    fill: false 
+});
+  // Thêm dữ liệu doanh thu vào biểu đồ Combo
+  config.type = 'line'; // Chuyển sang loại đồ thị đường
+  config.data.datasets.push({
+      label: 'Số lượng đang giao hàng',
+      data: columnData2,
+      backgroundColor : 'rgba(24, 138, 229, 1)',
+      borderColor: 'rgba(24, 138, 229, 1)',
+      borderWidth: 2,
+      fill: false // Không tô màu dưới đường doanh thu
+  });
+  // Thêm dữ liệu doanh thu vào biểu đồ Combo
+  config.type = 'line'; // Chuyển sang loại đồ thị đường
+  config.data.datasets.push({
+      label: 'Số lượng đã giao hàng',
+      data: columnDat3,
+      backgroundColor : 'rgba(206, 189, 20, 1)',
+      borderColor: 'rgba(206, 189, 20, 1)',
+      borderWidth: 2,
+      fill: false
+  });
+
+  // Thêm dữ liệu doanh thu vào biểu đồ Combo
+  config.type = 'line'; // Chuyển sang loại đồ thị đường
+  config.data.datasets.push({
+      label: 'Số lượng đã hủy',
+      data: columnData4,
+      backgroundColor : 'rgba(255, 0, 20, 1)',
+      borderColor: 'rgba(255, 0, 20, 1)',
+      borderWidth: 2,
+      fill: false
+  });
+// Vẽ lại biểu đồ với dữ liệu mới
+myComboChart.update();
+// drawChart($scope.labels, columnData);
+$http.get("http://localhost:8080/api/bill/gettksoluonghdstatus?tungay="+startDate+"&denngay="+endDate +"").then(function(tkhd){
+    $scope.hdstatus = tkhd.data;
+})
 
 })
 

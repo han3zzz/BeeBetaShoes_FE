@@ -415,7 +415,7 @@ window.ProductController = function ($http, $scope, $routeParams, $location) {
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */

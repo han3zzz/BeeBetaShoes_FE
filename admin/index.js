@@ -247,6 +247,17 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "banner/index.html",
            controller : BannerController
         })
+        .when("/news",{
+            templateUrl: "news/index.html",
+            controller : TinTucController
+        })
+        .when("/news/add",{
+            templateUrl: "news/add.html",
+            controller : TinTucController
+        }).when("/news/update/:key",{
+            templateUrl: "news/update.html",
+            controller : TinTucController
+        })
 
 
 
@@ -257,6 +268,44 @@ app.config(function ($routeProvider, $locationProvider) {
         });
 
 });
+app.directive('ckEditor', function() {
+    return {
+        require: '?ngModel',
+        link: function(scope, element, attrs, ngModel) {
+            var editor = CKEDITOR.replace(element[0], {
+                extraPlugins: 'image',
+                filebrowserImageUploadUrl: 'https://api.cloudinary.com/v1_1/dmatlhayn/image/upload?upload_preset=ml_default', // Thay YOUR_CLOUD_NAME và YOUR_UPLOAD_PRESET bằng thông tin của bạn
+                cloudinary_api_key: '886659291316774', // Thay YOUR_API_KEY bằng API key của bạn
+            });
+
+            if (!ngModel) return;
+
+            editor.on('change', function() {
+                scope.$apply(function() {
+                    ngModel.$setViewValue(editor.getData());
+                });
+            });
+            
+
+            ngModel.$render = function() {
+                editor.setData(ngModel.$viewValue);
+            };
+        }
+    };
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.factory('AuthInterceptor', function ($location,AuthService) {
     return {
         request: function (config) {

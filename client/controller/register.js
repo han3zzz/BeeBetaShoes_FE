@@ -22,6 +22,9 @@ $scope.register = function(){
         if (err.status === 400){
             $scope.validationErrors = err.data;
         }
+        else{
+            Swal.fire("Tài khoản đã tồn tại !","","error");   
+    }
        
     })
 }

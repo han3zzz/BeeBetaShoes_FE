@@ -15,12 +15,21 @@
                     <div class="product-single">
                         <div class="row">
                             <div class="col-lg-6 col-md-6 col-sm-12 col-12">
-                                <div id="slideshow">
+                                
+                                <!-- <div id="slideshow">
                                     <div class="slide-wrapper">
                                       <div class="slide" ng-repeat="img in sp.product.productImages">
                                         <img style="height: 350px; width: 500px;" src="{{img.url}}"></div>
                         
                                     </div>
+                                  </div> -->
+                                  <span ng-repeat="img in sp.product.productImages" ng-if="img.mainImage === true">
+                                    <img style="height: 350px; width: 500px;" src="{{img.url}}">
+                                  </span>
+                                  <div style="padding-left: 60px;padding-top: 10px;padding-bottom: 10px;">
+                                    <span ng-repeat="img in sp.product.productImages" ng-if="img.mainImage === false" style="padding-left: 10px;">
+                                        <img ng-click="openModal(img.url)" style="height: 70px; width: 70px; border: 2px solid black;" src="{{img.url}}">
+                                      </span>
                                   </div>
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-12 col-12">
@@ -107,7 +116,7 @@
                                             <div class="wrapQtyBtn">
                                                 <div class="qtyField">
                                                     <a class="qtyBtn minus" ng-click="giam()"><i class="fa anm anm-minus-r" aria-hidden="true"></i></a>
-                                                    <input type="text" id="Quantity" name="quantity" value="1" class="product-form__input qty">
+                                                    <input style="width: 50px;" type="text" id="Quantity" name="quantity" value="1" class="product-form__input qty">
                                                     <a class="qtyBtn plus" ng-click="tang()"><i class="fa anm anm-plus-r" aria-hidden="true"></i></a>
                                                 </div>
                                             </div>
@@ -327,7 +336,9 @@
                                                     <div class="spr-review-header">
                                             
                 
-                                                        <span class="spr-review-header-byline"><strong>{{rate.customer.username}}</strong> đã đánh giá  <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><span ng-repeat="star in [].constructor(rate.score) track by $index">
+                                                        <span class="spr-review-header-byline">
+                                                            <img style="width: 30px;height: 30px;border-radius: 10px;" src="{{rate.customer.image}}">
+                                                            <strong>{{rate.customer.username}}</strong> đã đánh giá  <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><span ng-repeat="star in [].constructor(rate.score) track by $index">
                                                             <i class="fa fa-star"></i>
                                                           </span></span></span> vào ngày <strong>{{rate.createDate | date:'dd-MM-yyyy'}}</strong></span>
                                                     </div>

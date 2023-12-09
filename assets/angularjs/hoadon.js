@@ -142,7 +142,7 @@ $http.get(urlsize).then(function (response) {
                  
                   $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(resp){
                     $scope.bill = resp.data;
-                    $scope.cus = {};
+                    $scope.cus = null;
                     if($scope.bill.idCustomer != ""){
                       $http.get("http://localhost:8080/api/customer/"+$scope.bill.idCustomer).then(function(cus){
                         $scope.cus = cus.data;

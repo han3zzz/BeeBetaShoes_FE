@@ -119,7 +119,8 @@
       <h4>Thông Tin Giao Hàng</h4>
       <div>
         <div>
-          Khách hàng <button style="border: none;"><i class="fa-solid fa-circle-plus"></i></button>
+          Khách hàng
+          <!-- Khách hàng <button style="border: none;"><i class="fa-solid fa-circle-plus"></i></button> -->
           <select class="haninput" ng-click="chondiachi()" id="khachhang" >
             <option value="0">Khách lẻ</option>
             <option  ng-repeat="kh in listCustomer" value="{{kh.id}}">{{kh.fullname}} ({{kh.code}})</option>
@@ -258,10 +259,12 @@
              
           </div>
       </div>
-        <div>Tổng tiền : <input style="width: 250px;" class="input-group-text" value="{{tongTien}}"></div>
-        <div id="muaonline1" style="display: none;">Phí ship : <input style="width: 250px;" class="input-group-text" value="{{phiShip}}"></div>
-        <div>Giảm giá : <input value="{{giamGia}}" style="width: 250px;" class="input-group-text"></div>
-        <div>Tổng tiền cần thanh toán : <input style="width: 250px;" class="input-group-text" value="{{tienThanhToan}}"></div>
+        <div>Tổng tiền : <input style="width: 250px;" class="input-group-text" value="{{tongTien}}" disabled></div>
+        <div id="muaonline1" style="display: none;">Phí ship : <input style="width: 250px;" class="input-group-text" value="{{phiShip}}" disabled></div>
+        <div>Giảm giá : <input value="{{giamGia}}" style="width: 250px;" class="input-group-text" disabled></div>
+        <div>Tổng tiền cần thanh toán : <input style="width: 250px;" class="input-group-text" value="{{tienThanhToan}}" disabled></div>
+        <!-- <div>Tiền khách đưa : <input style="width: 250px;" class="input-group-text" value="{{tienThanhToan}}"></div>
+        <div>Tiền thừa : <input style="width: 250px;" class="input-group-text" value="{{tienThanhToan}}"></div> -->
        
       <div style="padding-top: 10px;">
         <button ng-click="huyhoadon(hoadon.code)" class="btn btn-dark"><i class="fa-solid fa-ban"></i> Hủy</button>

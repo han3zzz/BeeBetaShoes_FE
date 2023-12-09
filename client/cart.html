@@ -68,7 +68,7 @@
                                         <div class="cart__qty text-center">
                                             <div class="qtyField">
                                                 <a class="qtyBtn minus" ng-click="giam(cart.id,cart.productDetail.id,cart.idColor,cart.idSize)"><i class="icon icon-minus"></i></a>
-                                                <input ng-keyup="EnterQuantity(cart.id,cart.productDetail.id,cart.idColor,cart.idSize)" class="cart__qty-input qty" type="text" name="updates[]" id="qty{{cart.id}}" value="{{cart.quantity}}" pattern="[0-9]*">
+                                                <input style="width: 50px;" ng-keyup="EnterQuantity(cart.id,cart.productDetail.id,cart.idColor,cart.idSize)" class="cart__qty-input qty" type="text" name="updates[]" id="qty{{cart.id}}" value="{{cart.quantity}}" pattern="[0-9]*">
                                                 <a class="qtyBtn plus"  ng-click="tang(cart.id,cart.productDetail.id,cart.idColor,cart.idSize)"><i class="icon icon-plus"></i></a>
                                             </div>
                                         </div>
@@ -178,7 +178,7 @@
                                         <div class="cart__qty text-center">
                                             <div class="qtyField">
                                                 <a class="qtyBtn minus" ng-click="giam1(cart.idProductDetail.id,cart.idColor,cart.idSize)"><i class="icon icon-minus"></i></a>
-                                                <input ng-keyup="EnterQuantity1(cart.idProductDetail.id,cart.idColor,cart.idSize)" class="cart__qty-input qty" type="text" name="updates[]" id="qty1{{cart.idProductDetail.id}}color{{cart.idColor}}size{{cart.idSize}}" value="{{cart.quantity}}" pattern="[0-9]*">
+                                                <input style="width: 50px;" ng-keyup="EnterQuantity1(cart.idProductDetail.id,cart.idColor,cart.idSize)" class="cart__qty-input qty" type="text" name="updates[]" id="qty1{{cart.idProductDetail.id}}color{{cart.idColor}}size{{cart.idSize}}" value="{{cart.quantity}}" pattern="[0-9]*">
                                                 <a class="qtyBtn plus"  ng-click="tang1(cart.idProductDetail.id,cart.idColor,cart.idSize)"><i class="icon icon-plus"></i></a>
                                             </div>
                                         </div>

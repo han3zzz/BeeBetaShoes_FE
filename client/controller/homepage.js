@@ -1,4 +1,4 @@
-window.HomeController = function ($http, $scope, $routeParams, $location,$rootScope,AuthService) {
+window.HomeController = function ($http, $scope, $routeParams, $location,$rootScope,AuthService,$sce) {
  
   $scope.loadProductNew = function () {
     let url = "http://localhost:8080/api/product";
@@ -184,6 +184,131 @@ document.getElementById("slide-wrapperhan").style.animation = `slidehan ${number
   
   };
 
+  $scope.loadNew = function(){
+    $scope.listNews = [];
+    $scope.listN = [];
+    $http.get("https://beebetanews-default-rtdb.firebaseio.com/news.json").then(function(resp){
+        $scope.listNews = resp.data;
+  
+        for (let key in resp.data) {
+            if (resp.data.hasOwnProperty(key)) {
+                const value = resp.data[key];
+            
+        
+                var obj = {
+                    key: key,
+                    value: value
+                };
+        
+                $scope.listN.push(obj);
+                
+            }
+        }
+       // Chuyển đổi thời gian thành timestamp
+$scope.listN.forEach(function(item) {
+  item.value.timestamp = new Date(item.value.time).getTime();
+});
+
+// Sắp xếp theo timestamp
+$scope.listN.sort(function(a, b) {
+  return b.value.timestamp - a.value.timestamp;
+});
+  // pagation
+  $scope.pagerNew1 = {
+    page: 0,
+    size: 4,
+    get items() {
+      var start = this.page * this.size;
+      return $scope.listN.slice(start, start + this.size);
+    },
+    get count() {
+      return Math.ceil((1.0 * $scope.listN.length) / this.size);
+    },
+
+    first() {
+      this.page = 0;
+    },
+    prev() {
+      this.page--;
+      if (this.page < 0) {
+        this.last();
+      }
+    },
+    next() {
+      this.page++;
+      if (this.page >= this.count) {
+        this.first();
+      }
+    },
+    last() {
+      this.page = this.count - 1;
+    }
+
+
+    
+    
+
+    
+    
+  };
+
+        
+                
+      
+    })
+    $scope.detailNew = function(){
+      var key = $routeParams.key;
+      $http.get("https://beebetanews-default-rtdb.firebaseio.com/news/"+key+".json").then(function(resp){
+          $scope.form = resp.data;
+        // Tin tưởng nội dung HTML trước khi hiển thị
+    $scope.trustedHtml = $sce.trustAsHtml($scope.form.content);
+         
+      
+      })
+    }
+
+     // pagation
+     $scope.pagerNew = {
+      page: 0,
+      size: 8,
+      get items() {
+        var start = this.page * this.size;
+        return $scope.listN.slice(start, start + this.size);
+      },
+      get count() {
+        return Math.ceil((1.0 * $scope.listN.length) / this.size);
+      },
+  
+      first() {
+        this.page = 0;
+      },
+      prev() {
+        this.page--;
+        if (this.page < 0) {
+          this.last();
+        }
+      },
+      next() {
+        this.page++;
+        if (this.page >= this.count) {
+          this.first();
+        }
+      },
+      last() {
+        this.page = this.count - 1;
+      }
+
+
+      
+      
+
+      
+      
+    };
+  }
+
+  $scope.loadNew();
+
   $scope.loadProductNew();
   $scope.colorid = [];
   //load product new
@@ -260,11 +385,17 @@ document.getElementById("slide-wrapperhan").style.animation = `slidehan ${number
       last() {
         this.page = this.count - 1;
       }
+
+
+      
       
 
       
       
     };
+
+
+      
   
 
   
@@ -406,7 +537,7 @@ document.getElementById("slide-wrapperhan").style.animation = `slidehan ${number
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */

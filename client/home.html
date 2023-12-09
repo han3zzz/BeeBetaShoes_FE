@@ -347,6 +347,82 @@
 	   </div>
 	</div>	
 	<!--End Featured Product-->
+	<div class="product-rows section">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 col-sm-12 col-md-12 col-lg-12">
+					<div class="section-header text-center">
+						<h2 class="h2">Tin Tức Mới</h2>
+					</div>
+				</div>
+			</div>
+			<div class="grid-products">
+				<div class="row">
+					<div ng-repeat="new in pagerNew1.items" class="col-6 col-sm-6 col-md-3 col-lg-3 item grid-view-item style2">
+						<div class="grid-view_image">
+							<!-- start product image -->
+							<a href="#/news/{{new.key}}" class="grid-view-item__link">
+								<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{new.value.image}}" alt="{{new.value.title}}" title="{{new.value.title}}">
+								<!-- End image -->
+								<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{new.value.image}}" alt="{{new.value.title}}" title="{{new.value.title}}">
+									<!-- End image -->
+										
+								
+									<!-- product label -->
+					
+								<!-- End product label -->
+							</a>
+							<!-- end product image -->
+							<!--start product details -->
+							<div class="product-details hoverDetails text-center mobile">
+							
+								
+								<!-- product button -->
+								<div class="button-set">
+									
+									<div class="btn">
+										<a href="#/news/{{new.key}}">
+											Đọc ngay
+										</a>
+									</div>
+									
+								</div>
+								<!-- end product button -->
+							</div>
+								<!-- product name -->
+								<div class="product-name">
+									<a href="#/news/{{new.key}}"><h3>{{new.value.title}}</h3></a>
+								</div>
+								<!-- <div>
+									{{new.value.time | date:'HH:mm:ss  dd/MM/yyyy' }}
+								</div> -->
+								<!-- End product name -->
+								<!-- product price -->
+								
+								<!-- <div class="product-review">
+									<i class="font-13 fa fa-star"></i>
+									<i class="font-13 fa fa-star"></i>
+									<i class="font-13 fa fa-star"></i>
+									<i class="font-13 fa fa-star-o"></i>
+									<i class="font-13 fa fa-star-o"></i>
+								</div> -->
+								<!-- End product price -->
+							<!-- Variant -->
+							<!-- <ul class="swatches text-center" ng-repeat="img in sp.product.productImages">
+								<li class="swatch medium rounded"><img style="height: 50px;" src="{{img.url}}" alt="image" /></li>
+	
+							</ul> -->
+							<!-- End Variant -->
+							<!-- End product details -->
+						</div>
+					</div>
+				</div>
+			</div>
+	   </div>
+	   <div style="text-align: center;">
+		<button class="btn"><a style="color: white;text-decoration: none;" href="#/news">Đọc nhiều hơn</a></button>
+	   </div>
+	</div>
 	
 	
 	<!--Store Feature-->
@@ -362,8 +438,8 @@
 						</li>
 						  <li class="display-table-cell">
 							<i class="icon anm anm-dollar-sign-r"></i>
-							<h5>Miễn Phí Đổi Trả</h5>
-							<span class="sub-text">Đổi trả miễn phí trong vòng 7 ngày.</span>
+							<h5>Miễn Phí Đổi Hàng</h5>
+							<span class="sub-text">Đổi hàng miễn phí trong vòng 7 ngày.</span>
 						  </li>
 						  <li class="display-table-cell">
 							<i class="icon anm anm-comments-l"></i>

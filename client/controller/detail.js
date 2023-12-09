@@ -108,6 +108,7 @@ $scope.change = function(){
         }
       });
 }
+
 $scope.openModal = function(imageUrl) {
   var modal = document.getElementById("myModal");
     var modalImg = document.getElementById("modalImg");
@@ -418,7 +419,7 @@ $scope.deleteImage = function(index) {
               $http.get("http://localhost:8080/api/cart/getCartByCustomer/"+ IdCustomer).then(function(idd){
                 
                 let idCart = idd.data.id;
-                console.log(idCart);
+              
                   //get cart by user
               $scope.listCart = [];
               $http.get("http://localhost:8080/api/cart/"+ IdCustomer).then(function (cart) {
@@ -724,7 +725,7 @@ $scope.deleteImage = function(index) {
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */

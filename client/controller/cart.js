@@ -488,6 +488,7 @@ $scope.EnterQuantity1 = function (
         "",
         "error"
       );
+      document.getElementById("qty1" + idProductDetail + "color" + idColor + "size" + idSize).value = resp.data
     } else {
       //get đơn giá ở thời điểm hiện tại
       $http
@@ -688,7 +689,7 @@ $scope.checkCheckOut = function(){
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */

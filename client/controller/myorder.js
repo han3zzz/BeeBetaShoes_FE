@@ -448,7 +448,7 @@ $http.get(urlsize).then(function (response) {
         }
       });
     }
-    minicart_dropdown();
+    // minicart_dropdown();
     /*-----------------------------------------
 	  6. Login Dropdown ---------------------
 	  ------------------------------------------ */
