@@ -200,10 +200,11 @@ $scope.deleteImage = function(index) {
                 "http://localhost:8080/api/product/category?id=" +
                   response.data.category.id + "&idBrand=" +response.data.brand.id + "&idDesign=" +response.data.design.id
                   + "&idToe=" +response.data.toe.id + "&idSole=" +response.data.sole.id
-                  + "&idShoelace=" +response.data.shoelace.id + "&idHeelcushion=" +response.data.heelcushion.id
+                  + "&idShoelace=" +response.data.shoelace.id + "&idHeelcushion=" +response.data.heelcushion.id + "&idProduct=" +id
               )
               .then(function (e) {
                 $scope.listCungLoai = e.data;
+            
                 // pagation
                 $scope.pagerCungLoai = {
                   page: 0,

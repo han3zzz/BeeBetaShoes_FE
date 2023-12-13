@@ -37,7 +37,7 @@
                         <td class="text-center"><h3>{{hd.purchaseDate | date:'dd-MM-yyyy' }}</h3></td>
                         <td class="text-center"><h3>{{hd.totalPrice + hd.shipPrice - hd.totalPriceLast | currency:'':0}} VNĐ</h3></td>
                         <td class="text-center"><h3>{{hd.payType == 0 ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua VN Pay'}}</h3></td>
-                        <td class="text-center" ng-if="hd.status != 4"><h3>{{hd.payStatus == 1 ? 'Đã thanh toán' : 'Chưa thanh toán'}}</h3></td>
+                        <td class="text-center" ng-if="hd.status != 4"><h3>{{hd.payStatus == 0 ? 'Chưa thanh toán' : 'Đã thanh toán'}}</h3></td>
                         <td class="text-center" ng-if="hd.status == 4"><h3>Đã hủy</h3></td>
                         <td>
                             <button ng-if="hd.status == 0 && hd.payType == 1 && hd.payStatus == 0" class="btn btn-dark" ng-click="thanhtoan(hd.code,hd.totalPrice + hd.shipPrice - hd.totalPriceLast)"><i class="fa-solid fa-credit-card"></i> Thanh toán</button>
