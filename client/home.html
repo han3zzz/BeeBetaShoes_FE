@@ -138,12 +138,12 @@
 										<span ng-repeat="image in sp.product.productImages">
 											<span ng-if="image.mainImage == true">
 												<!-- image -->
-										<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="product">
+										<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="{{sp.product.name}}">
 										<!-- End image -->
 											</span>
 											<span ng-if="image.mainImage == false">
 											<!-- Hover image -->
-										<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{sp.product.productImages[0].url}}" alt="image" title="product">
+										<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{sp.product.productImages[0].url}}" alt="image" title="{{sp.product.name}}">
 										<!-- End hover image -->
 											</span>
 										</span>
@@ -153,12 +153,12 @@
 
 										   
 												<!-- image -->
-										<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="product">
+										<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="{{sp.product.name}}">
 										<!-- End image -->
 											
 											
 											<!-- Hover image -->
-										<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{image.url}}" alt="image" title="product">
+										<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{image.url}}" alt="image" title="{{sp.product.name}}">
 										<!-- End hover image -->
 										   
 										</span>
@@ -253,12 +253,12 @@
 									<span ng-repeat="image in sp.product.productImages">
 										<span ng-if="image.mainImage == true">
 											<!-- image -->
-									<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="product">
+									<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="{{sp.product.name}}">
 									<!-- End image -->
 										</span>
 										<span ng-if="image.mainImage == false">
 										<!-- Hover image -->
-									<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{sp.product.productImages[0].url}}" alt="image" title="product">
+									<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{sp.product.productImages[0].url}}" alt="image" title="{{sp.product.name}}">
 									<!-- End hover image -->
 										</span>
 									</span>
@@ -268,12 +268,12 @@
 
 									   
 											<!-- image -->
-									<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="product">
+									<img style="height: 300px;" class="grid-view-item__image primary blur-up lazyload"  src="{{image.url}}" alt="Ảnh sản phẩm" title="{{sp.product.name}}">
 									<!-- End image -->
 										
 										
 										<!-- Hover image -->
-									<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{image.url}}" alt="image" title="product">
+									<img style="height: 300px;" class="grid-view-item__image hover blur-up lazyload"  src="{{image.url}}" alt="image" title="{{sp.product.name}}">
 									<!-- End hover image -->
 									   
 									</span>

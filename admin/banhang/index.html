@@ -86,13 +86,13 @@
                       <br>
                   </div>
               </td>
-              <td class="text-center">
+              <td class="text-center" style="font-size: 12px;">
                 {{cart.productDetail.price | currency:'':0}} VNĐ
               </td>
               <td class="cart__update-wrapper cart-flex-item text-center">
                 <button style="background-color: black; color: white;" ng-click="giam(cart.id)"><i class="fa-solid fa-minus"></i></button> <input id="quantity{{cart.id}}" class="text-center"  style="width: 50px;" type="text" value="{{cart.quantity}}" disabled> <button  style="background-color: black; color: white;" ng-click="tang(cart.id)"><i class="fa-solid fa-plus"></i></button>
               </td>
-              <td>
+              <td style="font-size: 12px;">
                 {{cart.productDetail.price * cart.quantity | currency:'':0}} VNĐ
               </td>
               <td><button ng-click="deleteBillDetail(cart.id)" class="btn btn-dark"><i class="fa-solid fa-trash"></i></button></td>

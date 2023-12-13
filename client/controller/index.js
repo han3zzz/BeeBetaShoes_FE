@@ -104,6 +104,14 @@ app.config(function ($routeProvider, $locationProvider,$httpProvider) {
         });
 
 });
+app.config(['$httpProvider', function($httpProvider) {
+  // Mở rộng các header CORS chỉ trong môi trường phát triển
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      $httpProvider.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+      $httpProvider.defaults.headers.common['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE';
+      $httpProvider.defaults.headers.common['Access-Control-Allow-Headers'] = 'Content-Type';
+  }
+}]);
 
 
 app.factory('AuthInterceptor', function ($location,AuthService,$rootScope) {

@@ -130,6 +130,9 @@ $scope.deleteImage = function(index) {
           .get("http://localhost:8080/api/product/" + id)
           .then(function (response) {
             $scope.sp = response.data;
+            if($scope.sp.status === 1){
+              location.href = "#/404";
+            }
                // pagation
            $scope.pagerRating = {
             page: 0,

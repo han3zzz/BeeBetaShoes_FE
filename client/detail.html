@@ -14,7 +14,7 @@
                     <!--product-single-->
                     <div class="product-single">
                         <div class="row">
-                            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                            <div class="col-lg-5 col-md-5 col-sm-12 col-12">
                                 
                                 <!-- <div id="slideshow">
                                     <div class="slide-wrapper">
@@ -24,7 +24,7 @@
                                     </div>
                                   </div> -->
                                   <span ng-repeat="img in sp.product.productImages" ng-if="img.mainImage === true">
-                                    <img style="height: 350px; width: 500px;" src="{{img.url}}">
+                                    <img style="height: 400px; width: 500px;" src="{{img.url}}">
                                   </span>
                                   <div style="padding-left: 60px;padding-top: 10px;padding-bottom: 10px;">
                                     <span ng-repeat="img in sp.product.productImages" ng-if="img.mainImage === false" style="padding-left: 10px;">
@@ -32,7 +32,7 @@
                                       </span>
                                   </div>
                             </div>
-                            <div class="col-lg-6 col-md-6 col-sm-12 col-12">
+                            <div class="col-lg-7 col-md-7 col-sm-12 col-12">
                                 <div class="product-single__meta">
                                     <h1 class="product-single__title">{{sp.product.name}}</h1>
                                     
@@ -487,5 +487,5 @@
           <!-- Modal -->
   <div id="myModal" class="modal">
     <span class="close" onclick="closeModal()">&times;</span>
-    <img style="width: 500px;height: 350px;" class="modal-content" id="modalImg">
+    <img style="width: 500px;height: 450px;" class="modal-content" id="modalImg">
   </div>

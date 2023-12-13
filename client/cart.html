@@ -10,7 +10,7 @@
     
     <div class="container">
         <div class="row" ng-if="user != null">
-            <div class="col-12 col-sm-12 col-md-8 col-lg-8 main-col">
+            <div class="col-12 col-sm-12 col-md-9 col-lg-9 main-col">
                
                     <table class="table">
                         <thead class="cart__row cart__header">
@@ -101,12 +101,13 @@
                 
                              
                </div>
-            <div class="col-12 col-sm-12 col-md-4 col-lg-4 cart__footer">
+            <div class="col-12 col-sm-12 col-md-3 col-lg-3 cart__footer">
               
                 <div class="solid-border">
                   <div class="row">
-                      <span class="col-12 col-sm-6 cart__subtotal-title"><strong>Tổng Tiền Tạm Tính :</strong></span>
-                    <span class="col-12 col-sm-6 cart__subtotal-title cart__subtotal text-right"><span class="money">{{tongTien | currency:'':0}} VNĐ</span></span>
+                      <span class="col-12 col-sm-12 cart__subtotal-title"><strong>Tổng Tiền Tạm Tính</strong></span>
+                      <br>
+                    <span class="col-12 col-sm-12 cart__subtotal-title cart__subtotal"><span class="money">{{tongTien | currency:'':0}} VNĐ</span></span>
                   </div>
                   <div class="cart__shipping">Phí ship sẽ được cập nhật trong phần thanh toán</div>
                   
@@ -166,7 +167,7 @@
                                         </span><br>
                                     </div>
                                 </td>
-                                <td class="text-center"><span ng-if="cart.idProductDetail.discount > 0">
+                                <td class="text-center" ><span ng-if="cart.idProductDetail.discount > 0">
                                     {{cart.idProductDetail.price - (cart.idProductDetail.price * (cart.idProductDetail.discount * 0.01)) | currency:'':0}} VNĐ
                                 </span>
                                 <span ng-if="cart.idProductDetail.discount == 0">
