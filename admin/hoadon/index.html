@@ -13,11 +13,15 @@
   <label for="radioButton5">Đã giao hàng ({{dagiaohang}})</label>
   <input type="radio" id="radioButton6" name="radioGroup" ng-click="loc(4)">
   <label for="radioButton6">Đã hủy ({{dahuy}})</label>
-  <input type="radio" id="radioButton7" name="radioGroup" ng-click="loc(5)">
-  <label for="radioButton7">Đổi trả ({{doitra}})</label>
+  <!-- <input type="radio" id="radioButton7" name="radioGroup" ng-click="loc(5)">
+  <label for="radioButton7">Đổi trả ({{doitra}})</label> -->
 </div>
 <!-- <div class="timkiem"><input class="input-group-text" id="name" type="text" placeholder="Tìm theo mã.."><button class="btn btn-dark" ng-click="search()"><i class="fa-solid fa-magnifying-glass"></i></button></div> -->
 <div class="row">
+  <div class="col-md-12" style="display: inline-flex;">
+    <input id="timkiem" type="text" placeholder="Tìm theo mã hóa đơn" class="haninput">
+    <button ng-click="search()" style="margin-left: 10px;" class="btn btn-dark">Tìm kiếm</button>
+  </div>
  <div class="col-md-5">
   <label>Hình thức thanh toán</label>
   <select class="haninput" id="httt" ng-click="filter()">

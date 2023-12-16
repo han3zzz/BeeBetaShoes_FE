@@ -5,7 +5,7 @@
 <button ng-if="bill.status == 3" style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Giao Hàng</button>
 <button ng-if="bill.status == 4" style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Hủy</button> -->
 <div class="timeline">
-    <div class="timeline-item" ng-repeat="billhis in billhistory" ng-if="billhis.status != 10 && billhis.status != 11 && billhis.status != 12 && billhis.status != 13">
+    <div class="timeline-item" ng-repeat="billhis in billhistory" ng-if="billhis.status != 10 && billhis.status != 11 && billhis.status != 12 && billhis.status != 13 && billhis.status != 14">
       <div class="timeline-content">
         <center><div>
           <div class="timeline-icon" ng-if="billhis.status == 0" >  <i class="fa-regular fa-file-lines"></i></div>
@@ -14,6 +14,8 @@
           <div class="timeline-icon" ng-if="billhis.status == 3">   <i class="fa-solid fa-hand-holding"></i></div>
           <div class="timeline-icon1" ng-if="billhis.status == 4">   <i class="fa-solid fa-ban"></i></div>
           <div class="timeline-icon2" ng-if="billhis.status == 5">     <i class="fa-solid fa-right-left"></i></div>
+          <div class="timeline-icon2" ng-if="billhis.status == 6">    <i class="fa-solid fa-calendar-check"></i></div>
+          <div class="timeline-icon1" ng-if="billhis.status == 7">    <i class="fa-solid fa-ban"></i></div>
         
        
         
@@ -28,6 +30,8 @@
         <h2 ng-if="billhis.status == 3">Đã giao hàng</h2>
         <h2 ng-if="billhis.status == 4">Đã hủy</h2>
         <h2 ng-if="billhis.status == 5">Đổi hàng</h2>
+        <h2 ng-if="billhis.status == 6">Hẹn giao lại</h2>
+        <h2 ng-if="billhis.status == 7">Không nhận hàng</h2>
         <p>{{billhis.createDate | date:'HH:mm  dd/MM/yyyy' }}</p>
       </div>
     </div>
@@ -49,6 +53,8 @@
   <div style="margin-top: 10px;">
     <button class="btn btn-dark" ng-click="check(bill.code,bill.id)" ng-if="bill.status == 0 || bill.status == 1 || bill.status == 2"><i class="fa-solid fa-check"></i> {{bill.status == 0 ? 'Xác nhận đơn hàng' : bill.status == 1 ? 'Xác nhận đang giao hàng' : bill.status == 2 ? 'Xác nhận đã giao hàng' : ''}}</button>
     <button class="btn btn-dark" ng-click="huy(bill.code,bill.id)" ng-if="bill.status == 0 || bill.status == 1"><i class="fa-solid fa-ban"></i> Hủy đơn</button>
+    <button ng-if="bill.status == 2" ng-click="hengiao(bill.code,bill.id)" class="btn btn-dark" ng-click="chitiet(bill.code)"><i class="fa-solid fa-calendar-check"></i> Khách hẹn giao lại</button>
+    <button ng-if="bill.status == 2" class="btn btn-dark" ng-click="khongnhan(bill.code,bill.id)"><i class="fa-solid fa-ban"></i> Khách không nhận hàng</button>
     <button class="btn btn-dark" ng-click="chitiet(bill.code)"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử đơn hàng</button>
     <button ng-if="bill.status == 5" class="btn btn-dark" ng-click="chitiet(bill.code)"><i class="fa-solid fa-clock-rotate-left"></i> Lịch sử đổi hàng</button>
   </div>
@@ -69,6 +75,8 @@
     <h6 ng-if="bill.typeStatus != 1">Thông tin giao hàng : {{address.fullname}} - {{address.phone}} 
         ( {{address.address}}, {{address.wardName}}, {{address.districtName}}, {{address.cityName}} )   
        <h6>Ghi chú : {{bill.note === '' ? 'Không có' : bill.note}}</h6>
+       <h6>Phí giao hàng : {{bill.shipPrice | currency:'':0}} VNĐ</h6>
+       <h6>Giảm giá : {{bill.totalPriceLast | currency:'':0}} VNĐ</h6>
     <!-- <h6>Hình thức thanh toán : <span class="button-bill">{{bill.payType == 0 ? 'Tiền mặt' : 'VNPAY'}}</span></h6>
     <h6>Trạng thái thanh toán :  <span class="button-bill" ng-if="bill.payStatus == 1">Đã thanh toán</span>
         <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span></h6> -->
@@ -102,6 +110,7 @@
     <div>
       <button ng-if="bill.status == 0 || bill.status == 1" ng-click="togglePopup()" class="btn btn-dark"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</button>
     <button ng-if="(bill.status == 0 && bill.typeStatus != 1) || (bill.status == 1 && bill.typeStatus != 1)" ng-click="updateAddress(bill.code)" class="btn btn-dark"><i class="fa-solid fa-pen-to-square"></i> Cập nhật thông tin giao hàng</button>
+    <button ng-if="(bill.status == 0 && bill.typeStatus != 1) || (bill.status == 1 && bill.typeStatus != 1)" ng-click="updateFee(bill.code,bill.id)" class="btn btn-dark"><i class="fa-solid fa-money-bill-wave"></i> Cập nhật phí giao hàng</button>
     </div>
 <table class="table">
     <thead class="cart__row cart__header">
@@ -152,7 +161,7 @@
                 <td class="text-center">
                     {{cart.unitPrice * cart.quantity | currency:'':0}} VNĐ
                 </td>
-                <td ng-if="bill.status == 0 || bill.status == 1"><button style="border: none;color: red;" ng-click="deleteBillDetail(cart.id,bill.id)"><i class="fa-solid fa-trash-can"></i></button></td>
+                <td ng-if="bill.status == 0 || bill.status == 1"><button style="border: none;color: red;" ng-click="deleteBillDetail(cart.id,bill.id,bill.code)"><i class="fa-solid fa-trash-can"></i></button></td>
                 <!-- <td ng-if="bill.status == 3"><button ng-click="doihang(cart.productDetail.id)" class="button-bill2"><i class="fa-solid fa-right-left"></i> Đổi hàng</button></td> -->
 
         </tr>
@@ -180,12 +189,12 @@
             <td style="max-width: 200px; overflow-wrap: break-word;">Ghi chú</td>
             <td>Người cập nhật</td>
         </tr>
-        <tr ng-if="bill.status == 3 && bill.payStatus == 1">
+        <!-- <tr ng-if="bill.status == 3 && bill.payStatus == 1">
           <td><span class="button-bill"><i class="fa-solid fa-circle-check"></i> Hoàn thành</span></td>
             <td></td>
             <td style="max-width: 200px; overflow-wrap: break-word;">Đơn hàng hoàn tất</td>
             <td></td>
-        </tr>
+        </tr> -->
         <tr ng-repeat="bi in listbillhistory">
             <td> <span class="button-bill" ng-if="bi.status == 0"><i class="fa-regular fa-file-lines"></i> Tạo đơn hàng</span>
                 <span class="button-bill" ng-if="bi.status == 1"><i class="fa-regular fa-calendar-check"></i> Đã xác nhận</span>
@@ -197,6 +206,11 @@
                 <span class="button-bill4" ng-if="bi.status == 11"><i class="fa-solid fa-map-location"></i> Cập nhật địa chỉ</span>
                 <span class="button-bill2" ng-if="bi.status == 12"><i class="fa-solid fa-trash-can"></i> Xóa sản phẩm</span>
                 <span class="button-bill1" ng-if="bi.status == 13"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</span>
+                <span class="button-bill6" ng-if="bi.status == 6"><i class="fa-solid fa-calendar-check"></i> Hẹn giao lại</span>
+                <span class="button-bill2" ng-if="bi.status == 7"><i class="fa-solid fa-ban"></i> Không nhận hàng</span>
+                <span class="button-bill6" ng-if="bi.status == 14"><i class="fa-solid fa-money-bill-wave"></i> Cập nhật phí giao hàng</span>
+              
+        
                 </td>
             <td>{{bi.createDate | date:'HH:mm  dd/MM/yyyy' }}</td>
             <td style="max-width: 200px; overflow-wrap: break-word;">{{bi.note}}</td>
@@ -484,7 +498,7 @@
       <button class="btn btn-primary" ng-click="doihang()">Đóng</button>
     </div>
   </div>
-  <!-- exportbill -->
+ <!-- exportbill -->
 <div style="display: none;">
   <section id="exportbill" style="width: 1000px; height: auto; background: #f4f4f4; padding: 50px 60px; position: relative; margin: 20px auto; box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);font-family: Tahoma;">
     <div class="header">
@@ -605,3 +619,5 @@
     </div>
   </section>
 </div>
+
+    

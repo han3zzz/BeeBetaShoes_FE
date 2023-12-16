@@ -79,6 +79,26 @@ $http.get(urlsize).then(function (response) {
    
 
   };
+//   $scope.customFilter = function(item) {
+//     if (!$scope.hoadon && !$scope.ngaymua) {
+//         return true; // Hiển thị tất cả nếu không có điều kiện
+//     }
+
+//     var matchHoadon = (!$scope.hoadon) || (item.code.indexOf($scope.hoadon) !== -1);
+
+//     if ($scope.ngaymua) {
+//         // Chuyển đổi ngày mua từ ngày nhập của người dùng (ví dụ: '2023-01-01')
+//         // thành định dạng ngày mà purchaseDate sử dụng
+//         console.log(item.purchaseDate)
+//         var formattedNgaymua = $filter('date')($scope.ngaymua, "yyyy-MM-dd HH:mm:ss.sss Z");
+
+//         var matchNgaymua = (item.purchaseDate.indexOf(formattedNgaymua) !== -1);
+//     } else {
+//         var matchNgaymua = true; // Không có điều kiện về ngày mua
+//     }
+
+//     return matchHoadon && matchNgaymua;
+// };
   $scope.countTT = function(){
     //count all
   $scope.countall = [];

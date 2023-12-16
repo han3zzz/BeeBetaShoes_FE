@@ -11,13 +11,18 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-sm-12 col-md-12 col-lg-12 main-col">
-                <button ng-click="getStatus(null)" style="padding-right: 15px;" class="btn btn-dark">Tất cả ({{countall}})</button>
-               <button ng-click="getStatus(0)" style="padding-right: 15px;" class="btn btn-dark">Chờ xác nhận ({{choxacnhan}})</button>
-               <button ng-click="getStatus(1)" style="padding-right: 15px;" class="btn btn-dark">Chờ lấy hàng ({{chogiaohang}})</button>
-               <button ng-click="getStatus(2)" style="padding-right: 15px;" class="btn btn-dark">Đang giao hàng ({{danggiaohang}})</button>
-               <button ng-click="getStatus(3)" style="padding-right: 15px;" class="btn btn-dark">Đã giao hàng ({{dagiaohang}})</button>
-               <button ng-click="getStatus(4)" style="padding-right: 15px;" class="btn btn-dark">Đã hủy ({{dahuy}})</button>
-               <button ng-click="getStatus(5)" style="padding-right: 15px;" class="btn btn-dark">Hoàn trả ({{hoantra}})</button>
+                <button ng-click="getStatus(null)" style="padding-right: 15px; background-color: rgb(72, 7, 133);" class="btn">Tất cả ({{countall}})</button>
+               <button ng-click="getStatus(0)" style="padding-right: 15px;background-color: rgb(186, 67, 25);" class="btn">Chờ xác nhận ({{choxacnhan}})</button>
+               <button ng-click="getStatus(1)" style="padding-right: 15px;background-color: rgb(0, 127, 127);" class="btn">Chờ lấy hàng ({{chogiaohang}})</button>
+               <button ng-click="getStatus(2)" style="padding-right: 15px;background-color: rgb(0, 65, 139);" class="btn">Đang giao hàng ({{danggiaohang}})</button>
+               <button ng-click="getStatus(3)" style="padding-right: 15px; background-color: darkgreen;" class="btn">Đã giao hàng ({{dagiaohang}})</button>
+               <button ng-click="getStatus(4)" style="padding-right: 15px;background-color: brown;" class="btn">Đã hủy ({{dahuy}})</button>
+               <!-- <button ng-click="getStatus(5)" style="padding-right: 15px;" class="btn">Hoàn trả ({{hoantra}})</button> -->
+                <div style="margin-top: 10px;" ng-model="search">
+                    <input style="width: 400px;" placeholder="Nhập mã hóa đơn..." ng-model="hoadon">
+                    <!-- Ngày mua
+                    <input style="width: 400px;" type="date" ng-model="ngaymua"> -->
+                </div>
                <table class="table" style="margin-top: 10px;">
                 <thead class="cart__row cart__header">
                     <tr>
@@ -27,11 +32,11 @@
                         <td class="text-center"><h3>Tổng Tiền</h3></td>
                         <td class="text-center"><h3>Phương Thức Thanh Toán</h3></td>
                         <td class="text-center"><h3>Trạng Thái Thanh Toán</h3></td>
-                        <td class="text-center"><h3>Hành Động</h3></td>
+                        <td colspan="2" class="text-center"><h3>Hành Động</h3></td>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-if="list.length > 0" ng-repeat="hd in pager.items">
+                    <tr ng-if="list.length > 0" ng-repeat="hd in pager.items | filter: { code : hoadon}">
                         <td colspan="2" class="text-center"><h3>{{$index + 1}}</h3></td>
                         <td class="text-center"><h3>{{hd.code}}</h3></td>
                         <td class="text-center"><h3>{{hd.purchaseDate | date:'dd-MM-yyyy' }}</h3></td>
@@ -39,7 +44,7 @@
                         <td class="text-center"><h3>{{hd.payType == 0 ? 'Thanh toán khi nhận hàng' : 'Thanh toán qua VN Pay'}}</h3></td>
                         <td class="text-center" ng-if="hd.status != 4"><h3>{{hd.payStatus == 0 ? 'Chưa thanh toán' : 'Đã thanh toán'}}</h3></td>
                         <td class="text-center" ng-if="hd.status == 4"><h3>Đã hủy</h3></td>
-                        <td>
+                        <td colspan="2">
                             <button ng-if="hd.status == 0 && hd.payType == 1 && hd.payStatus == 0" class="btn btn-dark" ng-click="thanhtoan(hd.code,hd.totalPrice + hd.shipPrice - hd.totalPriceLast)"><i class="fa-solid fa-credit-card"></i> Thanh toán</button>
                             <button ng-click="togglePopup(hd.code)" class="btn btn-dark"><i class="fa-solid fa-circle-info"></i> Xem chi tiết</button>
                             <button ng-if="hd.status == 0 || hd.status == 1" class="btn btn-dark" ng-click="huy(hd.code)"><i class="fa-solid fa-ban"></i> Hủy</button>
@@ -192,13 +197,16 @@
             <td> <span class="button-bill" ng-if="bi.status == 0"><i class="fa-regular fa-file-lines"></i> Tạo đơn hàng</span>
                 <span class="button-bill" ng-if="bi.status == 1"><i class="fa-regular fa-calendar-check"></i> Đã xác nhận</span>
                 <span class="button-bill" ng-if="bi.status == 2"><i class="fa-solid fa-truck-fast"></i> Đang giao hàng</span>
-                <span class="button-bill" ng-if="bi.status == 3"><i class="fa-solid fa-circle-check"></i> Hoàn thành</span>
+                <span class="button-bill" ng-if="bi.status == 3"><i class="fa-solid fa-circle-check"></i> Đã giao hàng</span>
                 <span class="button-bill" ng-if="bi.status == 4"><i class="fa-solid fa-ban"></i> Đã hủy</span>
                 <span class="button-bill" ng-if="bi.status == 5"><i class="fa-solid fa-right-left"></i> Đổi trả</span>
                 <span class="button-bill5" ng-if="bi.status == 10"><i class="fa-solid fa-file-invoice-dollar"></i> Xác nhận thanh toán</span>
                 <span class="button-bill4" ng-if="bi.status == 11"><i class="fa-solid fa-map-location"></i> Cập nhật địa chỉ</span>
                 <span class="button-bill2" ng-if="bi.status == 12"><i class="fa-solid fa-trash-can"></i> Xóa sản phẩm</span>
                 <span class="button-bill1" ng-if="bi.status == 13"><i class="fa-solid fa-circle-plus"></i> Thêm sản phẩm</span>
+                <span class="button-bill6" ng-if="bi.status == 6"><i class="fa-solid fa-calendar-check"></i> Hẹn giao lại</span>
+                <span class="button-bill2" ng-if="bi.status == 7"><i class="fa-solid fa-ban"></i> Không nhận hàng</span>
+                <span class="button-bill6" ng-if="bi.status == 14"><i class="fa-solid fa-money-bill-wave"></i> Cập nhật phí giao hàng</span>
                 </td>
             <td>{{bi.createDate | date:'HH:mm  dd/MM/yyyy' }}</td>
             <td style="max-width: 200px; overflow-wrap: break-word;">{{bi.note}}</td>

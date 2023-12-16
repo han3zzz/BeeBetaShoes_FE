@@ -1,5 +1,13 @@
 window.HoaDonController = function($scope, $http, $location,$routeParams,$rootScope,$timeout){
+  $(document).ready(function() {
+    // Đặt thuộc tính checked cho radio button với ID là 'pay1'
+    $("#radioButton1").prop("checked", true);
+    // Hoặc có thể sử dụng
+    // $("#pay1").attr("checked", "checked");
+});
     $scope.list = [];
+    
+    
     $http.get("http://localhost:8080/api/bill/getall").then(function(rest){
         $scope.list = rest.data;
         $scope.tatca = rest.data.length;
@@ -41,6 +49,20 @@ $http.get(urlsize).then(function (response) {
    $scope.listPro = response.data;
  });
 
+ $scope.search = function(){
+  let text = document.getElementById("timkiem").value;
+  if(text.length === 0){
+    Swal.fire("Không được bỏ trống !","","warning");
+    return;
+  }
+  $scope.list = [];
+  
+  $http.get("http://localhost:8080/api/bill/getbycode/"+ text).then(function(rest){
+
+    $scope.list.push(rest.data);
+})
+ }
+
  $scope.loc = function(status){
   $scope.list = [];
   if(status ===null){
@@ -53,6 +75,7 @@ $http.get(urlsize).then(function (response) {
       $scope.list = rest.data;
   });
   }
+
    
        // pagation
        $scope.pager = {
@@ -232,6 +255,103 @@ $http.get(urlsize).then(function (response) {
         
                   }
 
+                  $scope.hengiao = function(code,id){
+                    Swal.fire({
+                      title: "Xác nhận khách hàng hẹn giao lại đơn hàng " +code +" ?",
+                      inputLabel : 'Ghi chú',
+                      input: 'textarea',
+                      inputPlaceholder: 'Lý do hẹn giao lại',
+                      showCancelButton: true,
+                      confirmButtonText: "Xác nhận",        
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      $http.post('http://localhost:8080/api/billhistory',{
+                        createBy : $rootScope.user.username,
+                        note : result.value,
+                        status : 6,
+                        idBill : id
+                      }).then(function(resp){
+                       
+                        $http.put("http://localhost:8080/api/bill/updatestatusbill",{
+                          code : code,
+                          status : 2
+                        }).then(function(re){
+                          Swal.fire("Xác nhận thành công !","","success");
+                          $scope.sendBillToMail(code,"được xác nhận hẹn giao lại");
+                            $scope.getBill();
+                        
+                        })
+                      
+                       
+                      })
+                  
+                   
+                      
+                    
+                 
+                }
+                  })
+
+                  }
+
+
+                  $scope.updateFee = function(code,id){
+                    var check  = /^[0-9]+(\.[0-9]+)?$/
+                    Swal.fire({
+                      title: "Cập nhật phí giao hàng cho đơn hàng " +code +" ?",
+                      inputLabel : 'Phí giao hàng',
+                      input: 'text',
+                      inputPlaceholder: 'Nhập phí giao hàng',
+                      inputValue : $scope.bill.shipPrice,
+                      showCancelButton: true,
+                      confirmButtonText: "Cập nhật",        
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      if(result.value.trim() === ''){
+                        Swal.fire("Không được bỏ trống !","","warning");
+                        return;
+                      }
+                      if(!check.test(result.value)){
+                        Swal.fire("Phí giao hàng phải là số nguyên dương !","","warning");
+                        return;
+                      }
+                      if(parseFloat(result.value) === parseFloat($scope.bill.shipPrice)){
+                        Swal.fire("Giá trị chưa có sự cập nhật !","","warning");
+                        return;
+                      }
+                      if(parseFloat(result.value) < 0){
+                        Swal.fire("Phí giao hàng phải lớn hơn hoặc bằng 0 !","","warning");
+                        return;
+                      }
+                      
+                      $http.post('http://localhost:8080/api/billhistory',{
+                        createBy : $rootScope.user.username,
+                        note : 'Cập nhật phí giao hàng từ ' + $scope.bill.shipPrice + " thành " + result.value,
+                        status : 14,
+                        idBill : id
+                      }).then(function(resp){
+                       
+                        $http.put("http://localhost:8080/api/bill/updatePhiShip",{
+                          code : code,
+                          money : result.value
+                        }).then(function(re){
+                          Swal.fire("Cập nhật thành công !","","success");
+                          $scope.sendBillToMail(code,"được cập nhật phí giao hàng");
+                            $scope.getBill();
+                        
+                        })
+                      
+                       
+                      })
+                  
+                   
+                      
+                    
+                 
+                }
+                  })
+
+                  }
 
                      $scope.check = function(code,id){
                       if($scope.bill.status === 0){
@@ -255,7 +375,7 @@ $http.get(urlsize).then(function (response) {
                               status : 1
                             }).then(function(re){
                               Swal.fire("Xác nhận thành công !","","success");
-                            
+                              $scope.sendBillToMail(code,"được xác nhận");
                                 $scope.getBill();
                             
                             })
@@ -275,6 +395,7 @@ $http.get(urlsize).then(function (response) {
                           title: "Xác nhận đang giao hàng đơn hàng " +code +" ?",
                           inputLabel : 'Ghi chú',
                           input: 'textarea',
+                          inputPlaceholder: 'Thông tin vận chuyển',
                           showCancelButton: true,
                           confirmButtonText: "Xác nhận",        
                       }).then((result) => {
@@ -291,7 +412,7 @@ $http.get(urlsize).then(function (response) {
                               status : 2
                             }).then(function(re){
                               Swal.fire("Xác nhận thành công !","","success");
-                            
+                              $scope.sendBillToMail(code,"được xác nhận đang giao");
                                 $scope.getBill();
                             
                             })
@@ -311,9 +432,10 @@ $http.get(urlsize).then(function (response) {
                    
                      if($scope.bill.status === 2){
                         Swal.fire({
-                          title: "Xác nhận đơn hàng " +code +" đã hoàn thành",
+                          title: "Xác nhận đơn hàng " +code +" đã giao hàng",
                           inputLabel : 'Ghi chú',
                           input: 'textarea',
+                          inputPlaceholder: 'Thông tin người giao hàng',
                           showCancelButton: true,
                           confirmButtonText: "Xác nhận",        
                       }).then((result) => {
@@ -329,7 +451,7 @@ $http.get(urlsize).then(function (response) {
                               status : 3
                             }).then(function(re){
                               Swal.fire("Xác nhận thành công !","","success");
-                            
+                              $scope.sendBillToMail(code,"được xác nhận đã giao");
                                 $scope.getBill();
                             
                             })
@@ -419,6 +541,7 @@ $http.get(urlsize).then(function (response) {
                       
                     
                      }
+
                      $scope.suaDiaChi = function(code,id){
                       let tennguoimua = document.getElementById('tennguoimua').value;
                       let sodienthoai = document.getElementById('sodienthoai').value;
@@ -462,6 +585,7 @@ $http.get(urlsize).then(function (response) {
                               idBill : id
                             }).then(function(resp){
                               Swal.fire("Cập nhật địa chỉ giao hàng thành công !","","success");
+                              $scope.sendBillToMail(code,"được cập nhật địa chỉ giao hàng");
                               $scope.isUpdateAddress = false;
                               $scope.getBill();
                             })
@@ -531,7 +655,82 @@ $http.get(urlsize).then(function (response) {
                      }).then(function(res){
                      
                       Swal.fire("Hủy đơn hàng thành công !","","success");
+                      $scope.sendBillToMail(code,"được hủy");
+                      $scope.getBill();
+                     })
+                             
                             
+                            })
+                          })
+                 
+                     
+                    
+                      }
+                    })
+                    
+                     }
+                     $scope.khongnhan = function(code,id){
+                      Swal.fire({
+                        title: "Xác nhận khách không nhận đơn hàng " +code +" ?",
+                        inputLabel : 'Ghi chú',
+                        input: 'textarea',
+                        inputPlaceholder: 'Lý do không nhận hàng',
+                        showCancelButton: true,
+                        confirmButtonText: "Xác nhận",        
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        $http.post('http://localhost:8080/api/billhistory',{
+                            createBy : $rootScope.user.username,
+                            note : result.value,
+                            status : 7,
+                            idBill : id
+                          }).then(function(resp){
+                            $http.put("http://localhost:8080/api/bill/updatestatusbill",{
+                              code : code,
+                              status : 4
+                            }).then(function(re){
+                               
+                    $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+                      for(let i = 0; i < resp.data.length; i++){
+                         //get số lượng sản phẩm đang có
+                         var getPram = {
+                           IdProduct:
+                           resp.data[i].productDetail
+                               .id,
+                           IdColor:
+                           resp.data[i].idColor,
+                           IdSize: resp.data[i].idSize,
+                         };
+                         $http({
+                           method: "GET",
+                           url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                           params: getPram,
+                         }).then(function (soluong) {
+                           var param2 = {
+                             IdProduct:
+                             resp.data[i]
+                                 .productDetail.id,
+                             IdColor:
+                             resp.data[i].idColor,
+                             IdSize:
+                             resp.data[i].idSize,
+                             Quantity:
+                               parseInt(soluong.data) +
+                               parseInt(
+                                 resp.data[i].quantity
+                               ),
+                           };
+                           $http({
+                             method: "PUT",
+                             url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                             params: param2,
+                           })
+                      })
+                      }
+                     }).then(function(res){
+                     
+                      Swal.fire("Xác nhận khách không nhận đơn hàng thành công !","","success");
+                      $scope.sendBillToMail(code,"được hủy do không nhận");
                       $scope.getBill();
                      })
                              
@@ -755,7 +954,7 @@ $http.get(urlsize).then(function (response) {
                                                       idBill : idBill
                                                     }).then(function(re){
                                                       Swal.fire("Đã thêm !","","success");
-                                                
+                                                      $scope.sendBillToMail(code,"được thêm sản phẩm ");
                                                       $scope.getBill();
                                                       $scope.getAllProduct();
                                                     })
@@ -865,7 +1064,7 @@ $http.get(urlsize).then(function (response) {
                                                                       idBill : idBill
                                                                     }).then(function(re){
                                                                       Swal.fire("Đã thêm !","","success");
-                                                                
+                                                                      $scope.sendBillToMail(code,"được thêm sản phẩm");
                                                                       $scope.getBill();
                                                                       $scope.getAllProduct();
                                                                     })
@@ -940,7 +1139,7 @@ $http.get(urlsize).then(function (response) {
                     $scope.filter();
                   });
                   $scope.filter = function (){
-                    
+                    document.getElementById("timkiem").value = '';
                     let idHttt = document.getElementById("httt").value;
                     let idTTTT = document.getElementById("tttt").value;
                     let idTTDH = document.getElementById("ttdh").value;
@@ -1018,9 +1217,14 @@ $http.get(urlsize).then(function (response) {
                             }
                   }
                     //xóa bill detail
-                    $scope.deleteBillDetail = function(id,IdBill){
-                   
-                      Swal.fire({
+                    $scope.deleteBillDetail = function(id,IdBill,code){
+                      $http.get("http://localhost:8080/api/bill/getallbybill/"+code).then(function(resp){
+                        $scope.listItem = resp.data;
+                        if($scope.listItem.length === 1){
+                          Swal.fire("Không thể xóa vì đơn hàng này chỉ còn một sản phẩm duy nhất","","warning");
+                          return;
+                        }
+                        Swal.fire({
                           title: 'Bạn có chắc muốn xóa sản phẩm này ?',
                           showCancelButton: true,
                           confirmButtonText: 'Xóa',
@@ -1092,7 +1296,7 @@ $http.get(urlsize).then(function (response) {
                                                 idBill : IdBill
                                               }).then(function(re){
                                                 Swal.fire("Xóa thành công !","","success");
-                                      
+                                                $scope.sendBillToMail(code,"được xóa sản phẩm");
                                                 $scope.getBill();
                                               })
                                                
@@ -1126,6 +1330,10 @@ $http.get(urlsize).then(function (response) {
                              
                           }
                       })
+
+                      })
+                   
+                     
                     }
 
                     $scope.XacNhanTT = function(){
@@ -1154,6 +1362,7 @@ $http.get(urlsize).then(function (response) {
                               
                               }).then(function(resp){
                                 Swal.fire("Xác nhận thanh toán thành công !","","success");
+                                $scope.sendBillToMail(code,"được xác nhận thanh toán");
                                 $timeout(function () {
                                   $scope.getBill();
                               });
@@ -1167,7 +1376,7 @@ $http.get(urlsize).then(function (response) {
                    
                    
                     }
-                    $scope.sendBillToMail = function(code){
+                    $scope.sendBillToMail = function(code,title){
      
                       $http.get('http://localhost:8080/api/bill/getbycode/'+code).then(function(billexport){
                         $scope.billexport = billexport.data;
@@ -1178,44 +1387,37 @@ $http.get(urlsize).then(function (response) {
                             $scope.listItemExport = resp.data;
                 
                        
-                      
+                      if($scope.billexport.idCustomer != null){
+                        $http.get("http://localhost:8080/api/customer/"+$scope.billexport.idCustomer).then(function(response){
+                          // Lấy phần tử bằng ID
+                 var myElement = document.getElementById('exportbill');
+           
+                 // Lấy HTML từ phần tử và in ra console
+                 var htmlContent = myElement.innerHTML;
+                   // Lấy ngày và giờ hiện tại
+           var currentDate = new Date();
+           
+           // Lấy giờ, phút, giây
+           var hours = currentDate.getHours();
+           var minutes = currentDate.getMinutes();
+           
+           // Lấy ngày, tháng, năm
+           var day = currentDate.getDate();
+           var month = currentDate.getMonth() + 1; // Tháng bắt đầu từ 0
+           var year = currentDate.getFullYear();
+                   var emailData = {
+                       to: response.data.email,
+                       subject: 'Đơn hàng của bạn ' + title +" lúc " + hours +' giờ ' + minutes + ' phút ' +day + '/'+month + '/' + year,
+                       bodyHtml: htmlContent,
+                   };
+           
+                   $http.post('http://localhost:8080/api/sendmail', emailData).then(function(resp){
+                   })
+           
+               })
+                      }
                 
-                      $http.get("http://localhost:8080/api/customer/"+IdCustomer).then(function(response){
-                               // Lấy phần tử bằng ID
-                      var myElement = document.getElementById('exportbill');
-                
-                      // Lấy HTML từ phần tử và in ra console
-                      var htmlContent = myElement.innerHTML;
-                        // Lấy ngày và giờ hiện tại
-                var currentDate = new Date();
-                
-                // Lấy giờ, phút, giây
-                var hours = currentDate.getHours();
-                var minutes = currentDate.getMinutes();
-                
-                // Lấy ngày, tháng, năm
-                var day = currentDate.getDate();
-                var month = currentDate.getMonth() + 1; // Tháng bắt đầu từ 0
-                var year = currentDate.getFullYear();
-                        var emailData = {
-                            to: response.data.email,
-                            subject: 'Cảm ơn bạn đã mua hàng tại BeeBetaShoes lúc ' + hours +' giờ ' + minutes + ' phút ' +day + '/'+month + '/' + year,
-                            bodyHtml: htmlContent,
-                        };
-                
-                        $http.post('http://localhost:8080/api/sendmail', emailData).then(function(resp){
-                          Swal.fire(
-                            "Đặt hàng thành công !",
-                            "",
-                            "success"
-                          );
-                          
-                         $rootScope.listCartIndex = [];
-                         $rootScope.tongTienIndex = 0;
-                          location.href = "#/myorder";
-                        })
-                
-                    })
+                   
                         })
                         })
                        
