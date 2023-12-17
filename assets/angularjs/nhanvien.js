@@ -105,15 +105,15 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
         if(document.getElementById("gtNu").checked == true){
             gender = false ; 
         }
-        var idRole = document.getElementById("vaitro").value;
+        var idRole = document.getElementById("vaitro").value; 
 
-        var status = document.getElementById("trangthai").value;
+    //    var status = document.getElementById("trangthai").value;
 
         var MainImage = document.getElementById("fileUpload").files;
-            if (MainImage.length == 0){
-                Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
-                return;
-            }
+            // if (MainImage.length == 0){
+            //     Swal.fire('Vui lòng thêm ảnh đại diện cho sản phẩm !', '', 'error');
+            //     return;
+            // }
         if(MainImage.length > 0){
             var img = new FormData();
             img.append("files",MainImage[0]);
@@ -133,7 +133,6 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                     gender: gender,
                     phone: $scope.form.phone,
                     email: $scope.form.email,
-                    status: status,
                     idRole: idRole,
                 }).then(function (resp) {
                     if (resp.status === 200) {
@@ -161,6 +160,7 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
                     gender: $scope.form.gender,
                     phone: $scope.form.phone,
                     email: $scope.form.email,
+                    idRole: idRole,
                 }).then(function (resp) {
                     if (resp.status === 200) {
                         Swal.fire('Sửa thành công !', '', 'success')
