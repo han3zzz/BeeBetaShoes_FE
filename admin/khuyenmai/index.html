@@ -31,22 +31,19 @@
     <thead>
       <tr>
         <td scope="col">#</td>
-        <td scope="col">ID khuyến mãi</td>
         <td scope="col">Mã khuyến mãi</td>
         <td scope="col">Tên khuyến mãi</td>
         <td scope="col">Loại khuyến mãi</td>
         <td scope="col">Kiểu khuyến mãi</td>
-        <td scope="col">Khuyến mãi theo %</td>
-        <td scope="col">Khuyến mãi theo tiền</td>
-        <td scope="col">Hóa đơn được áp dụng</td>
+        <td scope="col">Giá trị khuyến mãi</td>
         <td scope="col">Ngày bắt đầu</td>
         <td scope="col">Ngày kết thúc</td>
+        <td scope="col">Trạng thái</td>
       </tr>
     </thead>
     <tbody>
       <tr ng-repeat="v in pager.items">
         <td>{{$index + 1}}</td>
-        <td>{{v.id}}</td>
         <td>{{v.code}}</td>
         <td>{{v.name}}</td>
         <td>{{v.isVoucher == false ? 'Giảm giá theo tổng bill' : ''}}</td>
@@ -55,11 +52,10 @@
     <label for="voucherDiscount">Giảm giá theo % trên tổng bill</label>
   </td> -->
         <td>{{v.typeVoucher == true ? 'Giảm giá theo %' : 'Giảm giá theo tiền'}}</td>
-        <td>{{v.discount}}</td>
-        <td>{{v.cash}}</td>
-        <td>{{v.minimum}}</td>
+        <td>{{v.typeVoucher == true ? v.discount : v.cash}}</td>
         <td>{{v.startDate}}</td>
         <td>{{v.endDate}}</td>
+        <td>{{v.status == 0 ? 'Đang hoạt động' : v.status == 1 ? 'Ngừng hoạt động' : ''}}</td>
         <td><a href="#/voucher/update/{{v.id}}"><button class="btn btn-indigo"> Sửa</button></a>
           <button style="margin-top: 5px" class="btn btn-danger" ng-click="delete(v.id)"> Xóa</button>
         </td>

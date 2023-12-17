@@ -27,11 +27,13 @@
                 <div class="col-md-6" style="margin-top: 15px;">
                     <label>Loại khuyến mãi <span class="vaid">*</span></label>
                     <div class=" custom-radio">
-                        <input type="radio" value="false" ng-model="form.isVoucher" checked id="giamtheobill"
-                            ng-click="appear()" />
+                        <input type="radio" value="false" ng-model="form.isVoucher" id="giamtheobill"
+                              />
                         <label for="giamtheobill">Giảm giá theo tổng bill</label>
+                        <input type="radio" value="true" ng-model="form.isVoucher" id="giamtheosp" ng-click="appear()"  />
+                         <label for="giamtheosp">Giảm giá theo sản phẩm</label>
                         <br>
-                        <div class=" custom-radio" style="display: none;" id="123">
+                        <div class=" custom-radio" id="123">
                             <br>
                             <input type="radio" ng-value="true" ng-model="form.typeVoucher" id="giamphantram"
                                 ng-checked="form.typeVoucher === 'true'" />
@@ -67,16 +69,16 @@
                         </span>
                     </div>
                 </div>
-                <div class="col-md-12" style="margin-top: 30px;">
+                <!-- <div class="col-md-12" style="margin-top: 30px;"> -->
                     <!-- <label>Ngày bắt đầu</label> <input style="width: 200px;" ng-model="form.startdate"> -->
-                    <label>Hóa đơn được áp dụng <span class="vaid">*</span></label>
+                    <!-- <label>Hóa đơn được áp dụng <span class="vaid">*</span></label>
                     <input type="number" class="haninput" ng-model="form.minimum" id="minimun">
                     <div ng-repeat="err in validationErrors">
                         <span class="validate" ng-if="err.objectName == 'voucherRequest' && err.field == 'Minimum'">
                             {{err.defaultMessage}}
                         </span>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="col-md-6" style="margin-top: 30px;">
                     <!-- <label>Ngày bắt đầu</label> <input style="width: 200px;" ng-model="form.startdate"> -->
