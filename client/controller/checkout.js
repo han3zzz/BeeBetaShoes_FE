@@ -1074,6 +1074,53 @@ const cityName = selectElement.options[selectElement.selectedIndex].textContent;
     Swal.fire('Thêm thành công !','','success');
     $http.get("http://localhost:8080/api/address/"+IdCustomer).then(function (address) {
    $scope.listAddress = address.data;
+   //load cart by user
+   $http.get("http://localhost:8080/api/cart/"+IdCustomer).then(function (cart) {
+    let TotalPrice = 0;
+
+    let TotalGam = 0;
+    for (let i = 0; i < cart.data.length; i++) {
+      TotalPrice +=
+        parseFloat(cart.data[i].unitPrice) *
+        parseFloat(cart.data[i].quantity);
+    }
+    for (let i = 0; i < cart.data.length; i++) {
+      TotalGam +=
+        cart.data[i].productDetail.weight * cart.data[i].quantity;
+    }
+
+    // lấy thông tin địa chỉ giao hàng
+    $http
+      .get("http://localhost:8080/api/address/get/" + $scope.listAddress[0].id)
+      .then(function (resp) {
+        var params = {
+          service_type_id: 2,
+          insurance_value: parseInt(TotalPrice),
+          coupon: null,
+          from_district_id: 1482,
+          to_district_id: resp.data.districtId,
+          to_ward_code: resp.data.wardId,
+          height: 0,
+          length: 0,
+          weight: parseInt(TotalGam),
+          width: 0,
+        };
+        // get phí ship từ GHN
+        $http({
+          method: "GET",
+          url: "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee",
+          params: params,
+          headers: {
+            "Content-Type": undefined,
+            token: "f22a8bb9-632c-11ee-b394-8ac29577e80e",
+            shop_id: 4603004,
+          },
+        }).then(function (resp) {
+          $scope.phiShip = resp.data.data.total;
+          $scope.tienThanhToan = TotalPrice + resp.data.data.total - $scope.giamGia;
+        });
+      });
+  });
 
   })
   })
