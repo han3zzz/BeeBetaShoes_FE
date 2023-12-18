@@ -435,7 +435,7 @@ $http.get(urlsize).then(function (response) {
                           title: "Xác nhận đơn hàng " +code +" đã giao hàng",
                           inputLabel : 'Ghi chú',
                           input: 'textarea',
-                          inputPlaceholder: 'Thông tin người giao hàng',
+                          inputPlaceholder: 'Thông tin người nhận hàng',
                           showCancelButton: true,
                           confirmButtonText: "Xác nhận",        
                       }).then((result) => {
