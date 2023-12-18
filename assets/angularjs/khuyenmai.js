@@ -96,15 +96,56 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
 
     //add
     $scope.add = function(){
-        console.log($scope.form.isVoucher)
+        let checkk = true;
+        if(document.getElementById("giamtheobill").checked === true){
+            checkk = false;
+        }
+        let checkk2 = true;
+        if(document.getElementById("giamtienmat").checked === true){
+            checkk2 = false;
+        }
+
+        let checkk1 = '';
+        if(document.getElementById("giamtienmat").checked === true){
+            checkk1 =  $scope.form.cash
+           
+        }
+        else{
+            checkk1 = $scope.form.discount;
+        }
+
+
+        if(document.getElementById("giamphantram").checked === true){
+            if($scope.form.discount === ''){
+                Swal.fire("Giá trị phần trăm giảm không bỏ trống !","","warning")
+                return;
+            }
+        }
+        else{
+            if($scope.form.cash === ''){
+                Swal.fire("Giá trị tiền giảm không bỏ trống !","","warning")
+                return;
+            }
+
+        }
+
+        let tungay = document.getElementById("ngaybatdau").value;
+        let denngay = document.getElementById("ngayhethan").value;
+
+        var startDate = new Date(tungay);
+        var endDate = new Date(denngay);
+        if(startDate > endDate){
+            Swal.fire("Ngày bắt đầu trước ngày hết hạn","","error");
+            return;
+        }
         
         $http.post(url,{
             code : $scope.form.code,
             name : $scope.form.name,
-            typeVoucher : $scope.form.typeVoucher ,
-            isVoucher : $scope.form.isVoucher ,
-            discount : $scope.form.discount, 
-            cash : $scope.form.cash,
+            typeVoucher : checkk2,
+            isVoucher : checkk ,
+            discount : checkk1, 
+            cash : checkk1,
             startDate : $scope.form.startdate,
             endDate : $scope.form.enddate,
             minimum : 0,
@@ -135,14 +176,59 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         }else{
             $scope.form.discount = null;
         }
+
+        let checkk = true;
+        if(document.getElementById("giamtheobill").checked === true){
+            checkk = false;
+        }
+        let checkk2 = true;
+        if(document.getElementById("giamtienmat").checked === true){
+            checkk2 = false;
+        }
+
+        let checkk1 = '';
+        if(document.getElementById("giamtienmat").checked === true){
+            checkk1 =  document.getElementById("giamtien").value;
+           
+        }
+
+        if(document.getElementById("giamphantram").checked === true){
+            checkk1 =  document.getElementById("giamtram").value;
+        }
+
+        if(document.getElementById("giamphantram").checked === true){
+            if($scope.form.discount === ''){
+                Swal.fire("Giá trị phần trăm giảm không bỏ trống !","","warning")
+                return;
+            }
+        }
+        else{
+            if($scope.form.cash === ''){
+                Swal.fire("Giá trị tiền giảm không bỏ trống !","","warning")
+                return;
+            }
+
+        }
+
+        let tungay = document.getElementById("ngaybatdau").value;
+        let denngay = document.getElementById("ngayhethan").value;
+
+        var startDate = new Date(tungay);
+        var endDate = new Date(denngay);
+        if(startDate > endDate){
+            Swal.fire("Ngày bắt đầu trước ngày hết hạn","","error");
+            return;
+        }
+
+        console.log(checkk1);
         
         $http.put("http://localhost:8080/api/voucher/update/"+id,{
             code : $scope.form.code,
             name : $scope.form.name,
-            typeVoucher : $scope.form.typeVoucher,
-            isVoucher : $scope.form.isVoucher,
-            discount : $scope.form.discount,
-            cash : $scope.form.cash,
+            typeVoucher : checkk2,
+            isVoucher : checkk,
+            discount : checkk1,
+            cash : checkk1,
             startDate : startDate,
             endDate : endDate,
             minimum : 0,
@@ -213,6 +299,18 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
             }else{
                 $(document).ready(function(){{
                     $("#giamtheosp").prop("checked",true);
+                }})
+
+            }
+            if(resp.data.typeVoucher == true){
+                $(document).ready(function(){{
+                    $("#giamphantram").prop("checked",true);
+                }})
+            
+               
+            }else{
+                $(document).ready(function(){{
+                    $("#giamtienmat").prop("checked",true);
                 }})
 
             }
