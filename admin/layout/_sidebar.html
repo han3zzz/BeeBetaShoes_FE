@@ -16,7 +16,7 @@
           <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
           <span class="hide-menu">Home</span>
         </li>
-        <li class="sidebar-item">
+        <li class="sidebar-item" ng-if="user.role.id === 1">
           <a class="sidebar-link" href="#/statistical" aria-expanded="false">
             <span>
               <img style="width: 25px;height: 25px;" src="../../assets/images/statistics.png">

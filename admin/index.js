@@ -258,6 +258,10 @@ app.config(function ($routeProvider, $locationProvider) {
             templateUrl: "news/update.html",
             controller : TinTucController
         })
+        .when("/403",{
+            templateUrl: "403.html",
+           
+        })
 
 
 
@@ -318,10 +322,13 @@ app.factory('AuthInterceptor', function ($location,AuthService) {
                
                 $location.path('/product/view');
             }
-            // if($rootScope.user.role.id === 2 && $location.path() === '/employee' || $rootScope.user.role.id === 2 && $location.path() === '/voucher'){
-            //     Swal.fire('Không có quyền truy cập','','warning')
-            //     $location.path('/product/view');
-            // }
+            
+            
+           
+            if(parseInt(AuthService.getRole()) === 2 && $location.path().startsWith('/employee') || parseInt(AuthService.getRole()) === 2 && $location.path().startsWith('/voucher') || parseInt(AuthService.getRole()) === 2 && $location.path().startsWith('/statistical')){
+        
+                $location.path('/403');
+            }
             return config;
         }
     };
@@ -356,6 +363,15 @@ app.factory('AuthService', function() {
     authService.clearId = function() {
         localStorage.removeItem('id');
     };
+    authService.saveRole = function(id) {
+        localStorage.setItem('role', id);
+    };
+    authService.getRole = function() {
+        return localStorage.getItem('role');
+    };
+    authService.clearRole = function() {
+        localStorage.removeItem('role');
+    };
 
     
 
@@ -376,6 +392,7 @@ app.run(function ($rootScope, $http,AuthService) {
             $http.get('http://localhost:8080/api/employee/getByUsername/'+username.data.username).then(function(user){
                 $rootScope.user = user.data;
                 AuthService.saveId(user.data.id);
+                AuthService.saveRole(user.data.role.id);
             })
 
           })
@@ -395,6 +412,7 @@ app.run(function ($rootScope, $http,AuthService) {
             if (result.isConfirmed) {
                 AuthService.clearToken();
                 AuthService.clearId();
+                AuthService.clearRole();
                 $rootScope.user = null;
                 Swal.fire('Đăng xuất thành công !','',"success");
                 location.href = "#/login"

@@ -24,6 +24,7 @@ window.LoginAdminController = function($scope, $http, $location,$rootScope,AuthS
             $http.get('http://localhost:8080/api/employee/getByUsername/'+username.data.username).then(function(user){
                 $rootScope.user = user.data;
                 AuthService.saveId(user.data.id);
+                AuthService.saveRole(user.data.role.id);
             })
 
           });
