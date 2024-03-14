@@ -4,3 +4,6 @@
 <p>B2. Mở VisualStudioCode và chạy project để chạy </p>
 <p><a href="http://127.0.0.1:5500/client/index.html#/home">Trang Client</a></p>
 <p><a href="http://127.0.0.1:5500/admin/index.html#/login">Trang Admin</a></p>
+
+
+<a href="https://github.com/han3zzz/BeeBetaShoes/">Project Front-end</a>
