@@ -533,6 +533,8 @@
           <div class="i_row">
             <div class="i_number">
               <p class="p_title">Mã Hóa Đơn: {{billexport.code}}</p>
+              <p class="p_title">  Thời gian: {{ thoigian | date:'HH:mm dd/MM/yyyy' }}</p>
+              <p class="p_title">Người mua hàng : {{cus == null ? 'Khách lẻ' : cus.fullname}} <span ng-if="cus != null">-</span>  {{cus == null ? '' : cus.phone}}</p>
               <p class="p_title" ng-if="billexport.typeStatus === 0">Thông tin giao hàng : {{addressexport.fullname}} - {{addressexport.phone}} | {{addressexport.address}}, {{addressexport.wardName}}, {{addressexport.districtName}}, {{addressexport.cityName}}</p>
               <p class="p_title">Phương thức thanh toán : {{billexport.payType === 0 ? 'Tiền mặt' : 'Online qua VNPay'}}</p>
               <p class="p_title">Phương thức mua hàng : {{billexport.typeStatus === 1 ? 'Mua tại quầy' : 'Mua online'}}</p>

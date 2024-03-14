@@ -1426,5 +1426,285 @@ $http.get(urlsize).then(function (response) {
                     
                     
                     }
+                       //giảm số lượng giỏ
+                  $scope.giam = function(id,idbill){
+                    if(document.getElementById("quantity"+id).value == 1 ){
+                      $http.get("http://localhost:8080/api/bill/getbycode/"+code).then(function(b){
+                        $scope.deleteBillDetail(id,b.data.id,code);
+                       
+                      })
+                      return;
+                       
+                    }
+             
+                    $http.get("http://localhost:8080/api/bill/getbilldetail/"+id).then(function(resp){
+                       
+                        $http.get("http://localhost:8080/api/product/" +resp.data.productDetail.id).then(function(pro){
+                        
+                                     
+                                        $http.get("http://localhost:8080/api/bill/getallbybill/"+ code).then(function(bill){
+            
+                                            for(let i = 0 ; i < bill.data.length ; i++) {
+                                            
+                                              if(bill.data[i].productDetail.id == resp.data.productDetail.id && bill.data[i].idColor == resp.data.idColor && bill.data[i].idSize == resp.data.idSize) {
+                                                  // nếu tồn tại rồi thì updatate số lượng
+                                                  $http.put("http://localhost:8080/api/bill/updateBillDetail/"+bill.data[i].id ,{
+                                                      idBill: bill.data[i].id,
+                                                      idProductDetail: resp.data.productDetail.id,
+                                                      idColor: resp.data.idColor,
+                                                      idSize: resp.data.idSize,
+                                                      quantity:  parseInt(bill.data[i].quantity) - 1,
+                                                      unitPrice:
+                                                        pro.data.price,
+                                                  }).then(function(billdetail){
+                                                        //get số lượng sản phẩm đang có
+                                                        var getPram = {
+                                                          IdProduct:
+                                                          resp.data.productDetail.id,
+                                                          IdColor:
+                                                          resp.data.idColor,
+                                                          IdSize: resp.data.idSize,
+                                                        };
+                                                        $http({
+                                                          method: "GET",
+                                                          url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                                                          params: getPram,
+                                                        }).then(function (soluong) {
+                                                              //  cập nhật số lượng sản phẩm
+                                                   var param2 = {
+                                                  IdProduct:
+                                                  resp.data.productDetail.id,
+                                                  IdColor:
+                                                  resp.data.idColor,
+                                                  IdSize:
+                                                  resp.data.idSize,
+                                                  Quantity:
+                                                    parseInt(soluong.data) +
+                                                   1,
+                                                };
+                                                $http({
+                                                  method: "PUT",
+                                                  url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                                                  params: param2,
+                                                }).then(function (resp) {
+                                                  let tenMau = '';
+                                                  let tenKT = '';
+                                               
+;                                                $http.get(urlcolor).then(function (response) {
+                                              
+                                                  for(let j = 0 ; j < response.data.length; j++){
+                                                    if(response.data[j].id === bill.data[i].idColor){
+                                                     
+                                                      tenMau = response.data[j].name;
+                                                     
+                                                      
+                                                    }
+                                                  }
+                                              
+                                              
+                                               
+                                                  $http.get(urlsize).then(function (response) {
+                                                
+                                                    
+                                                    for(let j = 0 ; j < response.data.length; j++){
+                                                      
+                                                      if(response.data[j].id === bill.data[i].idSize){
+                                                       
+                                                        tenKT = response.data[j].name;
+                                                       
+                                                       
+                                                      }
+                                                    }
+                                                 
+                                               
+;                                                let soluongmoi =  parseInt(bill.data[i].quantity) - 1;
+                                                  let note = "Đã giảm số lượng sản phẩm " + bill.data[i].productDetail.product.name + " [ màu " +tenMau + ", kích thước " + tenKT + "], từ số lượng " + bill.data[i].quantity+" thành "+ soluongmoi +"";
+                                                  $http.post('http://localhost:8080/api/billhistory',{
+                                                    createBy : $rootScope.user.username,
+                                                    note : note,
+                                                    status : 20,
+                                                    idBill : idbill
+                                                  }).then(function(ex){
+                                                    $scope.getBill();
+                                                  })
+                                                })
+                                              })
+                                                 
+                                                  
+      
+                                              })
+      
+                                                        })
+                                                      
+                                                  })
+                                                  return;
+                                                 
+                                              }
+                                                 
+                                              }
+                                            
+                                       
+      
+                                            
+                                          })
+                                      })
+
+                                  
+                                  
+                              
+                          
+                      
+                            
+                        })
+                      
+                   
+
+                    
+                  }
+                    //tăng số lượng giỏ
+                $scope.tang = function(id,idbill){
+             
+                    $http.get("http://localhost:8080/api/bill/getbilldetail/"+id).then(function(resp){
+                       
+                        $http.get("http://localhost:8080/api/product/" +resp.data.productDetail.id).then(function(pro){
+                        
+                                      //get số lượng sản phẩm đang có
+                                      var getPram = {
+                                        IdProduct:
+                                        resp.data.productDetail.id,
+                                        IdColor:
+                                        resp.data.idColor,
+                                        IdSize: resp.data.idSize,
+                                      };
+                                      $http({
+                                        method: "GET",
+                                        url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                                        params: getPram,
+                                      }).then(function (soluong) {
+                                        if(soluong.data === 0){
+                                            Swal.fire("Đã đạt số lượng tối đa","","error");
+                                            return;
+                                        }
+                                        $http.get("http://localhost:8080/api/bill/getallbybill/"+ code).then(function(bill){
+            
+                                        for(let i = 0 ; i < bill.data.length ; i++) {
+                                        
+                                          if(bill.data[i].productDetail.id == resp.data.productDetail.id && bill.data[i].idColor == resp.data.idColor && bill.data[i].idSize == resp.data.idSize) {
+                                              // nếu tồn tại rồi thì updatate số lượng
+                                              $http.put("http://localhost:8080/api/bill/updateBillDetail/"+bill.data[i].id ,{
+                                                  idBill: id,
+                                                  idProductDetail: resp.data.productDetail.id,
+                                                  idColor: resp.data.idColor,
+                                                  idSize: resp.data.idSize,
+                                                  quantity:  parseInt(bill.data[i].quantity) + 1,
+                                                  unitPrice:
+                                                    pro.data.price,
+                                              }).then(function(billdetail){
+                                                    //get số lượng sản phẩm đang có
+                                                    var getPram = {
+                                                      IdProduct:
+                                                      resp.data.productDetail.id,
+                                                      IdColor:
+                                                      resp.data.idColor,
+                                                      IdSize: resp.data.idSize,
+                                                    };
+                                                    $http({
+                                                      method: "GET",
+                                                      url: "http://localhost:8080/api/productdetail_color_size/getQuantityProductAndColorAndSize",
+                                                      params: getPram,
+                                                    }).then(function (soluong) {
+                                                          //  cập nhật số lượng sản phẩm
+                                               var param2 = {
+                                              IdProduct:
+                                              resp.data.productDetail.id,
+                                              IdColor:
+                                              resp.data.idColor,
+                                              IdSize:
+                                              resp.data.idSize,
+                                              Quantity:
+                                                parseInt(soluong.data) -
+                                               1,
+                                            };
+                                            $http({
+                                              method: "PUT",
+                                              url: "http://localhost:8080/api/productdetail_color_size/updateQuantity",
+                                              params: param2,
+                                            }).then(function (resp) {
+                                              let tenMau = '';
+                                                  let tenKT = '';
+                                               
+;                                                $http.get(urlcolor).then(function (response) {
+                                              
+                                                  for(let j = 0 ; j < response.data.length; j++){
+                                                    if(response.data[j].id === bill.data[i].idColor){
+                                                     
+                                                      tenMau = response.data[j].name;
+                                                     
+                                                      
+                                                    }
+                                                  }
+                                              
+                                              
+                                               
+                                                  $http.get(urlsize).then(function (response) {
+                                                
+                                                    
+                                                    for(let j = 0 ; j < response.data.length; j++){
+                                                      
+                                                      if(response.data[j].id === bill.data[i].idSize){
+                                                       
+                                                        tenKT = response.data[j].name;
+                                                       
+                                                       
+                                                      }
+                                                    }
+                                                 
+                                               
+;                                                 let soluongmoi =  parseInt(bill.data[i].quantity) + 1;
+                                                  let note = "Đã tăng số lượng sản phẩm " + bill.data[i].productDetail.product.name + " [ màu " +tenMau + ", kích thước " + tenKT + "] từ số lượng " + bill.data[i].quantity+" thành "+ soluongmoi +"";
+                                                  $http.post('http://localhost:8080/api/billhistory',{
+                                                    createBy : $rootScope.user.username,
+                                                    note : note,
+                                                    status : 21,
+                                                    idBill : idbill
+                                                  }).then(function(ex){
+                                                    $scope.getBill();
+                                                  })
+                                                })
+                                              })
+                                             
+  
+                                          })
+  
+                                                    })
+                                                  
+                                              })
+                                              return;
+                                             
+                                          }
+                                             
+                                          }
+                                        
+                                   
+  
+                                        
+                                      })
+
+                                      })
+                                       
+                                      })
+
+                                  
+                                  
+                              
+                          
+                      
+                            
+                        })
+                      
+                   
+
+                    
+                  }
   
 }

@@ -5,7 +5,7 @@
 <button ng-if="bill.status == 3" style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Giao Hàng</button>
 <button ng-if="bill.status == 4" style="width: 200px; height: 100px;font-size: 20px;" class="btn btn-dark">Đã Hủy</button> -->
 <div class="timeline">
-    <div class="timeline-item" ng-repeat="billhis in billhistory" ng-if="billhis.status != 10 && billhis.status != 11 && billhis.status != 12 && billhis.status != 13 && billhis.status != 14">
+    <div class="timeline-item" ng-repeat="billhis in billhistory" ng-if="billhis.status != 10 && billhis.status != 11 && billhis.status != 12 && billhis.status != 13 && billhis.status != 14 && billhis.status != 20 && billhis.status != 21">
       <div class="timeline-content">
         <center><div>
           <div class="timeline-icon" ng-if="billhis.status == 0" >  <i class="fa-regular fa-file-lines"></i></div>
@@ -156,7 +156,7 @@
             <td class="text-center">{{cart.unitPrice | currency:'':0}} VNĐ
         </td>
                 <td class="cart__update-wrapper cart-flex-item text-center">
-                    {{cart.quantity}}
+                  <button ng-if="bill.status == 0 || bill.status == 1" style="background-color: black; color: white;" ng-click="giam(cart.id,bill.id)"><i class="fa-solid fa-minus"></i></button> <input id="quantity{{cart.id}}" class="text-center"  style="width: 50px;" type="text" value="{{cart.quantity}}" disabled> <button ng-if="bill.status == 0 || bill.status == 1"  style="background-color: black; color: white;" ng-click="tang(cart.id,bill.id)"><i class="fa-solid fa-plus"></i></button>
                 </td>
                 <td class="text-center">
                     {{cart.unitPrice * cart.quantity | currency:'':0}} VNĐ
@@ -209,6 +209,8 @@
                 <span class="button-bill6" ng-if="bi.status == 6"><i class="fa-solid fa-calendar-check"></i> Hẹn giao lại</span>
                 <span class="button-bill2" ng-if="bi.status == 7"><i class="fa-solid fa-ban"></i> Không nhận hàng</span>
                 <span class="button-bill6" ng-if="bi.status == 14"><i class="fa-solid fa-money-bill-wave"></i> Cập nhật phí giao hàng</span>
+                <span class="button-bill2" ng-if="bi.status == 20"><i class="fa-solid fa-money-bill-wave"></i> Giảm số lượng sản phẩm</span>
+                <span class="button-bill1" ng-if="bi.status == 21"><i class="fa-solid fa-money-bill-wave"></i> Tăng số lượng sản phẩm</span>
               
         
                 </td>

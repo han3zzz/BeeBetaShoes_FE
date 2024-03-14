@@ -1788,7 +1788,13 @@ idCoupon = null;
   $scope.listItemExport = [];
   $http.get('http://localhost:8080/api/bill/getbycode/'+$location.search().vnp_OrderInfo).then(function(billexport){
     $scope.billexport = billexport.data;
-  
+    $scope.cus = null;
+    $scope.thoigian = new Date();
+    if($scope.billexport.idCustomer != ""){
+      $http.get("http://localhost:8080/api/customer/"+$scope.billexport.idCustomer).then(function(cus){
+        $scope.cus = cus.data;
+      })
+    }
   
     $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
       $scope.addressexport = add.data;
@@ -1858,6 +1864,13 @@ $scope.exportBill = function(){
   $scope.listItemExport = [];
   $http.get('http://localhost:8080/api/bill/getbycode/'+codeBill).then(function(billexport){
     $scope.billexport = billexport.data;
+    $scope.cus = null;
+    $scope.thoigian = new Date();
+    if($scope.billexport.idCustomer != ""){
+      $http.get("http://localhost:8080/api/customer/"+$scope.billexport.idCustomer).then(function(cus){
+        $scope.cus = cus.data;
+      })
+    }
     $http.get('http://localhost:8080/api/address/get/' + billexport.data.idAddress).then(function(add){
       $scope.addressexport = add.data;
     })
