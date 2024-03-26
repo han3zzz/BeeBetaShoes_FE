@@ -1384,7 +1384,7 @@
 
         //filter
         $scope.filter = function (){
-            let name = document.getElementById("name").value;
+            // let name = document.getElementById("name").value;
             let idCategory = document.getElementById("danhmuc").value;
             let idMaterial = document.getElementById("chatlieu").value;
             let idColor = document.getElementById("mausac").value;
@@ -1414,7 +1414,6 @@
             let sl = (soLuong != '') ? soLuong : null;
             let sl1 = (soLuong == '10') ? 0 : -1;
             var params = {
-                name : nameF,
                 idcategory : idcate ,
                 idmaterial : idmate,
                 idcolor : idcolor,
