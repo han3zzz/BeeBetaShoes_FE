@@ -116,18 +116,18 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
     // delete khach hang 
     $scope.delete = function (id) {
         Swal.fire({
-            title: 'Bạn có chắc chắn muốn xóa ?',
+            title: 'Bạn có chắc chắn muốn dừng hoạt động ?',
             showCancelButton: true,
-            confirmButtonText: 'Xóa',
+            confirmButtonText: 'Dừng',
         }).then((result) => {
             if (result.isConfirmed) {
                 $http.put("http://localhost:8080/api/customer/delete/" + id).then(function (response) {
                     if (response.status === 200) {
-                        Swal.fire('xoa thanh cong ! ', '', 'success')
+                        Swal.fire('Dừng hoạt động thành công ! ', '', 'success')
                         // Tìm và xóa khách hàng khỏi danh sách hiển thị
                         $scope.loadAll();
                     } else {
-                        Swal.fire('Xoa that bai ! ', '', 'error')
+                        Swal.fire('Dừng hoạt động thất bại ! ', '', 'error')
                     }
                 })
             }
@@ -235,6 +235,78 @@ window.KhachHangController = function ($scope, $http, $location, $routeParams) {
         }
 
     }
+
+
+
+    $scope.openDungHoatDong = function(){
+        //load product
+        $scope.listdhd = [];
+        $http.get("http://localhost:8080/api/customer/getall1").then(function (response){
+            $scope.listdhd = response.data;
+           
+        })
+        $scope.pagerdhd = {
+          page: 0,
+          size: 10,
+          get items() {
+              var start = this.page * this.size;
+              return $scope.listdhd.slice(start, start + this.size);
+          },
+          get count() {
+              return Math.ceil(1.0 * $scope.listdhd.length / this.size);
+          },
+  
+          first() {
+              this.page = 0;
+          },
+          prev() {
+              this.page--;
+              if (this.page < 0) {
+                  this.last();
+              }
+          },
+          next() {
+              this.page++;
+              if (this.page >= this.count) {
+                  this.first();
+              }
+          },
+          last() {
+              this.page = this.count - 1;
+          }
+      }
+  
+      $scope.isDungHoatDong = !$scope.isDungHoatDong;
+  }
+
+  $scope.delete1 = function (idProductDetail){
+    Swal.fire({
+        title: 'Bạn có chắc muốn muốn khôi phục hoạt động ?',
+        showCancelButton: true,
+        confirmButtonText: 'Khôi phục',
+    }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            
+            $http.put("http://localhost:8080/api/customer/khoiphuc/"+idProductDetail).then(function (response){
+                if (response.status === 200){
+                    Swal.fire('Khôi phục hoạt động thành công !', '', 'success')
+                     //load product
+                    $http.get("http://localhost:8080/api/customer/getall1").then(function (response){
+                        $scope.listdhd = response.data;
+                        $scope.loadAll();
+                    })
+
+                }
+                else{
+                    Swal.fire('Khôi phục hoạt động thất bại !', '', 'error')
+                }
+            })
+           
+
+        }
+    })
+}
 
 
 

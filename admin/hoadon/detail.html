@@ -102,7 +102,7 @@
         <span class="button-bill2" ng-if="bill.payStatus == 0">Chưa thanh toán</span>
         
       </td>
-      <td ng-if="bill.payStatus == 0"><button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="(bill.payStatus == 0 && bill.status == 0) || (bill.payStatus == 0 && bill.status == 1) || (bill.payStatus == 0 && bill.status == 2) || (bill.payStatus == 0 && bill.status == 3)">Xác nhận thanh toán</button></td>
+      <td ng-if="bill.payStatus == 0"><button ng-click="XacNhanTT()" class="btn btn-dark" ng-if="(bill.payStatus == 0 && bill.status == 3)">Xác nhận thanh toán</button></td>
       <td ng-if="bill.payStatus == 1">{{nhanhVienTT}}</td>
   
     </tr>
