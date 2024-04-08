@@ -53,8 +53,8 @@
   </td> -->
         <td>{{v.typeVoucher == true ? 'Giảm giá theo %' : 'Giảm giá theo tiền'}}</td>
         <td>{{v.typeVoucher == true ? v.discount : v.cash}}</td>
-        <td>{{v.startDate}}</td>
-        <td>{{v.endDate}}</td>
+        <td>{{ formatDateTime(v.startDate) }}</td>
+        <td>{{ formatDateTime(v.endDate) }}</td>
         <td>{{v.status == 0 ? 'Đang hoạt động' : v.status == 1 ? 'Ngừng hoạt động' : ''}}</td>
         <td><a href="#/voucher/update/{{v.id}}"><button class="btn btn-indigo"> Sửa</button></a>
           <button style="margin-top: 5px" class="btn btn-danger" ng-click="delete(v.id)"> Xóa</button>

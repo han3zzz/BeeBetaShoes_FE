@@ -14,9 +14,13 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         }})
 
         document.getElementById("km").style.display = "block"
-        var today = new Date().toISOString().split('T')[0]
-        document.getElementById("ngaybatdau").min = today;
-        document.getElementById("ngayhethan").min = today;
+      // Lấy ngày hiện tại
+var today = new Date().toISOString().slice(0, 16);
+
+// Đặt thuộc tính min cho ô input datetime-local
+document.getElementById("ngaybatdau").min = today;
+document.getElementById("ngayhethan").min = today;
+
     }
     
 
@@ -134,7 +138,7 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
 
         var startDate = new Date(tungay);
         var endDate = new Date(denngay);
-        if(startDate > endDate){
+        if(tungay > denngay){
             Swal.fire("Ngày bắt đầu trước ngày hết hạn","","error");
             return;
         }
@@ -213,9 +217,11 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
         let tungay = document.getElementById("ngaybatdau").value;
         let denngay = document.getElementById("ngayhethan").value;
 
+       
         var startDate = new Date(tungay);
         var endDate = new Date(denngay);
-        if(startDate > endDate){
+        
+        if(tungay > denngay){
             Swal.fire("Ngày bắt đầu trước ngày hết hạn","","error");
             return;
         }
@@ -323,48 +329,45 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
 
 
           
-            let dateInput = document.getElementById('ngaybatdau');
-    
-            // Original datetime string in 'yyyy-MM-dd hh:mm:ss.sss' format
-            var originalDateStr = $scope.form.startDate; // Replace with your original date
-            if(originalDateStr !== null){
-                // Split the original date string
-            var dateParts = originalDateStr.split('T')[0].split('-');
-
-            // Extract year, month, and day
-            var year = dateParts[0];
-            var month = dateParts[1];
-            var day = dateParts[2];
-            var formattedDate = year + '-' + month + '-' + day;
-
-            // Set the formatted date in the input field'
         
-            dateInput.value = formattedDate;
-            
-            }            
-            
+      // Chuỗi thời gian từ SQL
+let sqlDateTimeString = $scope.form.startDate;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-            let dateInput1 = document.getElementById('ngayhethan');
+// Chuyển đổi chuỗi thời gian SQL thành một đối tượng Date
+let date = new Date(sqlDateTimeString);
 
-            // Original datetime string in 'yyyy-MM-dd hh:mm:ss.sss' format
-            var originalDateStr1 = $scope.form.endDate; // Replace with your original date
-            if(originalDateStr1 !== null){
-                                      // Split the original date string
-            var dateParts1 = originalDateStr1.split('T')[0].split('-');
+// Lấy các thành phần của thời gian
+let year = date.getFullYear();
+let month = ('0' + (date.getMonth() + 1)).slice(-2);
+let day = ('0' + date.getDate()).slice(-2);
+let hours = ('0' + date.getHours()).slice(-2);
+let minutes = ('0' + date.getMinutes()).slice(-2);
 
-            // Extract year, month, and day
-            var year1 = dateParts1[0];
-            var month1 = dateParts1[1];
-            var day1 = dateParts1[2];
-            var formattedDate1 = year1 + '-' + month1 + '-' + day1;
+// Tạo chuỗi thời gian định dạng 'yyyy-MM-ddTHH:mm'
+let formattedDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
 
-            // Set the formatted date in the input field'
-        
-            dateInput1.value = formattedDate1;
-                                 }
-           
-    // Create the formatted d
+// Đặt giá trị của ô input datetime-local
+document.getElementById("ngaybatdau").value = formattedDateTime;
+
+// Chuỗi thời gian từ SQL
+let sqlDateTimeString1 = $scope.form.endDate;
+
+// Chuyển đổi chuỗi thời gian SQL thành một đối tượng Date
+let date1 = new Date(sqlDateTimeString1);
+
+// Lấy các thành phần của thời gian
+let year1 = date1.getFullYear();
+let month1 = ('0' + (date1.getMonth() + 1)).slice(-2);
+let day1 = ('0' + date1.getDate()).slice(-2);
+let hours1 = ('0' + date1.getHours()).slice(-2);
+let minutes1 = ('0' + date1.getMinutes()).slice(-2);
+
+// Tạo chuỗi thời gian định dạng 'yyyy-MM-ddTHH:mm'
+let formattedDateTime1 = `${year1}-${month1}-${day1}T${hours1}:${minutes1}`;
+
+// Đặt giá trị của ô input datetime-local
+document.getElementById("ngayhethan").value = formattedDateTime1;
+
             
         })
 
@@ -431,5 +434,9 @@ window.KhuyenMaiController = function ($scope, $http, $location, $routeParams) {
             })
         }
     }
+    $scope.formatDateTime = function(dateTimeString) {
+        var date = new Date(dateTimeString);
+        return date.toLocaleString(); // Sử dụng hàm toLocaleString() để định dạng theo cài đặt địa phương của trình duyệt
+      };
 }
 
