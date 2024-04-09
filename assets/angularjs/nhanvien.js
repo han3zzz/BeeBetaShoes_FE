@@ -339,4 +339,32 @@ window.NhanVienController = function ($scope, $http, $location, $routeParams) {
     })
 }
 
+$scope.chitiet = function(id){
+     $http.get("http://localhost:8080/api/employee/" + id).then(function (resp) {
+            $scope.form = resp.data;
+            if(resp.data.role.id == 1 ){
+             $scope.vaiTro = "Quản lý"
+            }else{
+                $scope.vaiTro = "Nhân viên"
+            }
+            
+            $scope.form = resp.data;
+            if(resp.data.gender == true ){
+                $scope.gioiTinh = "Nam"
+            }else{
+                $scope.gioiTinh = "Nữ"
+
+            }
+
+            $scope.form = resp.data;
+            if(resp.data.status == 0){
+               $scope.trangThai = "Đang hoạt động";    
+            }else{
+                $scope.trangThai = "Dừng hoạt động";    
+            }
+        })
+
+  $scope.isChiTiet = !$scope.isChiTiet;
+}
+
 }

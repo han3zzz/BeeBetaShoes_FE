@@ -51,7 +51,9 @@
         <td>{{kh.email}}</td>
         <td>{{kh.status == 0 ? 'Đang hoạt động' : 'Dừng hoạt động'}}</td>
 
-        <td><a href="#/customer/update/{{kh.id}}"><button class="btn btn-indigo"> Sửa</button></a>
+        <!-- <td><a href="#/customer/update/{{kh.id}}"><button class="btn btn-indigo"> Sửa</button></a> -->
+          <td>
+          <button class="btn btn-indigo" ng-click="chitiet(kh.id)"> Chi tiết</button>
           <button style="margin-top: 5px" class="btn btn-danger" ng-click="delete(kh.id)"> Dừng</button>
         </td>
       </tr>
@@ -134,6 +136,74 @@
   </div>
  <div style="padding-top: 10px;">
   <button class="btn btn-primary" ng-click="openDungHoatDong()">X</button>
+ </div>
+
+   
+  </div>
+</div>
+<div class="popup" ng-class="{ 'show': isChiTiet }">
+  <div class="popup-content3">
+  <h2><i class="fa-solid fa-info"></i> Chi tiết khách hàng [ {{form.code}} - {{form.fullname}}] </h2>
+  <div class="row">
+
+    <div class="col-md-3 add">
+      <label>Ảnh </label>
+        <img src="{{form.image}}">
+      <!-- <input file-model="image" id="fileUpload" type="file" accept="image/*" onchange="loadFile1(event)" ng-model="form.image"> -->
+      <!-- <input type="file" style="width: 200px;" > -->
+      <div ng-repeat="err in validationErrors">
+      <span class="validate" ng-if="err.objectName == ' ' && err.field == 'image'">
+         {{err.defaultMessage}}
+      </span>
+      </div>
+    </div>
+    <div class="col-md-9">
+        <div class="row">
+          <div class="col-md-6" style="margin-top: 30px;">
+            <label>Mã Nhân Viên <input class="haninput" ng-model="form.code" disabled>
+          </div>
+          <div class="col-md-6" style="margin-top: 30px;">
+            <label>Họ Tên </label> <input class="haninput" ng-model="form.fullname" disabled>
+          </div>
+          <div class="col-md-6 " style="margin-top: 10px;">
+            <label>Tài Khoản </label> <input class="haninput" ng-model="form.username" disabled>
+          </div>
+          <div class="col-md-6 " style="margin-top: 10px;">
+            <label>Mật Khẩu </label> <input class="haninput" ng-model="form.password" disabled>
+
+          </div>
+          <div class="col-md-6 "style="margin-top: 10px;">
+            <label>Giới Tính</label>
+            <input class="haninput" ng-model="gioiTinh" disabled>
+          </div>
+          <div class="col-md-6 "style="margin-top: 10px;">
+            <label>Số Điện Thoại </label> <input class="haninput" ng-model="form.phone" disabled>
+           
+          </div>
+          <div class="col-md-6 "style="margin-top: 10px;">
+            <label>Email </label> <input class="haninput" ng-model="form.email" disabled>
+          </div>
+          <!-- <div class="col-md-6" style="margin-top: 10px;">
+            <label>Vai Trò</label>
+            <input class="haninput" ng-model="vaiTro" disabled>
+          </div> -->
+          <div class="col-md-6" style="margin-top: 10px;">
+            <label>Trạng Thái</label>
+            <input class="haninput" ng-model="trangThai" disabled>
+          </div>
+          <!-- <div class="col-md-6" style="margin-top: 10px;">
+            <label>Trạng Thái <span class="vaid">*</span></label>
+            <select id="trangthai" class="haninput">
+              <option value="0" id="lam">Đang Làm Việc</option>
+              <option value="1" id="nghi">Đã Nghỉ Việc</option>
+            </select>
+          </div> -->
+        </div>
+    </div>
+
+  </div>
+ <div style="padding-top: 10px;">
+  <button class="btn btn-primary" ng-click="chitiet()">X</button>
  </div>
 
    
